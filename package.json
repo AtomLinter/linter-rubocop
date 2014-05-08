@@ -1,0 +1,15 @@
+{
+  "name": "linter-rubocop",
+  "linter-package": true,
+  "main": "./lib/init",
+  "version": "0.0.0",
+  "description": "Lint `Ruby` on the fly, using rubocop",
+  "activationEvents": ["linter-rubocop:toggle"],
+  "repository": "https://github.com/AtomLinter/linter-rubocop",
+  "license": "MIT",
+  "engines": {
+    "atom": ">0.50.0"
+  },
+  "dependencies": {
+  }
+}
