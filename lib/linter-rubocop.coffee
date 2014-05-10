@@ -20,7 +20,9 @@ class LinterRubocop extends Linter
     '((?<warning>[RCW])|(?<error>[EF])): ' +
     '(?<message>.+)'
 
-  constructor: (editorView)->
+  constructor: (editor)->
+    super(editor)
+
     atom.config.observe 'linter-rubocop.rubocopExecutablePath', =>
       @executablePath = atom.config.get 'linter-rubocop.rubocopExecutablePath'
 
