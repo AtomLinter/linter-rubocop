@@ -1,6 +1,7 @@
 {
   "name": "linter-rubocop",
   "linter-package": true,
+  "activationEvents": [],
   "main": "./lib/init",
   "version": "0.0.2",
   "description": "Lint `Ruby` on the fly, using rubocop",
