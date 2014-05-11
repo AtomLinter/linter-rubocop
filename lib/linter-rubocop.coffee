@@ -1,5 +1,6 @@
 linterPath = atom.packages.getLoadedPackage("linter").path
 Linter = require "#{linterPath}/lib/linter"
+findFile = require "#{linterPath}/lib/util"
 
 class LinterRubocop extends Linter
   # The syntax that the linter handles. May be a string or
@@ -22,6 +23,10 @@ class LinterRubocop extends Linter
 
   constructor: (editor)->
     super(editor)
+
+    config = findFile(@cwd, '.rubocop.yml')
+    if config
+      @cmd += " --config #{config}"
 
     atom.config.observe 'linter-rubocop.rubocopExecutablePath', =>
       @executablePath = atom.config.get 'linter-rubocop.rubocopExecutablePath'
