@@ -24,6 +24,9 @@ class LinterRubocop extends Linter
   constructor: (editor)->
     super(editor)
 
+    if editor.getGrammar().scopeName == 'source.ruby.rails'
+      @cmd += " -R"
+
     config = findFile(@cwd, '.rubocop.yml')
     if config
       @cmd += " --config #{config}"
