@@ -11,8 +11,6 @@ class LinterRubocop extends Linter
   # containing the command line (with arguments) used to lint.
   cmd: 'rubocop --format emacs'
 
-  executablePath: null
-
   linterName: 'rubocop'
 
   # A regex pattern used to extract information from the executable's output.
