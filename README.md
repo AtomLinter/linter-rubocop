@@ -27,12 +27,9 @@ $ apm install linter-rubocop
 You can configure linter-rubocop by editing ~/.atom/config.cson (choose Open Your Config in Atom menu):
 ```
 'linter-rubocop':
-  'rubocopExecutablePath': null   #rubocop path (see notes)
+  'rubocopExecutablePath': null #rubocop path. run 'which rubocop' to find the path
 ```
-**Notes**:
-
-1. Run 'which rubocop' on commandline to find the path for `rubocopExecutablePath`, and use the reported path minus 'bin/rubocop'. So for example, if 'which rubocop' reports `/Users/username/.rvm/gems/ruby-2.1.2/bin/rubocop`  then use `/Users/username/.rvm/gems/ruby-2.1.2/`.
-1. This plugin finds the nearest .rubocop.yml file and uses the --config command line argument to use that file, so you may not use the --config argument in the linter settings.
+**Note**: This plugin finds the nearest .rubocop.yml file and uses the --config command line argument to use that file, so you may not use the --config argument in the linter settings.
 
 ## Contributing
 If you would like to contribute enhancements or fixes, please do the following:
