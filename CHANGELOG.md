@@ -2,7 +2,7 @@
 
 ### New Features
 
-* Support rspec syntax
+* Support rspec syntax [#12](https://github.com/AtomLinter/linter-rubocop/pull/12)
 
 # 0.2.0
 
