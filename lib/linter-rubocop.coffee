@@ -5,7 +5,7 @@ findFile = require "#{linterPath}/lib/util"
 class LinterRubocop extends Linter
   # The syntax that the linter handles. May be a string or
   # list/tuple of strings. Names should be all lowercase.
-  @syntax: ['source.ruby', 'source.ruby.rails']
+  @syntax: ['source.ruby', 'source.ruby.rails', 'source.ruby.rspec']
 
   # A string, list, tuple or callable that returns a string, list or tuple,
   # containing the command line (with arguments) used to lint.
