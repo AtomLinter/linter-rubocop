@@ -18,7 +18,7 @@ Before using this plugin, you must ensure that `rubocop` is installed on your sy
 
 Now you can proceed to install the linter-rubocop plugin.
 
-### Plugin installationd
+### Plugin installation
 ```
 $ apm install linter-rubocop
 ```
