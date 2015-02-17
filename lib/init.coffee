@@ -1,6 +1,6 @@
 module.exports =
   configDefaults:
-    rubocopExecutablePath: null
+    rubocopExecutablePath: ''
 
   activate: ->
     console.log 'activate linter-rubocop'
