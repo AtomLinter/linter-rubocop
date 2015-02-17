@@ -1,3 +1,9 @@
+# 0.2.2
+
+### Bugs fixed
+
+* Expose rubocopExecutablePath in settings-view [#23](https://github.com/AtomLinter/linter-rubocop/issues/23)
+
 # 0.2.1
 
 ### New Features
