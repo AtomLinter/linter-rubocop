@@ -29,7 +29,7 @@ class LinterRubocop extends Linter
     if config
       @cmd += " --config #{config}"
 
-    @executablePathListener = config.observe 'linter-rubocop.rubocopExecutablePath', =>
+    @executablePathListener = atom.config.observe 'linter-rubocop.rubocopExecutablePath', =>
       @executablePath = atom.config.get 'linter-rubocop.rubocopExecutablePath'
 
   destroy: ->
