@@ -33,6 +33,6 @@ class LinterRubocop extends Linter
       @executablePath = atom.config.get 'linter-rubocop.rubocopExecutablePath'
 
   destroy: ->
-    atom.config.unobserve 'linter-rubocop.rubocopExecutablePath'
+    'linter-rubocop.rubocopExecutablePath'.dispose
 
 module.exports = LinterRubocop
