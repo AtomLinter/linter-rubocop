@@ -3,7 +3,7 @@
   "linter-package": true,
   "activationCommands": [],
   "main": "./lib/init",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Lint `Ruby` on the fly, using rubocop",
   "repository": "https://github.com/AtomLinter/linter-rubocop",
   "license": "MIT",
