@@ -19,6 +19,8 @@ class LinterRubocop extends Linter
     '((?<warning>[RCW])|(?<error>[EF])): ' +
     '(?<message>.+)'
 
+  options: ['executablePath']
+
   constructor: (editor)->
     super(editor)
 
@@ -28,11 +30,5 @@ class LinterRubocop extends Linter
     config = findFile(@cwd, '.rubocop.yml')
     if config
       @cmd += " --config #{config}"
-
-    @executablePathListener = atom.config.observe 'linter-rubocop.rubocopExecutablePath', =>
-      @executablePath = atom.config.get 'linter-rubocop.rubocopExecutablePath'
-
-  destroy: ->
-    @executablePathListener.dispose()
 
 module.exports = LinterRubocop
