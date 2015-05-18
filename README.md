@@ -26,10 +26,10 @@ $ apm install linter-rubocop
 ## Settings
 You can configure linter-rubocop by editing ~/.atom/config.cson (choose Open Your Config in Atom menu):
 
-#### rubocopExecutablePath
+#### executablePath
 ```
 'linter-rubocop':
-  'rubocopExecutablePath': null # rubocop path. 
+  'executablePath': null # rubocop path.
 ```
 Run `which rubocop` to find the path,
 if you using rbenv run `rbenv which rubocop`
