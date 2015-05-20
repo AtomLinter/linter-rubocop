@@ -1,5 +1,13 @@
 linter-rubocop
 =========================
+[![Gitter](https://img.shields.io/badge/gitter-join%20chat-1dce73.svg?style=flat)](https://gitter.im/AtomLinter/Linter?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Plugin installs!](https://img.shields.io/apm/dm/linter-rubocop.svg)](https://atom.io/packages/linter-rubocop)
+[![Package version!](https://img.shields.io/apm/v/linter-rubocop.svg?style=flat)](https://atom.io/packages/linter-rubocop)
+[![Dependencies!](https://david-dm.org/AtomLinter/Linter.svg)](https://david-dm.org/AtomLinter/linter-rubocop)
+
+[![Gratipay donate button](https://img.shields.io/gratipay/hd-deman.svg?style=flat)](https://www.gratipay.com/hd-deman/ "Donate weekly to this project using Gratipay")
+[![PayPayl donate button](https://img.shields.io/badge/paypal-donate-yellow.svg?style=flat)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=KXUYS4ARNHCN8 "Donate once-off to this project using Paypal")
+[![BitCoin donate button](https://img.shields.io/badge/bitcoin-donate-yellow.svg?style=flat)](https://www.coinbase.com/checkouts/2945dab392cb1cefbb7097e4cd17a603 "Donate once-off to this project using BitCoin")
 
 This linter plugin for [Linter](https://github.com/AtomLinter/Linter) provides an interface to [rubocop](https://github.com/bbatsov/rubocop). It will be used with files that have the “Ruby” syntax.
 
@@ -54,4 +62,9 @@ Please note that modifications should follow these coding guidelines:
 Thank you for helping out!
 
 ## Donation
-[![Share the love!](https://chewbacco-stuff.s3.amazonaws.com/donate.png)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=KXUYS4ARNHCN8)
+
+[![Share the love!](https://s3-eu-west-1.amazonaws.com/atom-linter/we-need-your-help.png?style=flat)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=KXUYS4ARNHCN8 "Share the love")
+
+[![Gratipay donate button](https://img.shields.io/gratipay/hd-deman.svg?style=flat)](https://www.gratipay.com/hd-deman/ "Donate weekly to this project using Gratipay")
+[![PayPayl donate button](https://img.shields.io/badge/paypal-donate-yellow.svg?style=flat)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=KXUYS4ARNHCN8 "Donate once-off to this project using Paypal")
+[![BitCoin donate button](https://img.shields.io/badge/bitcoin-donate-yellow.svg?style=flat)](https://www.coinbase.com/checkouts/2945dab392cb1cefbb7097e4cd17a603 "Donate once-off to this project using BitCoin")
