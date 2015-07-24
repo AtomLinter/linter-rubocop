@@ -1,8 +1,11 @@
 module.exports =
   config:
+    additionalArguments:
+      title: 'Additional Arguments'
+      type: 'string'
+      default: ''
     executablePath:
-      title: 'Rubocop Executable Path'
-      description: 'The path where rubocop is located'
+      title: 'Executable Path'
       type: 'string'
       default: ''
     cmd:
