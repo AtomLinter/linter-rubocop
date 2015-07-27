@@ -1,14 +1,18 @@
 {
-  "name": "linter-rubocop",
-  "linter-package": true,
+  "name": "linter-rubocop-caseywebdev",
   "activationCommands": [],
-  "main": "./lib/init",
   "version": "0.2.7",
   "description": "Lint `Ruby` on the fly, using rubocop",
-  "repository": "https://github.com/AtomLinter/linter-rubocop",
+  "repository": "https://github.com/caseywebdev/linter-rubocop",
   "license": "MIT",
   "engines": {
     "atom": ">0.50.0"
   },
-  "dependencies": {}
+  "providedServices": {
+    "linter": {
+      "versions": {
+        "1.1.0": "provideLinter"
+      }
+    }
+  }
 }
