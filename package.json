@@ -1,7 +1,7 @@
 {
   "name": "linter-rubocop-caseywebdev",
   "activationCommands": [],
-  "version": "0.2.7",
+  "version": "0.2.8",
   "description": "Lint `Ruby` on the fly, using rubocop",
   "repository": "https://github.com/caseywebdev/linter-rubocop",
   "license": "MIT",
