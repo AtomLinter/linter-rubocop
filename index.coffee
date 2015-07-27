@@ -62,7 +62,7 @@ module.exports =
       default: ''
 
   activate: ->
-    prefix = 'linter-rubocop.'
+    prefix = 'linter-rubocop-caseywebdev.'
     @subscriptions = new CompositeDisposable
     @subscriptions.add atom.config.observe "#{prefix}executablePath",
       (executablePath) => @executablePath = executablePath
