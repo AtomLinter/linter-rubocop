@@ -1,6 +1,6 @@
 {BufferedProcess, CompositeDisposable} = require 'atom'
 {exists, unlink, writeFile} = require 'fs'
-{join, resolve} = require 'path'
+{join, resolve, dirname} = require 'path'
 {randomBytes} = require 'crypto'
 {tmpdir} = require 'os'
 
@@ -33,6 +33,8 @@ lint = (editor, command, args) ->
         args...
         tmpPath
       ]
+      options:
+        cwd: dirname(editor.getPath())
       stdout: appendToOut
       stderr: appendToOut
       exit: -> cleanup ->
