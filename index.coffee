@@ -64,7 +64,7 @@ module.exports =
       default: ''
 
   activate: ->
-    prefix = 'linter-rubocop-caseywebdev.'
+    prefix = 'linter-rubocop.'
     @subscriptions = new CompositeDisposable
     @subscriptions.add atom.config.observe "#{prefix}executablePath",
       (executablePath) => @executablePath = executablePath
@@ -75,8 +75,7 @@ module.exports =
     @subscriptions.dispose()
 
   provideLinter: ->
-    provider =
-      grammarScopes: ['source.ruby', 'source.ruby.rails', 'source.ruby.rspec'],
-      scope: 'file'
-      lintOnFly: true
-      lint: (editor) => lint editor, @executablePath, @additionalArguments
+    grammarScopes: ['source.ruby', 'source.ruby.rails', 'source.ruby.rspec'],
+    scope: 'file'
+    lintOnFly: true
+    lint: (editor) => lint editor, @executablePath, @additionalArguments
