@@ -16,8 +16,10 @@ lint = (editor, command, args) ->
   filePath = editor.getPath()
   tmpPath = join tmpdir(), randomBytes(32).toString 'hex'
   out = ''
+  err = ''
 
   appendToOut = (data) -> out += data
+  appendToErr = (data) -> err += data
   getConfig = (cb) -> findFile filePath, '.rubocop.yml', cb
   writeTmp = (cb) -> writeFile tmpPath, editor.getText(), cb
   cleanup = (cb) -> unlink tmpPath, cb
@@ -36,9 +38,10 @@ lint = (editor, command, args) ->
       options:
         cwd: dirname(editor.getPath())
       stdout: appendToOut
-      stderr: appendToOut
+      stderr: appendToErr
       exit: -> cleanup ->
         try {offenses: errors} = JSON.parse(out).files[0]
+        console.error err if err
         return reject new Error out unless errors
         resolve errors.map (error) ->
           {line, column, length} =
