@@ -14,17 +14,19 @@ findFile = (dir, file, cb) ->
 
 lint = (editor, command, args) ->
   filePath = editor.getPath()
+  fileDir = dirname(filePath)
   tmpPath = join tmpdir(), randomBytes(32).toString 'hex'
   out = ''
   err = ''
 
   appendToOut = (data) -> out += data
   appendToErr = (data) -> err += data
-  getConfig = (cb) -> findFile filePath, '.rubocop.yml', cb
+  getConfig = (cb) -> findFile fileDir, '.rubocop.yml', cb
+  getCwd = (cb) -> findFile fileDir, '', cb
   writeTmp = (cb) -> writeFile tmpPath, editor.getText(), cb
   cleanup = (cb) -> unlink tmpPath, cb
 
-  new Promise (resolve, reject) -> getConfig (config) -> writeTmp (er) ->
+  new Promise (resolve, reject) -> getConfig (config) -> writeTmp (er) -> getCwd (cwd) ->
     return reject er if er
     new BufferedProcess
       command: command
@@ -36,7 +38,7 @@ lint = (editor, command, args) ->
         tmpPath
       ]
       options:
-        cwd: dirname(editor.getPath())
+        cwd: cwd
       stdout: appendToOut
       stderr: appendToErr
       exit: -> cleanup ->
