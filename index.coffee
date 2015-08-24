@@ -29,8 +29,9 @@ lint = (editor, command, args) ->
   new Promise (resolve, reject) -> getConfig (config) -> writeTmp (er) -> getCwd (cwd) ->
     return reject er if er
     new BufferedProcess
-      command: command
+      command: command[0]
       args: [
+        command.slice(1)...
         '-f'
         'json'
         (if config then ['-c', config] else [])...
@@ -72,7 +73,7 @@ module.exports =
     prefix = 'linter-rubocop.'
     @subscriptions = new CompositeDisposable
     @subscriptions.add atom.config.observe "#{prefix}executablePath",
-      (executablePath) => @executablePath = executablePath
+      (args) => @executablePath = if args then args.split ' ' else ['rubocop']
     @subscriptions.add atom.config.observe "#{prefix}additionalArguments",
       (args) => @additionalArguments = if args then args.split ' ' else []
 
