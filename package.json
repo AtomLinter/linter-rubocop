@@ -1,6 +1,6 @@
 {
   "name": "linter-rubocop",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Lint `Ruby` on the fly, using rubocop",
   "repository": "https://github.com/AtomLinter/linter-rubocop",
   "license": "MIT",
