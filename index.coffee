@@ -81,7 +81,7 @@ module.exports =
     @subscriptions.dispose()
 
   provideLinter: ->
-    grammarScopes: ['source.ruby', 'source.ruby.rails', 'source.ruby.rspec'],
+    grammarScopes: ['source.ruby', 'source.ruby.rails', 'source.ruby.rspec', 'source.ruby.chef'],
     scope: 'file'
     lintOnFly: true
     lint: (editor) => lint editor, @executablePath, @additionalArguments
