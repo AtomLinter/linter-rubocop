@@ -44,8 +44,7 @@ lint = (editor, command, args) ->
       stderr: appendToErr
       exit: -> cleanup ->
         try {offenses: errors} = JSON.parse(out).files[0]
-        console.error err if err
-        return reject new Error out unless errors
+        return reject new Error "STDOUT:#{out}\nSTDERR:#{err}" unless errors
         resolve errors.map (error) ->
           {line, column, length} =
             error.location || {line: 1, column: 1, length: 0}
