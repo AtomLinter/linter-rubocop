@@ -26,7 +26,7 @@ module.exports =
   provideLinter: ->
     helpers = require('atom-linter')
     provider =
-      grammarScopes: ['source.js', 'source.php']
+      grammarScopes: ['source.ruby', 'source.ruby.rails', 'source.ruby.rspec', 'source.ruby.chef']
       scope: 'file' # or 'project'
       lintOnFly: false # must be false for scope: 'project'
       lint: (textEditor) =>
