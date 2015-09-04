@@ -27,8 +27,8 @@ module.exports =
     helpers = require('atom-linter')
     provider =
       grammarScopes: ['source.ruby', 'source.ruby.rails', 'source.ruby.rspec', 'source.ruby.chef']
-      scope: 'file' # or 'project'
-      lintOnFly: false # must be false for scope: 'project'
+      scope: 'file'
+      lintOnFly: true
       lint: (textEditor) =>
         return helpers.exec(@executablePath, ['-f', 'json', '-s', textEditor.getPath()].concat(@arguments),
           {stdin: textEditor.getText()}).then (contents) ->
