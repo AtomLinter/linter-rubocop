@@ -9,6 +9,7 @@ module.exports =
     additionalArguments:
       title: 'Additional Arguments'
       type: 'array'
+      default: []
       items:
         type: 'string'
 
