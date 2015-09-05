@@ -8,16 +8,14 @@ module.exports =
       default: 'rubocop'
     additionalArguments:
       title: 'Additional Arguments'
-      type: 'string'
-      default: ''
+      type: 'array'
+      items:
+        type: 'string'
 
   activate: ->
     @subscriptions = new CompositeDisposable
     @subscriptions.add atom.config.observe('linter-rubocop.executablePath', (executablePath) =>
       @executablePath = executablePath
-    )
-    @subscriptions.add atom.config.observe('linter-rubocop.additionalArguments', (extraArguments) =>
-      @arguments = extraArguments.split(' ').filter((i) => i)
     )
 
   deactivate: ->
@@ -30,7 +28,8 @@ module.exports =
       scope: 'file'
       lintOnFly: true
       lint: (textEditor) =>
-        return helpers.exec(@executablePath, ['-f', 'json', '-s', textEditor.getPath()].concat(@arguments),
+        additional = atom.config.get('linter-rubocop.additionalArguments')
+        return helpers.exec(@executablePath, additional.concat(['-f', 'json', '-s', textEditor.getPath()]),
           {stdin: textEditor.getText()}).then (contents) ->
             console.log(contents)
             return []
