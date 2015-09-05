@@ -37,8 +37,8 @@ module.exports =
             return contents.files[0].offenses.map (error) ->
               {line, column, length} = error.location || {line: 1, column: 1, length: 0}
               return {
-                type: warnings.has(error.severity) ? 'Warning' : 'Error'
-                text: (error.cop_name ? error.cop_name + ' - ' : '') + (error.message ? error.message : 'Unknown Error')
+                type: if warnings.has(error.severity) then 'Warning' else 'Error'
+                text: (if error.cop_name then error.cop_name + ' - ' else '') + (if error.message then error.message else 'Unknown Error')
                 filePath: filePath
                 range: [[line - 1, column - 1], [line - 1, column + length - 1]]
               }
