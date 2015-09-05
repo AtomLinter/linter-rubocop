@@ -24,13 +24,21 @@ module.exports =
 
   provideLinter: ->
     helpers = require('atom-linter')
+    warnings = new Set(['refactor', 'convention', 'warning'])
     provider =
       grammarScopes: ['source.ruby', 'source.ruby.rails', 'source.ruby.rspec', 'source.ruby.chef']
       scope: 'file'
       lintOnFly: true
       lint: (textEditor) =>
+        filePath = textEditor.getPath()
         additional = atom.config.get('linter-rubocop.additionalArguments')
         return helpers.exec(@executablePath, additional.concat(['-f', 'json', '-s', textEditor.getPath()]),
-          {stdin: textEditor.getText()}).then (contents) ->
-            console.log(contents)
-            return []
+          {stdin: textEditor.getText()}).then(JSON.parse).then (contents) ->
+            return contents.files[0].offenses.map (error) ->
+              {line, column, length} = error.location || {line: 1, column: 1, length: 0}
+              return {
+                type: warnings.has(error.severity) ? 'Warning' : 'Error'
+                text: (error.cop_name ? error.cop_name + ' - ' : '') + (error.message ? error.message : 'Unknown Error')
+                filePath: filePath
+                range: [[line - 1, column - 1], [line - 1, column + length - 1]]
+              }
