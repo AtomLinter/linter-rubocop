@@ -1,4 +1,37 @@
-{CompositeDisposable} = require 'atom'
+helpers = require 'atom-linter'
+
+COMMAND_CONFIG_KEY = 'linter-rubocop.executablePath'
+ARGS_CONFIG_KEY = 'linter-rubocop.additionalArguments'
+DEFAULT_LOCATION = {line: 1, column: 1, length: 0}
+DEFAULT_ARGS = ['--force-exclusion', '-f', 'json', '-s']
+DEFAULT_MESSAGE = 'Unknown Error'
+WARNINGS = new Set(['refactor', 'convention', 'warning'])
+
+lint = (editor) ->
+  command = atom.config.get(COMMAND_CONFIG_KEY)
+  args = atom.config.get(ARGS_CONFIG_KEY).split(/\s+/).filter((i) -> i)
+    .concat(DEFAULT_ARGS, path = editor.getPath())
+  options = {stdin: editor.getText()}
+  helpers.exec(command, args, options).then (result) ->
+    (JSON.parse(result).files[0]?.offenses || []).map (offense) ->
+      {cop_name, location, message, severity} = offense
+      {line, column, length} = location || DEFAULT_LOCATION
+      type: if WARNINGS.has(severity) then 'Warning' else 'Error'
+      text: (message || DEFAULT_MESSAGE) +
+        (if cop_name then " (#{cop_name})" else '')
+      filePath: path
+      range: [[line - 1, column - 1], [line - 1, column + length - 1]]
+
+linter =
+  grammarScopes: [
+    'source.ruby'
+    'source.ruby.rails'
+    'source.ruby.rspec'
+    'source.ruby.chef'
+  ]
+  scope: 'file'
+  lintOnFly: true
+  lint: lint
 
 module.exports =
   config:
@@ -11,32 +44,4 @@ module.exports =
       type: 'string'
       default: ''
 
-  activate: ->
-    @subscriptions = new CompositeDisposable
-    @subscriptions.add atom.config.observe('linter-rubocop.executablePath', (executablePath) =>
-      @executablePath = executablePath
-    )
-
-  deactivate: ->
-    @subscriptions.dispose()
-
-  provideLinter: ->
-    helpers = require('atom-linter')
-    warnings = new Set(['refactor', 'convention', 'warning'])
-    provider =
-      grammarScopes: ['source.ruby', 'source.ruby.rails', 'source.ruby.rspec', 'source.ruby.chef']
-      scope: 'file'
-      lintOnFly: true
-      lint: (textEditor) =>
-        filePath = textEditor.getPath()
-        additional = atom.config.get('linter-rubocop.additionalArguments').split(' ').filter((i) => i)
-        return helpers.exec(@executablePath, additional.concat(['-f', 'json', '-s', textEditor.getPath()]),
-          {stdin: textEditor.getText()}).then(JSON.parse).then (contents) ->
-            return contents.files[0].offenses.map (error) ->
-              {line, column, length} = error.location || {line: 1, column: 1, length: 0}
-              return {
-                type: if warnings.has(error.severity) then 'Warning' else 'Error'
-                text: (if error.cop_name then error.cop_name + ' - ' else '') + (if error.message then error.message else 'Unknown Error')
-                filePath: filePath
-                range: [[line - 1, column - 1], [line - 1, column + length - 1]]
-              }
+  provideLinter: -> linter
