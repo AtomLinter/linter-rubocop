@@ -36,14 +36,23 @@ lint = (editor, command, args) ->
         'json'
         (if config then ['-c', config] else [])...
         args...
-        tmpPath
+        filePath
       ]
       options:
         cwd: cwd
       stdout: appendToOut
       stderr: appendToErr
       exit: -> cleanup ->
-        try {offenses: errors} = JSON.parse(out).files[0]
+        jsonOutput = JSON.parse(out)
+
+        # Set errors to an empty array if jsonOutput.summary.offense_count is 0
+        # Set errors to jsonOutput.files[0].offenses otherwise
+        offense_count = try jsonOutput.summary.offense_count
+        errors = if offense_count == 0
+          []
+        else
+          try jsonOutput.files[0].offenses
+
         return reject new Error "STDOUT:#{out}\nSTDERR:#{err}" unless errors
         resolve errors.map (error) ->
           {line, column, length} =

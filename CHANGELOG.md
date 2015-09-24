@@ -1,3 +1,9 @@
+# Unreleased
+
+### Bugs fixed
+
+* Understand 'Exclude' config (most likely used with the --force-exclusion Additional Argument) [#43](https://github.com/AtomLinter/linter-rubocop/issues/43)
+
 # 0.2.2
 
 ### Bugs fixed
