@@ -36,7 +36,7 @@ lint = (editor, command, args) ->
         'json'
         (if config then ['-c', config] else [])...
         args...
-        tmpPath
+        filePath
       ]
       options:
         cwd: cwd
