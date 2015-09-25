@@ -1,61 +1,37 @@
-{BufferedProcess, CompositeDisposable} = require 'atom'
-{exists, unlink, writeFile} = require 'fs'
-{join, resolve, dirname} = require 'path'
-{randomBytes} = require 'crypto'
-{tmpdir} = require 'os'
+helpers = require 'atom-linter'
 
-findFile = (dir, file, cb) ->
-  absolute = join dir, file
-  exists absolute, (doesExist) ->
-    return cb absolute if doesExist
-    parent = resolve dir, '..'
-    return cb() if dir is parent
-    findFile parent, file, cb
+COMMAND_CONFIG_KEY = 'linter-rubocop.executablePath'
+ARGS_CONFIG_KEY = 'linter-rubocop.additionalArguments'
+DEFAULT_LOCATION = {line: 1, column: 1, length: 0}
+DEFAULT_ARGS = ['--cache', 'false', '--force-exclusion', '-f', 'json', '-s']
+DEFAULT_MESSAGE = 'Unknown Error'
+WARNINGS = new Set(['refactor', 'convention', 'warning'])
 
-lint = (editor, command, args) ->
-  filePath = editor.getPath()
-  fileDir = dirname(filePath)
-  tmpPath = join tmpdir(), randomBytes(32).toString 'hex'
-  out = ''
-  err = ''
+lint = (editor) ->
+  command = atom.config.get(COMMAND_CONFIG_KEY)
+  args = atom.config.get(ARGS_CONFIG_KEY).split(/\s+/).filter((i) -> i)
+    .concat(DEFAULT_ARGS, path = editor.getPath())
+  options = {stdin: editor.getText()}
+  helpers.exec(command, args, options).then (result) ->
+    (JSON.parse(result).files[0]?.offenses || []).map (offense) ->
+      {cop_name, location, message, severity} = offense
+      {line, column, length} = location || DEFAULT_LOCATION
+      type: if WARNINGS.has(severity) then 'Warning' else 'Error'
+      text: (message || DEFAULT_MESSAGE) +
+        (if cop_name then " (#{cop_name})" else '')
+      filePath: path
+      range: [[line - 1, column - 1], [line - 1, column + length - 1]]
 
-  appendToOut = (data) -> out += data
-  appendToErr = (data) -> err += data
-  getConfig = (cb) -> findFile fileDir, '.rubocop.yml', cb
-  getCwd = (cb) -> findFile fileDir, '', cb
-  writeTmp = (cb) -> writeFile tmpPath, editor.getText(), cb
-  cleanup = (cb) -> unlink tmpPath, cb
-
-  new Promise (resolve, reject) -> getConfig (config) -> writeTmp (er) -> getCwd (cwd) ->
-    return reject er if er
-    new BufferedProcess
-      command: command[0]
-      args: [
-        command.slice(1)...
-        '-f'
-        'json'
-        (if config then ['-c', config] else [])...
-        args...
-        tmpPath
-      ]
-      options:
-        cwd: cwd
-      stdout: appendToOut
-      stderr: appendToErr
-      exit: -> cleanup ->
-        try {offenses: errors} = JSON.parse(out).files[0]
-        return reject new Error "STDOUT:#{out}\nSTDERR:#{err}" unless errors
-        resolve errors.map (error) ->
-          {line, column, length} =
-            error.location || {line: 1, column: 1, length: 0}
-          type:
-            switch error.severity
-              when 'refactor', 'convention', 'warning' then 'warning'
-              else 'error'
-          text: (error.message or 'Unknown Error') +
-            (if error.cop_name then " (#{error.cop_name})" else ''),
-          filePath: filePath,
-          range: [[line - 1, column - 1], [line - 1, column + length - 1]]
+linter =
+  grammarScopes: [
+    'source.ruby'
+    'source.ruby.rails'
+    'source.ruby.rspec'
+    'source.ruby.chef'
+  ]
+  scope: 'file'
+  lintOnFly: true
+  lint: lint
 
 module.exports =
   config:
@@ -68,19 +44,4 @@ module.exports =
       type: 'string'
       default: ''
 
-  activate: ->
-    prefix = 'linter-rubocop.'
-    @subscriptions = new CompositeDisposable
-    @subscriptions.add atom.config.observe "#{prefix}executablePath",
-      (args) => @executablePath = if args then args.split ' ' else ['rubocop']
-    @subscriptions.add atom.config.observe "#{prefix}additionalArguments",
-      (args) => @additionalArguments = if args then args.split ' ' else []
-
-  deactivate: ->
-    @subscriptions.dispose()
-
-  provideLinter: ->
-    grammarScopes: ['source.ruby', 'source.ruby.rails', 'source.ruby.rspec', 'source.ruby.chef'],
-    scope: 'file'
-    lintOnFly: true
-    lint: (editor) => lint editor, @executablePath, @additionalArguments
+  provideLinter: -> linter

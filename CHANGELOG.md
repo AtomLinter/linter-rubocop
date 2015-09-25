@@ -1,3 +1,11 @@
+# 0.4.0
+
+### New Features
+
+* Use STDIN for linting
+  [#72](https://github.com/AtomLinter/linter-rubocop/pull/72/files). This
+  version requires `rubocop >= 0.34.0`.
+
 # 0.2.2
 
 ### Bugs fixed
