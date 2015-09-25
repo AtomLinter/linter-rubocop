@@ -1,3 +1,10 @@
+# 0.4.1
+
+### Bug Fixes
+
+* The linter will now ignore stderr output from rubocop if it is still able to
+  parse stdout.
+
 # 0.4.0
 
 ### New Features
