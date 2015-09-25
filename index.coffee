@@ -3,7 +3,7 @@ helpers = require 'atom-linter'
 COMMAND_CONFIG_KEY = 'linter-rubocop.executablePath'
 ARGS_CONFIG_KEY = 'linter-rubocop.additionalArguments'
 DEFAULT_LOCATION = {line: 1, column: 1, length: 0}
-DEFAULT_ARGS = ['--force-exclusion', '-f', 'json', '-s']
+DEFAULT_ARGS = ['--cache', 'false', '--force-exclusion', '-f', 'json', '-s']
 DEFAULT_MESSAGE = 'Unknown Error'
 WARNINGS = new Set(['refactor', 'convention', 'warning'])
 
