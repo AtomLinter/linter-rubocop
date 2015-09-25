@@ -11,9 +11,12 @@ lint = (editor) ->
   command = atom.config.get(COMMAND_CONFIG_KEY)
   args = atom.config.get(ARGS_CONFIG_KEY).split(/\s+/).filter((i) -> i)
     .concat(DEFAULT_ARGS, path = editor.getPath())
-  options = {stdin: editor.getText()}
+  options = {stdin: editor.getText(), stream: 'both'}
   helpers.exec(command, args, options).then (result) ->
-    (JSON.parse(result).files[0]?.offenses || []).map (offense) ->
+    {stdout, stderr} = result
+    parsed = try JSON.parse(stdout)
+    throw new Error stderr || stdout unless typeof parsed is 'object'
+    (parsed.files?[0]?.offenses || []).map (offense) ->
       {cop_name, location, message, severity} = offense
       {line, column, length} = location || DEFAULT_LOCATION
       type: if WARNINGS.has(severity) then 'Warning' else 'Error'
