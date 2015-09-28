@@ -1,3 +1,4 @@
+path = require 'path'
 helpers = require 'atom-linter'
 
 COMMAND_CONFIG_KEY = 'linter-rubocop.command'
@@ -19,9 +20,11 @@ convertOldConfig = ->
 lint = (editor) ->
   convertOldConfig()
   command = atom.config.get(COMMAND_CONFIG_KEY).split(/\s+/).filter((i) -> i)
-    .concat(DEFAULT_ARGS, path = editor.getPath())
-  options = {stdin: editor.getText(), stream: 'both'}
-  helpers.exec(command[0], command[1..], options).then (result) ->
+    .concat(DEFAULT_ARGS, filePath = editor.getPath())
+  cwd = path.dirname helpers.findFile filePath, '.'
+  stdin = editor.getText()
+  stream = 'both'
+  helpers.exec(command[0], command[1..], {cwd, stdin, stream}).then (result) ->
     {stdout, stderr} = result
     parsed = try JSON.parse(stdout)
     throw new Error stderr || stdout unless typeof parsed is 'object'
@@ -31,7 +34,7 @@ lint = (editor) ->
       type: if WARNINGS.has(severity) then 'Warning' else 'Error'
       text: (message || DEFAULT_MESSAGE) +
         (if cop_name then " (#{cop_name})" else '')
-      filePath: path
+      filePath: filePath
       range: [[line - 1, column - 1], [line - 1, column + length - 1]]
 
 linter =
