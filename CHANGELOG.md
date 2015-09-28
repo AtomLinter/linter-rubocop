@@ -1,5 +1,11 @@
 # 0.4.3
 
+### Bux Fixes
+
+* Fix `undefined` showing up in `command` option.
+
+# 0.4.3
+
 ### Changes
 
 * Improve command description.

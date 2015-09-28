@@ -13,7 +13,7 @@ convertOldConfig = ->
   execPath = atom.config.get OLD_EXEC_PATH_CONFIG_KEY
   args = atom.config.get OLD_ARGS_CONFIG_KEY
   return unless execPath || args
-  atom.config.set COMMAND_CONFIG_KEY, "#{execPath} #{args}".trim()
+  atom.config.set COMMAND_CONFIG_KEY, "#{execPath || ''} #{args || ''}".trim()
   atom.config.set OLD_EXEC_PATH_CONFIG_KEY, undefined
   atom.config.set OLD_ARGS_CONFIG_KEY, undefined
 
