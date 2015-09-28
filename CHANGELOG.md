@@ -1,3 +1,19 @@
+# 0.4.2
+
+### Changes
+
+* There is now a single `command` option. Example commands are `rubocop`,
+  `bundle exec rubocop`, `rubocop --config /my/config`, etc. The necessary
+  arguments linter-rubocop needs will be automatically appended to whatever base
+  command you specify. Existing `executablePath` and `additionalArguments`
+  config options will automatically be merged into the `command` option on the
+  first run.
+
+### Bug Fixes
+
+* The linter will now run in the directory of the file being linted. This
+  should make `bundle exec rubocop` function correctly again.
+
 # 0.4.1
 
 ### Bug Fixes
