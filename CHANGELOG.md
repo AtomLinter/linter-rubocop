@@ -1,3 +1,9 @@
+# 0.4.3
+
+### Changes
+
+* Improve command description.
+
 # 0.4.2
 
 ### Changes

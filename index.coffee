@@ -54,7 +54,11 @@ module.exports =
       type: 'string'
       title: 'Command'
       default: 'rubocop'
-      description:
-        'Examples: `rubocop`, `bundle exec rubocop --config /my/rubocop.yml`'
+      description: '
+        This is the absolute path to your `rubocop` command. You may need to run
+        `which rubocop` or `rbenv which rubocop` to find this. Examples:
+        `/usr/local/bin/rubocop` or `/usr/local/bin/bundle exec rubocop --config
+        /my/rubocop.yml`.
+      '
 
   provideLinter: -> linter
