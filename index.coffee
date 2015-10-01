@@ -38,6 +38,7 @@ lint = (editor) ->
       range: [[line - 1, column - 1], [line - 1, column + length - 1]]
 
 linter =
+  name: 'RuboCop'
   grammarScopes: [
     'source.ruby'
     'source.ruby.rails'
