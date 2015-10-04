@@ -21,7 +21,9 @@ lint = (editor) ->
   convertOldConfig()
   command = atom.config.get(COMMAND_CONFIG_KEY).split(/\s+/).filter((i) -> i)
     .concat(DEFAULT_ARGS, filePath = editor.getPath())
-  cwd = path.dirname helpers.findFile filePath, '.'
+  cwd = path.dirname helpers.findFile filePath, '.rubocop.yml'
+  unless cwd
+    cwd = path.dirname filePath
   stdin = editor.getText()
   stream = 'both'
   helpers.exec(command[0], command[1..], {cwd, stdin, stream}).then (result) ->
