@@ -1,3 +1,9 @@
+# 0.4.5
+
+### Maintenance
+
+* Upgrade to `atom-linter@4`.
+
 # 0.4.4
 
 ### Bux Fixes
