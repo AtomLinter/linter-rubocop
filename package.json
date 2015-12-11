@@ -15,6 +15,6 @@
     }
   },
   "dependencies": {
-    "atom-linter": "^3.2.0"
+    "atom-linter": "^4.1.0"
   }
 }
