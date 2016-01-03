@@ -1,3 +1,9 @@
+# 0.4.7
+
+### Maintenance
+
+* Upgrade to `atom-linter@4.3.0`.
+
 # 0.4.6
 
 ### Maintenance
