@@ -15,7 +15,7 @@ This linter plugin for [Linter](https://github.com/AtomLinter/Linter) provides a
 Linter package must be installed in order to use this plugin. If Linter is not installed, please follow the instructions [here](https://github.com/AtomLinter/Linter).
 
 ### rubocop installation
-Before using this plugin, you must ensure that `rubocop` is installed on your system. To install `rubocop`, do the following:
+Before using this plugin, you must ensure that `rubocop`, version 0.37 or greater, is installed on your system. To install `rubocop`, do the following:
 
 1. Install [ruby](https://www.ruby-lang.org/).
 
