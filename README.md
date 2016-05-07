@@ -44,6 +44,22 @@ if you using rbenv run `rbenv which rubocop`
 
 **Note**: This plugin finds the nearest .rubocop.yml file and uses the --config command line argument to use that file, so you may not use the --config argument in the linter settings.
 
+#### Using RVM
+
+If you're using RVM and receiving errors in Atom that indicate Rubocop can't be found, you may need to change `/bin` to `/wrappers` in the path that gets returned from `which rubocop` before using it as your executablePath setting. Example:
+
+Change: 
+```
+  /Users/JohnDoe/.rvm/gems/ruby-2.2.4@global/bin/rubocop
+```
+
+To:
+```
+  /Users/JohnDoe/.rvm/gems/ruby-2.2.4@global/wrappers/rubocop
+```
+
+
+
 ## Contributing
 If you would like to contribute enhancements or fixes, please do the following:
 
