@@ -37,14 +37,6 @@ describe('The RuboCop provider for Linter', () => {
       );
     });
 
-    it('finds at least one message', () => {
-      waitsForPromise(() =>
-        lint(editor).then(messages =>
-          expect(messages.length).toBeGreaterThan(0)
-        )
-      );
-    });
-
     it('verifies the first message', () => {
       const msgText = 'unterminated string meets end of file\n(Using Ruby 2.2 parser; ' +
         'configure using `TargetRubyVersion` parameter, under `AllCops`) (Syntax)';
@@ -72,14 +64,6 @@ describe('The RuboCop provider for Linter', () => {
     beforeEach(() => {
       waitsForPromise(() =>
         atom.workspace.open(invalidPath).then(openEditor => { editor = openEditor; })
-      );
-    });
-
-    it('finds at least one message', () => {
-      waitsForPromise(() =>
-        lint(editor).then(messages =>
-          expect(messages.length).toBeGreaterThan(0)
-        )
       );
     });
 
