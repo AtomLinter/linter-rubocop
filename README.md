@@ -51,6 +51,15 @@ You can configure linter-rubocop by editing `~/.atom/config.cson`
 Run `which rubocop` to find the path, if you using rbenv run
 `rbenv which rubocop`
 
+### command
+
+```cson
+'linter-rubocop':
+  'command': 'bundle exec rubocop --rails --lint'
+```
+
+Tailor rubocop execution to your needs.
+
 **Note**: This plugin finds the nearest `.rubocop.yml` file and uses the
 `--config` command line argument to use that file, so you may not use the
 `--config` argument in the linter settings.
