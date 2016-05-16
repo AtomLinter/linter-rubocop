@@ -13,7 +13,7 @@
     "test": "apm test"
   },
   "dependencies": {
-    "atom-linter": "^5.0.1"
+    "atom-linter": "^4.6.1"
   },
   "devDependencies": {
     "coffeelint": "^1.15.0",
