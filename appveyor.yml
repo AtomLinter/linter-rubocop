@@ -26,9 +26,5 @@ branches:
   only:
     - master
 
-notifications:
-  - provider: Email
-    on_build_success: false
-
 deploy: off
 test: off
