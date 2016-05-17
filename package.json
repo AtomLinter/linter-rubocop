@@ -21,9 +21,6 @@
     "eslint-config-airbnb-base": "^3.0.0",
     "eslint-plugin-import": "^1.7.0"
   },
-  "package-deps": [
-    "linter"
-  ],
   "providedServices": {
     "linter": {
       "versions": {
