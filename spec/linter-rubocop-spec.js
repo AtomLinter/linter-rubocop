@@ -43,15 +43,10 @@ describe('The RuboCop provider for Linter', () => {
 
       waitsForPromise(() =>
         lint(editor).then(messages => {
-          expect(messages[0].type).toBeDefined();
           expect(messages[0].type).toEqual('Error');
           expect(messages[0].html).not.toBeDefined();
-          expect(messages[0].text).toBeDefined();
           expect(messages[0].text).toEqual(msgText);
-          expect(messages[0].filePath).toBeDefined();
           expect(messages[0].filePath).toEqual(badPath);
-          expect(messages[0].range).toBeDefined();
-          expect(messages[0].range.length).toEqual(2);
           expect(messages[0].range).toEqual([[0, 6], [0, 7]]);
         })
       );
@@ -73,15 +68,10 @@ describe('The RuboCop provider for Linter', () => {
 
       waitsForPromise(() =>
         lint(editor).then(messages => {
-          expect(messages[0].type).toBeDefined();
           expect(messages[0].type).toEqual('Warning');
           expect(messages[0].html).not.toBeDefined();
-          expect(messages[0].text).toBeDefined();
           expect(messages[0].text).toEqual(msgText);
-          expect(messages[0].filePath).toBeDefined();
           expect(messages[0].filePath).toEqual(invalidPath);
-          expect(messages[0].range).toBeDefined();
-          expect(messages[0].range.length).toEqual(2);
           expect(messages[0].range).toEqual([[0, 6], [0, 20]]);
         })
       );
