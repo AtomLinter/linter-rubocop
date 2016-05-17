@@ -12,8 +12,8 @@ WARNINGS = new Set(['refactor', 'convention', 'warning'])
 convertOldConfig = ->
   execPath = atom.config.get OLD_EXEC_PATH_CONFIG_KEY
   args = atom.config.get OLD_ARGS_CONFIG_KEY
-  return unless execPath || args
-  atom.config.set COMMAND_CONFIG_KEY, "#{execPath || ''} #{args || ''}".trim()
+  return unless execPath or args
+  atom.config.set COMMAND_CONFIG_KEY, "#{execPath or ''} #{args or ''}".trim()
   atom.config.set OLD_EXEC_PATH_CONFIG_KEY, undefined
   atom.config.set OLD_ARGS_CONFIG_KEY, undefined
 
@@ -27,12 +27,12 @@ lint = (editor) ->
   helpers.exec(command[0], command[1..], {cwd, stdin, stream}).then (result) ->
     {stdout, stderr} = result
     parsed = try JSON.parse(stdout)
-    throw new Error stderr || stdout unless typeof parsed is 'object'
-    (parsed.files?[0]?.offenses || []).map (offense) ->
+    throw new Error stderr or stdout unless typeof parsed is 'object'
+    (parsed.files?[0]?.offenses or []).map (offense) ->
       {cop_name, location, message, severity} = offense
-      {line, column, length} = location || DEFAULT_LOCATION
+      {line, column, length} = location or DEFAULT_LOCATION
       type: if WARNINGS.has(severity) then 'Warning' else 'Error'
-      text: (message || DEFAULT_MESSAGE) +
+      text: (message or DEFAULT_MESSAGE) +
         (if cop_name then " (#{cop_name})" else '')
       filePath: filePath
       range: [[line - 1, column - 1], [line - 1, column + length - 1]]
