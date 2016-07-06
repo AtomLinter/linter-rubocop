@@ -1,6 +1,7 @@
+# Project specific config
 language: ruby
 rvm:
-  - 2.2.3
+  - 2.3.1
 
 os:
   - linux
@@ -13,15 +14,24 @@ env:
 
 install:
   - gem install rubocop
+  # Installed for linting the project
+  - nvm install 6
 
 before_script:
+  - node --version
   - rubocop --version
+
+# Generic setup follows
 script: 'curl -s https://raw.githubusercontent.com/atom/ci/master/build-package.sh | sh'
 
 notifications:
   email:
     on_success: never
     on_failure: change
+
+branches:
+  only:
+    - master
 
 git:
   depth: 10
@@ -35,7 +45,3 @@ addons:
     - git
     - libgnome-keyring-dev
     - fakeroot
-
-branches:
-  only:
-    - master
