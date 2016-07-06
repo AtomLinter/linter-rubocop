@@ -4,21 +4,23 @@ platform: x64
 
 environment:
   APM_TEST_PACKAGES:
-  RUBY_VERSION: 22-x64
+  RUBY_VERSION: 23-x64
   matrix:
     - ATOM_CHANNEL: stable
     - ATOM_CHANNEL: beta
 
 install:
-  - ps: Install-Product node 5
+  - ps: Install-Product node 6
   - SET PATH=C:\Ruby%RUBY_VERSION%\bin;%PATH%
   - gem update --system
   - gem install rubocop --no-document
 
 before_build:
+  - node --version
   - ruby --version
   - gem --version
   - rubocop --version
+
 build_script:
   - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/atom/ci/master/build-package.ps1'))
 
@@ -28,3 +30,5 @@ branches:
 
 deploy: off
 test: off
+clone_depth: 10
+skip_tags: true

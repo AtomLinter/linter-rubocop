@@ -1,27 +1,44 @@
+# Project specific config
 language: ruby
-rvm:
-  - 2.2.3
 
-os:
-  - linux
-  - osx
-
-env:
-  matrix:
-    - ATOM_CHANNEL=stable
-    - ATOM_CHANNEL=beta
+matrix:
+  include:
+    - os: linux
+      rvm: 2.3.1
+      before_install:
+        # Installed for linting the project
+        - nvm install 6
+    - os: linux
+      rvm: 2.3.1
+      env: ATOM_CHANNEL=beta
+      before_install:
+        # Installed for linting the project
+        - nvm install 6
+    - os: osx
+      rvm: 2.2.2
+      before_install:
+        - brew update
+        # Installed for linting the project
+        - brew outdated node || brew upgrade node
 
 install:
-  - gem install rubocop
+  - gem install --no-document rubocop
 
 before_script:
+  - node --version
   - rubocop --version
+
+# Generic setup follows
 script: 'curl -s https://raw.githubusercontent.com/atom/ci/master/build-package.sh | sh'
 
 notifications:
   email:
     on_success: never
     on_failure: change
+
+branches:
+  only:
+    - master
 
 git:
   depth: 10
@@ -35,7 +52,3 @@ addons:
     - git
     - libgnome-keyring-dev
     - fakeroot
-
-branches:
-  only:
-    - master
