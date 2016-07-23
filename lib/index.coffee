@@ -6,7 +6,7 @@ DISABLE_CONFIG_KEY = 'linter-rubocop.disableWhenNoConfigFile'
 OLD_EXEC_PATH_CONFIG_KEY = 'linter-rubocop.executablePath'
 OLD_ARGS_CONFIG_KEY = 'linter-rubocop.additionalArguments'
 DEFAULT_LOCATION = {line: 1, column: 1, length: 0}
-DEFAULT_ARGS = ['--cache', 'false', '--force-exclusion', '-f', 'json', '-s']
+DEFAULT_ARGS = ['--cache', 'false', '--force-exclusion', '--format', 'json', '--stdin']
 DEFAULT_MESSAGE = 'Unknown Error'
 WARNINGS = new Set(['refactor', 'convention', 'warning'])
 
