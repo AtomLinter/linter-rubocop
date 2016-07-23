@@ -6,7 +6,13 @@ DISABLE_CONFIG_KEY = 'linter-rubocop.disableWhenNoConfigFile'
 OLD_EXEC_PATH_CONFIG_KEY = 'linter-rubocop.executablePath'
 OLD_ARGS_CONFIG_KEY = 'linter-rubocop.additionalArguments'
 DEFAULT_LOCATION = {line: 1, column: 1, length: 0}
-DEFAULT_ARGS = ['--cache', 'false', '--force-exclusion', '--format', 'json', '--stdin']
+DEFAULT_ARGS = [
+  '--cache', 'false',
+  '--force-exclusion',
+  '--format', 'json',
+  '--stdin',
+  '--display-style-guide',
+]
 DEFAULT_MESSAGE = 'Unknown Error'
 WARNINGS = new Set(['refactor', 'convention', 'warning'])
 
@@ -17,6 +23,11 @@ convertOldConfig = ->
   atom.config.set COMMAND_CONFIG_KEY, "#{execPath or ''} #{args or ''}".trim()
   atom.config.set OLD_EXEC_PATH_CONFIG_KEY, undefined
   atom.config.set OLD_ARGS_CONFIG_KEY, undefined
+
+extractUri = (cop_name, message) ->
+  [message, uri] = message.split /\ \((.*)\)/, 2
+  cop_name = "<a href=\"#{uri}\">#{cop_name}</a>" if uri
+  {cop_name, message}
 
 lint = (editor) ->
   convertOldConfig()
@@ -34,9 +45,10 @@ lint = (editor) ->
     throw new Error stderr or stdout unless typeof parsed is 'object'
     (parsed.files?[0]?.offenses or []).map (offense) ->
       {cop_name, location, message, severity} = offense
+      {cop_name, message} = extractUri cop_name, message
       {line, column, length} = location or DEFAULT_LOCATION
       type: if WARNINGS.has(severity) then 'Warning' else 'Error'
-      text: (message or DEFAULT_MESSAGE) +
+      html: (message or DEFAULT_MESSAGE) +
         (if cop_name then " (#{cop_name})" else '')
       filePath: filePath
       range: [[line - 1, column - 1], [line - 1, column + length - 1]]

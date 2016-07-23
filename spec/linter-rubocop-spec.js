@@ -44,8 +44,8 @@ describe('The RuboCop provider for Linter', () => {
       waitsForPromise(() =>
         lint(editor).then((messages) => {
           expect(messages[0].type).toEqual('Error');
-          expect(messages[0].html).not.toBeDefined();
-          expect(messages[0].text).toEqual(msgText);
+          expect(messages[0].html).toEqual(msgText);
+          expect(messages[0].text).not.toBeDefined();
           expect(messages[0].filePath).toEqual(badPath);
           expect(messages[0].range).toEqual([[0, 6], [0, 7]]);
         })
@@ -64,13 +64,14 @@ describe('The RuboCop provider for Linter', () => {
 
     it('verifies the first message', () => {
       const msgText = 'Prefer single-quoted strings when you don\'t need string ' +
-        'interpolation or special symbols. (Style/StringLiterals)';
+        'interpolation or special symbols. ' +
+        '(<a href="https://github.com/bbatsov/ruby-style-guide#consistent-string-literals">Style/StringLiterals</a>)';
 
       waitsForPromise(() =>
         lint(editor).then((messages) => {
           expect(messages[0].type).toEqual('Warning');
-          expect(messages[0].html).not.toBeDefined();
-          expect(messages[0].text).toEqual(msgText);
+          expect(messages[0].html).toEqual(msgText);
+          expect(messages[0].text).not.toBeDefined();
           expect(messages[0].filePath).toEqual(invalidPath);
           expect(messages[0].range).toEqual([[0, 6], [0, 20]]);
         })
