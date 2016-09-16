@@ -33,7 +33,7 @@ describe('The RuboCop provider for Linter', () => {
 
     beforeEach(() => {
       waitsForPromise(() =>
-        atom.workspace.open(badPath).then(openEditor => { editor = openEditor; })
+        atom.workspace.open(badPath).then((openEditor) => { editor = openEditor; })
       );
     });
 
@@ -42,7 +42,7 @@ describe('The RuboCop provider for Linter', () => {
         'configure using `TargetRubyVersion` parameter, under `AllCops`) (Syntax)';
 
       waitsForPromise(() =>
-        lint(editor).then(messages => {
+        lint(editor).then((messages) => {
           expect(messages[0].type).toEqual('Error');
           expect(messages[0].html).not.toBeDefined();
           expect(messages[0].text).toEqual(msgText);
@@ -58,7 +58,7 @@ describe('The RuboCop provider for Linter', () => {
 
     beforeEach(() => {
       waitsForPromise(() =>
-        atom.workspace.open(invalidPath).then(openEditor => { editor = openEditor; })
+        atom.workspace.open(invalidPath).then((openEditor) => { editor = openEditor; })
       );
     });
 
@@ -67,7 +67,7 @@ describe('The RuboCop provider for Linter', () => {
         'interpolation or special symbols. (Style/StringLiterals)';
 
       waitsForPromise(() =>
-        lint(editor).then(messages => {
+        lint(editor).then((messages) => {
           expect(messages[0].type).toEqual('Warning');
           expect(messages[0].html).not.toBeDefined();
           expect(messages[0].text).toEqual(msgText);
