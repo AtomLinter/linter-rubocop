@@ -2,6 +2,7 @@ path = require 'path'
 helpers = require 'atom-linter'
 
 COMMAND_CONFIG_KEY = 'linter-rubocop.command'
+DISABLE_CONFIG_KEY = 'linter-rubocop.disableWhenNoConfigFile'
 OLD_EXEC_PATH_CONFIG_KEY = 'linter-rubocop.executablePath'
 OLD_ARGS_CONFIG_KEY = 'linter-rubocop.additionalArguments'
 DEFAULT_LOCATION = {line: 1, column: 1, length: 0}
@@ -21,6 +22,9 @@ lint = (editor) ->
   convertOldConfig()
   command = atom.config.get(COMMAND_CONFIG_KEY).split(/\s+/).filter((i) -> i)
     .concat(DEFAULT_ARGS, filePath = editor.getPath())
+  if atom.config.get(DISABLE_CONFIG_KEY) is true
+    config = helpers.find(filePath, '.rubocop.yml')
+    return [] if config is null
   cwd = path.dirname helpers.find filePath, '.'
   stdin = editor.getText()
   stream = 'both'
@@ -60,6 +64,14 @@ module.exports =
         `which rubocop` or `rbenv which rubocop` to find this. Examples:
         `/usr/local/bin/rubocop` or `/usr/local/bin/bundle exec rubocop --config
         /my/rubocop.yml`.
+      '
+    disableWhenNoConfigFile:
+      type: 'boolean'
+      title: 'Disable when no .rubocop.yml config file is found'
+      default: false
+      description: '
+        Only run linter if a RuboCop config file is found somewhere in the path
+        for the current file.
       '
 
   provideLinter: -> linter
