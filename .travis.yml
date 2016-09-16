@@ -1,25 +1,17 @@
-# Project specific config
+### Project specific config ###
 language: ruby
 
 matrix:
   include:
     - os: linux
       rvm: 2.3.1
-      before_install:
-        # Installed for linting the project
-        - nvm install 6
+
     - os: linux
       rvm: 2.3.1
       env: ATOM_CHANNEL=beta
-      before_install:
-        # Installed for linting the project
-        - nvm install 6
+
     - os: osx
       rvm: 2.2.2
-      before_install:
-        - brew update
-        # Installed for linting the project
-        - brew outdated node || brew upgrade node
 
 install:
   - gem install --no-document rubocop
@@ -28,7 +20,7 @@ before_script:
   - node --version
   - rubocop --version
 
-# Generic setup follows
+### Generic setup follows ###
 script: 'curl -s https://raw.githubusercontent.com/atom/ci/master/build-package.sh | sh'
 
 notifications:

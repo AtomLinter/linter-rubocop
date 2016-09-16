@@ -1,24 +1,14 @@
+test:
+  override:
+    - gem --version
+    - rubocop --version
+    - curl -s https://raw.githubusercontent.com/Arcanemagus/ci/atomlinter/build-package.sh | sh
+
 dependencies:
   override:
     - gem update --system
     - gem install rubocop --no-document
-    - curl -L https://atom.io/download/deb -o atom-amd64.deb
-    - sudo dpkg --install atom-amd64.deb || true
-    - sudo apt-get update
-    - sudo apt-get -f install
-    - apm install
-test:
-  override:
-    - node --version
-    - gem --version
-    - rubocop --version
-    - atom -v
-    - apm -v
-    - npm run lint
-    - apm test
 
 machine:
-  node:
-    version: 6
   ruby:
     version: 2.3.1
