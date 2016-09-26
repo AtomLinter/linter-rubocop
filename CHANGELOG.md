@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.0
+
+*   Note the minimum `rubocop` version of v0.37.0
+*   Add specs and enable CI builds
+*   Add links in messages to the rule documentation
+
 ## 0.4.7
 
 ### Maintenance
