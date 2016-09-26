@@ -7,7 +7,8 @@ const lint = require(path.join('..', 'lib', 'index')).provideLinter().lint;
 const badPath = path.join(__dirname, 'fixtures', 'bad.rb');
 const emptyPath = path.join(__dirname, 'fixtures', 'empty.rb');
 const goodPath = path.join(__dirname, 'fixtures', 'good.rb');
-const invalidPath = path.join(__dirname, 'fixtures', 'invalid.rb');
+const invalidWithUrlPath = path.join(__dirname, 'fixtures', 'invalid_with_url.rb');
+const invalidWithoutUrlPath = path.join(__dirname, 'fixtures', 'invalid_without_url.rb');
 
 describe('The RuboCop provider for Linter', () => {
   beforeEach(() => {
@@ -44,7 +45,7 @@ describe('The RuboCop provider for Linter', () => {
       waitsForPromise(() =>
         lint(editor).then((messages) => {
           expect(messages[0].type).toEqual('Error');
-          expect(messages[0].html).toEqual(msgText);
+          expect(messages[0].html).toBe(msgText);
           expect(messages[0].text).not.toBeDefined();
           expect(messages[0].filePath).toEqual(badPath);
           expect(messages[0].range).toEqual([[0, 6], [0, 7]]);
@@ -53,27 +54,52 @@ describe('The RuboCop provider for Linter', () => {
     });
   });
 
-  describe('shows errors in a file with warnings', () => {
+  describe('shows errors with a clickable link in a file with warnings', () => {
     let editor = null;
 
     beforeEach(() => {
       waitsForPromise(() =>
-        atom.workspace.open(invalidPath).then((openEditor) => { editor = openEditor; })
+        atom.workspace.open(invalidWithUrlPath).then((openEditor) => { editor = openEditor; })
       );
     });
 
     it('verifies the first message', () => {
-      const msgText = 'Prefer single-quoted strings when you don\'t need string ' +
-        'interpolation or special symbols. ' +
+      const msgText = 'Prefer single-quoted strings when you don&#39;t need ' +
+        'string interpolation or special symbols. ' +
         '(<a href="https://github.com/bbatsov/ruby-style-guide#consistent-string-literals">Style/StringLiterals</a>)';
 
       waitsForPromise(() =>
         lint(editor).then((messages) => {
           expect(messages[0].type).toEqual('Warning');
-          expect(messages[0].html).toEqual(msgText);
+          expect(messages[0].html).toBe(msgText);
           expect(messages[0].text).not.toBeDefined();
-          expect(messages[0].filePath).toEqual(invalidPath);
+          expect(messages[0].filePath).toEqual(invalidWithUrlPath);
           expect(messages[0].range).toEqual([[0, 6], [0, 20]]);
+        })
+      );
+    });
+  });
+
+  describe('shows errors without a clickable link in a file with warnings', () => {
+    let editor = null;
+
+    beforeEach(() => {
+      waitsForPromise(() =>
+        atom.workspace.open(invalidWithoutUrlPath).then((openEditor) => { editor = openEditor; })
+      );
+    });
+
+    it('verifies the first message', () => {
+      const msgText = 'Extra empty line detected at class body end. ' +
+        '(Style/EmptyLinesAroundClassBody)';
+
+      waitsForPromise(() =>
+        lint(editor).then((messages) => {
+          expect(messages[0].type).toEqual('Warning');
+          expect(messages[0].html).toBe(msgText);
+          expect(messages[0].text).not.toBeDefined();
+          expect(messages[0].filePath).toEqual(invalidWithoutUrlPath);
+          expect(messages[0].range).toEqual([[5, 0], [5, 1]]);
         })
       );
     });

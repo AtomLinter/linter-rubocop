@@ -1,5 +1,6 @@
 path = require 'path'
 helpers = require 'atom-linter'
+escapeHtml = require 'escape-html'
 
 COMMAND_CONFIG_KEY = 'linter-rubocop.command'
 DISABLE_CONFIG_KEY = 'linter-rubocop.disableWhenNoConfigFile'
@@ -24,10 +25,21 @@ convertOldConfig = ->
   atom.config.set OLD_EXEC_PATH_CONFIG_KEY, undefined
   atom.config.set OLD_ARGS_CONFIG_KEY, undefined
 
-extractUri = (cop_name, message) ->
-  [message, uri] = message.split /\ \((.*)\)/, 2
-  cop_name = "<a href=\"#{uri}\">#{cop_name}</a>" if uri
-  {cop_name, message}
+extractUrl = (message) ->
+  [message, url] = message.split /\ \((.*)\)/, 2
+  {message, url}
+
+formatMessage = ({message, cop_name, url}) ->
+  formatted_message = escapeHtml(message or DEFAULT_MESSAGE)
+  formatted_cop_name =
+    if cop_name?
+      if url?
+        " (<a href=\"#{escapeHtml url}\">#{escapeHtml cop_name}</a>)"
+      else
+        " (#{escapeHtml cop_name})"
+    else
+      ''
+  formatted_message + formatted_cop_name
 
 lint = (editor) ->
   convertOldConfig()
@@ -45,11 +57,10 @@ lint = (editor) ->
     throw new Error stderr or stdout unless typeof parsed is 'object'
     (parsed.files?[0]?.offenses or []).map (offense) ->
       {cop_name, location, message, severity} = offense
-      {cop_name, message} = extractUri cop_name, message
+      {message, url} = extractUrl message
       {line, column, length} = location or DEFAULT_LOCATION
       type: if WARNINGS.has(severity) then 'Warning' else 'Error'
-      html: (message or DEFAULT_MESSAGE) +
-        (if cop_name then " (#{cop_name})" else '')
+      html: formatMessage {cop_name, message, url}
       filePath: filePath
       range: [[line - 1, column - 1], [line - 1, column + length - 1]]
 
