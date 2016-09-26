@@ -2,7 +2,7 @@
 
 import * as path from 'path';
 
-const lint = require(path.join('..', 'lib', 'index')).provideLinter().lint;
+const lint = require('../lib/index.coffee').provideLinter().lint;
 
 const badPath = path.join(__dirname, 'fixtures', 'bad.rb');
 const emptyPath = path.join(__dirname, 'fixtures', 'empty.rb');
