@@ -8,6 +8,7 @@
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
   },
+  "activationHooks": ["language-ruby:grammar-used"],
   "scripts": {
     "lint": "coffeelint lib && eslint spec",
     "test": "apm test"
