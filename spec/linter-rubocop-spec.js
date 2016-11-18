@@ -14,19 +14,15 @@ describe('The RuboCop provider for Linter', () => {
   beforeEach(() => {
     atom.workspace.destroyActivePaneItem();
 
-    // This whole beforeEach function is inspired by:
-    // https://github.com/AtomLinter/linter-jscs/pull/295/files
-    //
-    // See also:
-    // https://discuss.atom.io/t/activationhooks-break-unit-tests/36028/8
+    // Info about this beforeEach() implementation:
+    // https://github.com/AtomLinter/Meta/issues/15
     const activationPromise =
       atom.packages.activatePackage('linter-rubocop');
 
     waitsForPromise(() =>
-      atom.packages.activatePackage('language-ruby'));
-
-    waitsForPromise(() =>
-      atom.workspace.open(goodPath));
+      atom.packages.activatePackage('language-ruby').then(() =>
+        atom.workspace.open(goodPath)
+    ));
 
     atom.packages.triggerDeferredActivationHooks();
     waitsForPromise(() => activationPromise);
