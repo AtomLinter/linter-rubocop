@@ -13,12 +13,19 @@ const invalidWithoutUrlPath = path.join(__dirname, 'fixtures', 'invalid_without_
 describe('The RuboCop provider for Linter', () => {
   beforeEach(() => {
     atom.workspace.destroyActivePaneItem();
-    waitsForPromise(() => {
+
+    // Info about this beforeEach() implementation:
+    // https://github.com/AtomLinter/Meta/issues/15
+    const activationPromise =
       atom.packages.activatePackage('linter-rubocop');
-      return atom.packages.activatePackage('language-ruby').then(() =>
+
+    waitsForPromise(() =>
+      atom.packages.activatePackage('language-ruby').then(() =>
         atom.workspace.open(goodPath)
-      );
-    });
+    ));
+
+    atom.packages.triggerDeferredActivationHooks();
+    waitsForPromise(() => activationPromise);
   });
 
   it('should be in the packages list', () =>
