@@ -12,7 +12,7 @@
     "language-ruby:grammar-used"
   ],
   "scripts": {
-    "lint": "coffeelint lib && eslint spec",
+    "lint": "coffeelint lib && eslint .",
     "test": "apm test"
   },
   "dependencies": {
@@ -38,11 +38,10 @@
       "atom": true
     },
     "env": {
-      "es6": true,
       "node": true
     },
     "rules": {
-      "global-require": 0
+      "global-require": "off"
     }
   },
   "coffeelintConfig": {

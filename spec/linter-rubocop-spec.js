@@ -21,7 +21,7 @@ describe('The RuboCop provider for Linter', () => {
 
     waitsForPromise(() =>
       atom.packages.activatePackage('language-ruby').then(() =>
-        atom.workspace.open(goodPath)
+        atom.workspace.open(goodPath),
     ));
 
     atom.packages.triggerDeferredActivationHooks();
@@ -29,11 +29,11 @@ describe('The RuboCop provider for Linter', () => {
   });
 
   it('should be in the packages list', () =>
-    expect(atom.packages.isPackageLoaded('linter-rubocop')).toEqual(true)
+    expect(atom.packages.isPackageLoaded('linter-rubocop')).toEqual(true),
   );
 
   it('should be an active package', () =>
-    expect(atom.packages.isPackageActive('linter-rubocop')).toEqual(true)
+    expect(atom.packages.isPackageActive('linter-rubocop')).toEqual(true),
   );
 
   describe('shows errors in a file with errors', () => {
@@ -41,7 +41,7 @@ describe('The RuboCop provider for Linter', () => {
 
     beforeEach(() => {
       waitsForPromise(() =>
-        atom.workspace.open(badPath).then((openEditor) => { editor = openEditor; })
+        atom.workspace.open(badPath).then((openEditor) => { editor = openEditor; }),
       );
     });
 
@@ -56,7 +56,7 @@ describe('The RuboCop provider for Linter', () => {
           expect(messages[0].text).not.toBeDefined();
           expect(messages[0].filePath).toEqual(badPath);
           expect(messages[0].range).toEqual([[0, 6], [0, 7]]);
-        })
+        }),
       );
     });
   });
@@ -66,7 +66,7 @@ describe('The RuboCop provider for Linter', () => {
 
     beforeEach(() => {
       waitsForPromise(() =>
-        atom.workspace.open(invalidWithUrlPath).then((openEditor) => { editor = openEditor; })
+        atom.workspace.open(invalidWithUrlPath).then((openEditor) => { editor = openEditor; }),
       );
     });
 
@@ -82,7 +82,7 @@ describe('The RuboCop provider for Linter', () => {
           expect(messages[0].text).not.toBeDefined();
           expect(messages[0].filePath).toEqual(invalidWithUrlPath);
           expect(messages[0].range).toEqual([[0, 6], [0, 20]]);
-        })
+        }),
       );
     });
   });
@@ -92,7 +92,7 @@ describe('The RuboCop provider for Linter', () => {
 
     beforeEach(() => {
       waitsForPromise(() =>
-        atom.workspace.open(invalidWithoutUrlPath).then((openEditor) => { editor = openEditor; })
+        atom.workspace.open(invalidWithoutUrlPath).then((openEditor) => { editor = openEditor; }),
       );
     });
 
@@ -107,7 +107,7 @@ describe('The RuboCop provider for Linter', () => {
           expect(messages[0].text).not.toBeDefined();
           expect(messages[0].filePath).toEqual(invalidWithoutUrlPath);
           expect(messages[0].range).toEqual([[5, 0], [5, 1]]);
-        })
+        }),
       );
     });
   });
@@ -116,9 +116,9 @@ describe('The RuboCop provider for Linter', () => {
     waitsForPromise(() =>
       atom.workspace.open(emptyPath).then(editor =>
         lint(editor).then(messages =>
-          expect(messages.length).toEqual(0)
-        )
-      )
+          expect(messages.length).toEqual(0),
+        ),
+      ),
     );
   });
 
@@ -126,9 +126,9 @@ describe('The RuboCop provider for Linter', () => {
     waitsForPromise(() =>
       atom.workspace.open(goodPath).then(editor =>
         lint(editor).then(messages =>
-          expect(messages.length).toEqual(0)
-        )
-      )
+          expect(messages.length).toEqual(0),
+        ),
+      ),
     );
   });
 });
