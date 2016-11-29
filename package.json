@@ -8,9 +8,11 @@
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
   },
-  "activationHooks": ["language-ruby:grammar-used"],
+  "activationHooks": [
+    "language-ruby:grammar-used"
+  ],
   "scripts": {
-    "lint": "coffeelint lib && eslint spec",
+    "lint": "coffeelint lib && eslint .",
     "test": "apm test"
   },
   "dependencies": {
@@ -19,9 +21,9 @@
   },
   "devDependencies": {
     "coffeelint": "^1.15.0",
-    "eslint": "^3.6.0",
-    "eslint-config-airbnb-base": "^8.0.0",
-    "eslint-plugin-import": "^1.16.0"
+    "eslint": "^3.9.1",
+    "eslint-config-airbnb-base": "^10.0.1",
+    "eslint-plugin-import": "^2.1.0"
   },
   "providedServices": {
     "linter": {
@@ -36,11 +38,10 @@
       "atom": true
     },
     "env": {
-      "es6": true,
       "node": true
     },
     "rules": {
-      "global-require": 0
+      "global-require": "off"
     }
   },
   "coffeelintConfig": {
