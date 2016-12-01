@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.5.2
+
+*   Add Ruby-on-Rails and Chef to the activation grammar list
+
 ## v0.5.1
 
 *   Only load the package when a Ruby file is opened
