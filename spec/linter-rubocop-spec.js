@@ -106,7 +106,7 @@ describe('The RuboCop provider for Linter', () => {
           expect(messages[0].html).toBe(msgText);
           expect(messages[0].text).not.toBeDefined();
           expect(messages[0].filePath).toEqual(invalidWithoutUrlPath);
-          expect(messages[0].range).toEqual([[5, 0], [5, 1]]);
+          expect(messages[0].range).toEqual([[4, 0], [4, 1]]);
         }),
       );
     });
