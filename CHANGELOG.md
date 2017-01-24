@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.5.3
+
+*   Fixed activation on Chef code
+
 ## v0.5.2
 
 *   Add Ruby-on-Rails and Chef to the activation grammar list
