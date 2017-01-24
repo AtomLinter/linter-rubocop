@@ -11,7 +11,7 @@
   "activationHooks": [
     "language-ruby:grammar-used",
     "language-ruby-on-rails:grammar-used",
-    "language-chec:grammar-used"
+    "language-chef:grammar-used"
   ],
   "scripts": {
     "lint": "coffeelint lib && eslint .",
