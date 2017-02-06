@@ -1,6 +1,6 @@
 {
   "name": "linter-rubocop",
-  "main": "./lib/index.coffee",
+  "main": "./lib/index.js",
   "version": "0.5.3",
   "description": "Lint Ruby on the fly, using rubocop",
   "repository": "https://github.com/AtomLinter/linter-rubocop",
@@ -14,15 +14,20 @@
     "language-chef:grammar-used"
   ],
   "scripts": {
-    "lint": "coffeelint lib && eslint .",
-    "test": "apm test"
+    "lint": "eslint .",
+    "test": "apm test",
+    "build": "babel src/index.js --watch --out-file lib/index.js --source-maps inline"
   },
   "dependencies": {
     "atom-linter": "~8.0.0",
-    "escape-html": "^1.0.3"
+    "escape-html": "^1.0.3",
+    "pluralize": "^3.1.0",
+    "tmp": "0.0.31"
   },
   "devDependencies": {
-    "coffeelint": "^1.15.0",
+    "babel-cli": "^6.22.2",
+    "babel-eslint": "^7.1.1",
+    "babel-preset-env": "^1.1.8",
     "eslint": "^3.9.1",
     "eslint-config-airbnb-base": "^10.0.1",
     "eslint-plugin-import": "^2.1.0"
@@ -35,150 +40,18 @@
     }
   },
   "eslintConfig": {
+    "parser": "babel-eslint",
     "extends": "airbnb-base",
     "globals": {
       "atom": true
     },
     "env": {
-      "node": true
+      "node": true,
+      "atomtest": true,
+      "jasmine": true
     },
     "rules": {
       "global-require": "off"
-    }
-  },
-  "coffeelintConfig": {
-    "arrow_spacing": {
-      "level": "error"
-    },
-    "braces_spacing": {
-      "level": "error",
-      "spaces": 0,
-      "empty_object_spaces": 0
-    },
-    "camel_case_classes": {
-      "level": "error"
-    },
-    "coffeescript_error": {
-      "level": "error"
-    },
-    "colon_assignment_spacing": {
-      "level": "error",
-      "spacing": {
-        "left": 0,
-        "right": 1
-      }
-    },
-    "cyclomatic_complexity": {
-      "value": 10,
-      "level": "ignore"
-    },
-    "duplicate_key": {
-      "level": "error"
-    },
-    "empty_constructor_needs_parens": {
-      "level": "ignore"
-    },
-    "ensure_comprehensions": {
-      "level": "warn"
-    },
-    "eol_last": {
-      "level": "ignore"
-    },
-    "indentation": {
-      "value": 2,
-      "level": "error"
-    },
-    "line_endings": {
-      "level": "ignore",
-      "value": "unix"
-    },
-    "max_line_length": {
-      "value": 120,
-      "level": "warn",
-      "limitComments": true
-    },
-    "missing_fat_arrows": {
-      "level": "ignore",
-      "is_strict": false
-    },
-    "newlines_after_classes": {
-      "value": 3,
-      "level": "ignore"
-    },
-    "no_backticks": {
-      "level": "error"
-    },
-    "no_debugger": {
-      "level": "error",
-      "console": false
-    },
-    "no_empty_functions": {
-      "level": "ignore"
-    },
-    "no_empty_param_list": {
-      "level": "error"
-    },
-    "no_implicit_braces": {
-      "level": "ignore",
-      "strict": true
-    },
-    "no_implicit_parens": {
-      "strict": true,
-      "level": "ignore"
-    },
-    "no_interpolation_in_single_quotes": {
-      "level": "error"
-    },
-    "no_nested_string_interpolation": {
-      "level": "warn"
-    },
-    "no_plusplus": {
-      "level": "ignore"
-    },
-    "no_private_function_fat_arrows": {
-      "level": "warn"
-    },
-    "no_stand_alone_at": {
-      "level": "error"
-    },
-    "no_tabs": {
-      "level": "error"
-    },
-    "no_this": {
-      "level": "ignore"
-    },
-    "no_throwing_strings": {
-      "level": "error"
-    },
-    "no_trailing_semicolons": {
-      "level": "error"
-    },
-    "no_trailing_whitespace": {
-      "level": "error",
-      "allowed_in_comments": false,
-      "allowed_in_empty_lines": true
-    },
-    "no_unnecessary_double_quotes": {
-      "level": "error"
-    },
-    "no_unnecessary_fat_arrows": {
-      "level": "warn"
-    },
-    "non_empty_constructor_needs_parens": {
-      "level": "ignore"
-    },
-    "prefer_english_operator": {
-      "level": "error",
-      "doubleNotLevel": "ignore"
-    },
-    "space_operators": {
-      "level": "ignore"
-    },
-    "spacing_after_comma": {
-      "level": "error"
-    },
-    "transform_messes_up_line_numbers": {
-      "level": "warn"
     }
   }
 }
