@@ -18,7 +18,7 @@
     "test": "apm test"
   },
   "dependencies": {
-    "atom-linter": "~8.0.0",
+    "atom-linter": "^9.0.0",
     "escape-html": "^1.0.3"
   },
   "devDependencies": {
