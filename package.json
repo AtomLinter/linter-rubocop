@@ -18,14 +18,14 @@
     "test": "apm test"
   },
   "dependencies": {
-    "atom-linter": "~8.0.0",
+    "atom-linter": "^9.0.0",
     "escape-html": "^1.0.3"
   },
   "devDependencies": {
     "coffeelint": "^1.15.0",
-    "eslint": "^3.9.1",
-    "eslint-config-airbnb-base": "^10.0.1",
-    "eslint-plugin-import": "^2.1.0"
+    "eslint": "^3.15.0",
+    "eslint-config-airbnb-base": "^11.1.0",
+    "eslint-plugin-import": "^2.2.0"
   },
   "providedServices": {
     "linter": {
