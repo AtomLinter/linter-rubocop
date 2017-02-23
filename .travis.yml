@@ -10,9 +10,6 @@ matrix:
       rvm: 2.3.1
       env: ATOM_CHANNEL=beta
 
-    - os: osx
-      rvm: 2.2.2
-
 install:
   - gem install --no-document rubocop
 
