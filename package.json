@@ -15,8 +15,7 @@
   ],
   "scripts": {
     "lint": "eslint .",
-    "test": "apm test",
-    "build": "babel src/index.js --watch --out-file lib/index.js --source-maps inline"
+    "test": "apm test"
   },
   "dependencies": {
     "atom-linter": "~8.0.0",
