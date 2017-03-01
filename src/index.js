@@ -39,13 +39,15 @@ const parseFromStd = (stdout, stderr) => {
 const forwardRubocopToLinter =
   ({ message: rawMessage, location, severity, cop_name }, filePath) => {
     const [message, url] = rawMessage.split(/ \((.*)\)/, 2);
-    const { line, column, length } = location || { line: 1, column: 1, length: 0 };
-    return {
+    const { line, column, length } = location;
+    const outputToLinter = {
       type: ['refactor', 'convention', 'warning'].includes(severity) ? 'Warning' : 'Error',
       html: formatMessage({ cop_name, message, url }),
       filePath,
-      range: [[line - 1, column - 1], [line - 1, (column + length) - 1]],
     };
+    return Object.assign(outputToLinter,
+      location && { range: [[line - 1, column - 1], [line - 1, (column + length) - 1]] },
+    );
   };
 
 export default {
