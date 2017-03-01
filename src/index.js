@@ -110,6 +110,14 @@ export default {
       lintOnFly: true,
       lint: async (editor) => {
         const filePath = editor.getPath();
+
+        if (this.disableWhenNoConfigFile === true) {
+          const config = helpers.find(filePath, '.rubocop.yml');
+          if (config === null) {
+            return [];
+          }
+        }
+
         const command = this.command
                             .split(/\s+/)
                             .filter(i => i)
