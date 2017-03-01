@@ -70,7 +70,7 @@ export default {
             return atom.notifications.addError('Linter-Rubocop: Please save before fixing');
           }
 
-          const cwd = path.dirname(helpers.find(filePath, '.'));
+          const cwd = path.dirname(filePath);
           const { stdout, stderr } = await helpers.exec(command[0], command.slice(1), { cwd, stream: 'both' });
           const { summary: { offense_count: offenseCount } } = parseFromStd(stdout, stderr);
           return offenseCount === 0 ?
@@ -114,11 +114,7 @@ export default {
                             .split(/\s+/)
                             .filter(i => i)
                             .concat(DEFAULT_ARGS, '--stdin', filePath);
-        if (this.disableWhenNoConfigFile === true) {
-          const config = helpers.find(filePath, '.rubocop.yml');
-          if (config === null) { return []; }
-        }
-        const cwd = path.dirname(helpers.find(filePath, '.'));
+        const cwd = path.dirname(filePath);
         const stdin = editor.getText();
         const { stdout, stderr } = await helpers.exec(command[0], command.slice(1), { cwd, stdin, stream: 'both' });
         const { files: [{ offenses }] } = parseFromStd(stdout, stderr);
