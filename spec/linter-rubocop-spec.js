@@ -2,6 +2,8 @@
 
 import * as path from 'path';
 import { truncateSync, writeFileSync, readFileSync } from 'fs';
+
+// eslint-disable-next-line import/no-extraneous-dependencies
 import tmp from 'tmp';
 
 const lint = require('../src/index.js').provideLinter().lint;

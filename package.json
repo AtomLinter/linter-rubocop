@@ -33,13 +33,13 @@
   "dependencies": {
     "atom-linter": "^9.0.0",
     "escape-html": "^1.0.3",
-    "pluralize": "^3.1.0",
-    "tmp": "0.0.31"
+    "pluralize": "^3.1.0"
   },
   "devDependencies": {
     "eslint": "^3.15.0",
     "eslint-config-airbnb-base": "^11.1.0",
-    "eslint-plugin-import": "^2.2.0"
+    "eslint-plugin-import": "^2.2.0",
+    "tmp": "^0.0.31"
   },
   "providedServices": {
     "linter": {
