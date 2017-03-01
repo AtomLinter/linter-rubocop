@@ -3,15 +3,15 @@
 import * as path from 'path';
 import { truncateSync, writeFileSync, readFileSync } from 'fs';
 import tmp from 'tmp';
-import { provideLinter, autoCorrectFile } from '../lib/index';
 
-const lint = provideLinter().lint;
+const lint = require('../src/index.js').provideLinter().lint;
 
-const badPath = path.join(__dirname, 'fixtures', 'bad.rb');
-const emptyPath = path.join(__dirname, 'fixtures', 'empty.rb');
-const goodPath = path.join(__dirname, 'fixtures', 'good.rb');
-const invalidWithUrlPath = path.join(__dirname, 'fixtures', 'invalid_with_url.rb');
-const invalidWithoutUrlPath = path.join(__dirname, 'fixtures', 'invalid_without_url.rb');
+const dirname = __dirname;
+const badPath = path.join(dirname, 'fixtures', 'bad.rb');
+const emptyPath = path.join(dirname, 'fixtures', 'empty.rb');
+const goodPath = path.join(dirname, 'fixtures', 'good.rb');
+const invalidWithUrlPath = path.join(dirname, 'fixtures', 'invalid_with_url.rb');
+const invalidWithoutUrlPath = path.join(dirname, 'fixtures', 'invalid_without_url.rb');
 
 describe('The RuboCop provider for Linter', () => {
   beforeEach(() => {
@@ -157,9 +157,9 @@ describe('The RuboCop provider for Linter', () => {
     it('corrects the bad file', () => {
       writeFileSync(tmpobj.name, readFileSync(invalidWithUrlPath));
       waitsForPromise(() =>
-        atom.workspace.open(tmpobj.name).then(() => {
+        atom.workspace.open(tmpobj.name).then((editor) => {
           atom.notifications.onDidAddNotification(checkNotificaton);
-          autoCorrectFile();
+          atom.commands.dispatch(atom.views.getView(editor), 'linter-rubocop:fix-file');
         }),
       );
       waitsFor(
@@ -170,9 +170,9 @@ describe('The RuboCop provider for Linter', () => {
 
     it("doesn't modify a good file", () => {
       waitsForPromise(() =>
-        atom.workspace.open(goodPath).then(() => {
+        atom.workspace.open(goodPath).then((editor) => {
           atom.notifications.onDidAddNotification(checkNotificaton);
-          autoCorrectFile();
+          atom.commands.dispatch(atom.views.getView(editor), 'linter-rubocop:fix-file');
         }),
       );
       waitsFor(

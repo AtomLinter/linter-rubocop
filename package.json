@@ -1,12 +1,25 @@
 {
   "name": "linter-rubocop",
-  "main": "./lib/index.js",
-  "version": "0.5.3",
+  "main": "./src/index.js",
+  "version": "0.6.0",
   "description": "Lint Ruby on the fly, using rubocop",
   "repository": "https://github.com/AtomLinter/linter-rubocop",
   "license": "MIT",
   "engines": {
-    "atom": ">=1.0.0 <2.0.0"
+    "atom": ">=1.4.0 <2.0.0"
+  },
+  "configSchema": {
+    "command": {
+      "type": "string",
+      "default": "rubocop",
+      "description": "\n This is the absolute path to your `rubocop` command. You may need to run \n `which rubocop` or `rbenv which rubocop` to find this. Examples: \n `/usr/local/bin/rubocop` or `/usr/local/bin/bundle exec rubocop --config \n /my/rubocop.yml`. \n"
+    },
+    "disableWhenNoConfigFile": {
+      "type": "boolean",
+      "title": "Disable when no .rubocop.yml config file is found",
+      "default": false,
+      "description": "\n Only run linter if a RuboCop config file is found somewhere in the path \n for the current file."
+    }
   },
   "activationHooks": [
     "language-ruby:grammar-used",
@@ -24,9 +37,6 @@
     "tmp": "0.0.31"
   },
   "devDependencies": {
-    "babel-cli": "^6.22.2",
-    "babel-eslint": "^7.1.1",
-    "babel-preset-env": "^1.1.8",
     "eslint": "^3.9.1",
     "eslint-config-airbnb-base": "^10.0.1",
     "eslint-plugin-import": "^2.1.0"
@@ -39,18 +49,23 @@
     }
   },
   "eslintConfig": {
-    "parser": "babel-eslint",
-    "extends": "airbnb-base",
-    "globals": {
-      "atom": true
-    },
-    "env": {
-      "node": true,
-      "atomtest": true,
-      "jasmine": true
-    },
-    "rules": {
-      "global-require": "off"
-    }
-  }
+   "extends": "airbnb-base",
+   "rules": {
+     "global-require": "off",
+     "import/no-unresolved": [
+       "error",
+       {
+         "ignore": [
+           "atom"
+         ]
+       }
+     ]
+   },
+   "globals": {
+     "atom": true
+   },
+   "env": {
+     "node": true
+   }
+ }
 }
