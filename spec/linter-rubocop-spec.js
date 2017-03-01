@@ -8,12 +8,11 @@ import tmp from 'tmp';
 
 const lint = require('../src/index.js').provideLinter().lint;
 
-const dirname = __dirname;
-const badPath = path.join(dirname, 'fixtures', 'bad.rb');
-const emptyPath = path.join(dirname, 'fixtures', 'empty.rb');
-const goodPath = path.join(dirname, 'fixtures', 'good.rb');
-const invalidWithUrlPath = path.join(dirname, 'fixtures', 'invalid_with_url.rb');
-const invalidWithoutUrlPath = path.join(dirname, 'fixtures', 'invalid_without_url.rb');
+const badPath = path.join(__dirname, 'fixtures', 'bad.rb');
+const emptyPath = path.join(__dirname, 'fixtures', 'empty.rb');
+const goodPath = path.join(__dirname, 'fixtures', 'good.rb');
+const invalidWithUrlPath = path.join(__dirname, 'fixtures', 'invalid_with_url.rb');
+const invalidWithoutUrlPath = path.join(__dirname, 'fixtures', 'invalid_without_url.rb');
 
 describe('The RuboCop provider for Linter', () => {
   beforeEach(() => {
