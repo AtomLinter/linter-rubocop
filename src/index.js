@@ -59,17 +59,17 @@ export default {
       atom.commands.add('atom-text-editor', {
         'linter-rubocop:fix-file': async () => {
           const textEditor = atom.workspace.getActiveTextEditor();
-          const filePath = textEditor.getPath();
-          const command = this.command
-                              .split(/\s+/)
-                              .filter(i => i)
-                              .concat(DEFAULT_ARGS, '--auto-correct', filePath);
 
           if (!atom.workspace.isTextEditor(textEditor) || textEditor.isModified()) {
             // Abort for invalid or unsaved text editors
             return atom.notifications.addError('Linter-Rubocop: Please save before fixing');
           }
 
+          const filePath = textEditor.getPath();
+          const command = this.command
+                              .split(/\s+/)
+                              .filter(i => i)
+                              .concat(DEFAULT_ARGS, '--auto-correct', filePath);
           const cwd = path.dirname(filePath);
           const { stdout, stderr } = await helpers.exec(command[0], command.slice(1), { cwd, stream: 'both' });
           const { summary: { offense_count: offenseCount } } = parseFromStd(stdout, stderr);
