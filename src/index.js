@@ -112,7 +112,7 @@ export default {
         const filePath = editor.getPath();
 
         if (this.disableWhenNoConfigFile === true) {
-          const config = helpers.find(filePath, '.rubocop.yml');
+          const config = await helpers.findAsync(filePath, '.rubocop.yml');
           if (config === null) {
             return [];
           }
