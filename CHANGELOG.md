@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.0.0
+
+*   Re-write in ES2017 (No more ☕ script yey!)
+*   Added Rubocop autocorrect functionality (`Linter Rubocop: Fix File`)
+
+    Demo:
+    https://gfycat.com/GrouchyCloudyAlleycat
+###### Breaking changes:
+* Does not support old Linter Rubocop configs `executablePath` and `additionalArguments`
+* Minimum Atom engine of `1.4.0`
+
 ## v0.5.3
 
 *   Fixed activation on Chef code
