@@ -1,8 +1,12 @@
 'use babel';
 
 import * as path from 'path';
+import { truncateSync, writeFileSync, readFileSync } from 'fs';
 
-const lint = require('../lib/index.coffee').provideLinter().lint;
+// eslint-disable-next-line import/no-extraneous-dependencies
+import tmp from 'tmp';
+
+const lint = require('../src/index.js').provideLinter().lint;
 
 const badPath = path.join(__dirname, 'fixtures', 'bad.rb');
 const emptyPath = path.join(__dirname, 'fixtures', 'empty.rb');
@@ -130,5 +134,52 @@ describe('The RuboCop provider for Linter', () => {
         ),
       ),
     );
+  });
+
+  describe('allows the user to autocorrect the current file', () => {
+    let doneCorrecting;
+    const tmpobj = tmp.fileSync({ postfix: '.rb' });
+    const checkNotificaton = (notification) => {
+      const message = notification.getMessage();
+      if (message === 'Linter-Rubocop: No fixes were made') {
+        expect(notification.getType()).toEqual('info');
+      } else {
+        expect(message).toMatch(/Linter-Rubocop: Fixed \d offenses/);
+        expect(notification.getType()).toEqual('success');
+      }
+      doneCorrecting = true;
+    };
+
+    beforeEach(() => {
+      truncateSync(tmpobj.name);
+      doneCorrecting = false;
+    });
+
+    it('corrects the bad file', () => {
+      writeFileSync(tmpobj.name, readFileSync(invalidWithUrlPath));
+      waitsForPromise(() =>
+        atom.workspace.open(tmpobj.name).then((editor) => {
+          atom.notifications.onDidAddNotification(checkNotificaton);
+          atom.commands.dispatch(atom.views.getView(editor), 'linter-rubocop:fix-file');
+        }),
+      );
+      waitsFor(
+        () => doneCorrecting,
+        'Notification type should be checked',
+      );
+    });
+
+    it("doesn't modify a good file", () => {
+      waitsForPromise(() =>
+        atom.workspace.open(goodPath).then((editor) => {
+          atom.notifications.onDidAddNotification(checkNotificaton);
+          atom.commands.dispatch(atom.views.getView(editor), 'linter-rubocop:fix-file');
+        }),
+      );
+      waitsFor(
+        () => doneCorrecting,
+        'Notification type should be checked',
+      );
+    });
   });
 });
