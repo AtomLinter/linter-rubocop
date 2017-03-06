@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.1.0](https://github.com/AtomLinter/linter-rubocop/compare/v1.0.0...v1.1.0)
+
+*   Use [atom-package-deps](https://www.npmjs.com/package/atom-package-deps) to ensure that Atom Linter is installed
+
 ## [v1.0.0](https://github.com/AtomLinter/linter-rubocop/compare/v0.5.3...v1.0.0)
 
 *   Re-write in ES2017 (No more ☕ script yey!)
