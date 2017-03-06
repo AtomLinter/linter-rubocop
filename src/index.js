@@ -91,6 +91,11 @@ export default {
         this.disableWhenNoConfigFile = value;
       }),
     );
+    this.subscriptions.add(
+      atom.config.observe('linter-rubocop.lintOnFly', (value) => {
+        this.lintOnFly = value;
+      }),
+    );
   },
 
   deactivate() {
@@ -107,7 +112,7 @@ export default {
         'source.ruby.chef',
       ],
       scope: 'file',
-      lintOnFly: true,
+      lintOnFly: this.lintOnFly,
       lint: async (editor) => {
         const filePath = editor.getPath();
 
