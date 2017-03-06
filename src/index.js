@@ -52,6 +52,8 @@ const forwardRubocopToLinter =
 
 export default {
   activate() {
+    require('atom-package-deps').install('linter-rubocop', true);
+
     this.subscriptions = new CompositeDisposable();
 
     // Register fix command
