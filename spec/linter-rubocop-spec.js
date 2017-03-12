@@ -8,11 +8,13 @@ import tmp from 'tmp';
 
 const lint = require('../src/index.js').provideLinter().lint;
 
-const badPath = path.join(__dirname, 'fixtures', 'bad.rb');
-const emptyPath = path.join(__dirname, 'fixtures', 'empty.rb');
-const goodPath = path.join(__dirname, 'fixtures', 'good.rb');
-const invalidWithUrlPath = path.join(__dirname, 'fixtures', 'invalid_with_url.rb');
-const invalidWithoutUrlPath = path.join(__dirname, 'fixtures', 'invalid_without_url.rb');
+const badPath = path.join(__dirname, 'fixtures', 'lintableFiles', 'bad.rb');
+const emptyPath = path.join(__dirname, 'fixtures', 'lintableFiles', 'empty.rb');
+const goodPath = path.join(__dirname, 'fixtures', 'lintableFiles', 'good.rb');
+const invalidWithUrlPath = path.join(__dirname, 'fixtures', 'lintableFiles', 'invalid_with_url.rb');
+const invalidWithoutUrlPath = path.join(__dirname, 'fixtures', 'lintableFiles', 'invalid_without_url.rb');
+const ruby23Path = path.join(__dirname, 'fixtures', 'lintableFiles', 'ruby_2_3.rb');
+const yml = path.join(__dirname, 'fixtures', '.rubocop.yml');
 
 describe('The RuboCop provider for Linter', () => {
   beforeEach(() => {
@@ -134,6 +136,29 @@ describe('The RuboCop provider for Linter', () => {
         ),
       ),
     );
+  });
+
+  describe('respects .ruby-version when .rubycop.yml has not defined ruby version', () => {
+    let rubocopYmlText;
+
+    beforeEach(() => {
+      rubocopYmlText = readFileSync(yml, 'utf8');
+      writeFileSync(yml, '', 'utf8');
+    });
+
+    afterEach(() => {
+      writeFileSync(yml, rubocopYmlText, 'utf8');
+    });
+
+    it('finds nothing wrong with a file using 2.3 syntax', () => {
+      waitsForPromise(() =>
+        atom.workspace.open(ruby23Path).then(editor =>
+          lint(editor).then(messages =>
+            expect(messages.length).toEqual(0),
+          ),
+        ),
+      );
+    });
   });
 
   describe('allows the user to autocorrect the current file', () => {
