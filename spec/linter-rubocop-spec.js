@@ -1,18 +1,20 @@
 'use babel';
 
 import * as path from 'path';
-import { truncateSync, writeFileSync, readFileSync } from 'fs';
+import { truncateSync, writeFileSync, readFileSync, unlinkSync } from 'fs';
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 import tmp from 'tmp';
 
 const lint = require('../src/index.js').provideLinter().lint;
 
-const badPath = path.join(__dirname, 'fixtures', 'bad.rb');
-const emptyPath = path.join(__dirname, 'fixtures', 'empty.rb');
-const goodPath = path.join(__dirname, 'fixtures', 'good.rb');
-const invalidWithUrlPath = path.join(__dirname, 'fixtures', 'invalid_with_url.rb');
-const invalidWithoutUrlPath = path.join(__dirname, 'fixtures', 'invalid_without_url.rb');
+const badPath = path.join(__dirname, 'fixtures', 'lintableFiles', 'bad.rb');
+const emptyPath = path.join(__dirname, 'fixtures', 'lintableFiles', 'empty.rb');
+const goodPath = path.join(__dirname, 'fixtures', 'lintableFiles', 'good.rb');
+const invalidWithUrlPath = path.join(__dirname, 'fixtures', 'lintableFiles', 'invalid_with_url.rb');
+const invalidWithoutUrlPath = path.join(__dirname, 'fixtures', 'lintableFiles', 'invalid_without_url.rb');
+const ruby23Path = path.join(__dirname, 'fixtures', 'lintableFiles', 'ruby_2_3.rb');
+const yml = path.join(__dirname, 'fixtures', '.rubocop.yml');
 
 describe('The RuboCop provider for Linter', () => {
   beforeEach(() => {
@@ -50,7 +52,7 @@ describe('The RuboCop provider for Linter', () => {
     });
 
     it('verifies the first message', () => {
-      const msgText = 'unterminated string meets end of file\n(Using Ruby 2.2 parser; ' +
+      const msgText = 'unterminated string meets end of file\n(Using Ruby 2.3 parser; ' +
         'configure using `TargetRubyVersion` parameter, under `AllCops`) (Syntax)';
 
       waitsForPromise(() =>
@@ -59,7 +61,7 @@ describe('The RuboCop provider for Linter', () => {
           expect(messages[0].html).toBe(msgText);
           expect(messages[0].text).not.toBeDefined();
           expect(messages[0].filePath).toEqual(badPath);
-          expect(messages[0].range).toEqual([[0, 6], [0, 7]]);
+          expect(messages[0].range).toEqual([[1, 6], [1, 7]]);
         }),
       );
     });
@@ -85,7 +87,7 @@ describe('The RuboCop provider for Linter', () => {
           expect(messages[0].html).toBe(msgText);
           expect(messages[0].text).not.toBeDefined();
           expect(messages[0].filePath).toEqual(invalidWithUrlPath);
-          expect(messages[0].range).toEqual([[0, 6], [0, 20]]);
+          expect(messages[0].range).toEqual([[1, 6], [1, 20]]);
         }),
       );
     });
@@ -110,7 +112,7 @@ describe('The RuboCop provider for Linter', () => {
           expect(messages[0].html).toBe(msgText);
           expect(messages[0].text).not.toBeDefined();
           expect(messages[0].filePath).toEqual(invalidWithoutUrlPath);
-          expect(messages[0].range).toEqual([[4, 0], [4, 1]]);
+          expect(messages[0].range).toEqual([[5, 0], [5, 1]]);
         }),
       );
     });
@@ -134,6 +136,32 @@ describe('The RuboCop provider for Linter', () => {
         ),
       ),
     );
+  });
+
+  describe('respects .ruby-version when .rubycop.yml has not defined ruby version', () => {
+    it('finds violations when .rubocop.yml sets syntax to Ruby 2.2', () => {
+      writeFileSync(yml, 'AllCops:\n  TargetRubyVersion: 2.2', 'utf8');
+
+      waitsForPromise(() =>
+        atom.workspace.open(ruby23Path).then(editor =>
+          lint(editor).then(messages =>
+            expect(messages.length).toBe(1),
+          ),
+        ),
+      );
+    });
+
+    it('finds nothing wrong with a file when .rubocop.yml does not override the Ruby version', () => {
+      unlinkSync(yml);
+
+      waitsForPromise(() =>
+        atom.workspace.open(ruby23Path).then(editor =>
+          lint(editor).then(messages =>
+            expect(messages.length).toBe(0),
+          ),
+        ),
+      );
+    });
   });
 
   describe('allows the user to autocorrect the current file', () => {
