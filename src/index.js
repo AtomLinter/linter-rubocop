@@ -37,6 +37,9 @@ const parseFromStd = (stdout, stderr) => {
   return parsed;
 };
 
+const getProjectDirectory = filePath =>
+                              atom.project.relativizePath(filePath)[0] || path.dirname(filePath);
+
 const forwardRubocopToLinter =
   ({ message: rawMessage, location, severity, cop_name }, filePath) => {
     console.debug(...arguments);
@@ -159,7 +162,7 @@ export default {
                               .split(/\s+/)
                               .filter(i => i)
                               .concat(DEFAULT_ARGS, '--auto-correct', filePath);
-          const cwd = atom.project.getPaths()[0];
+          const cwd = getProjectDirectory(filePath);
           const { stdout, stderr } = await helpers.exec(command[0], command.slice(1), { cwd, stream: 'both' });
           const { summary: { offense_count: offenseCount } } = parseFromStd(stdout, stderr);
           return offenseCount === 0 ?
@@ -211,8 +214,8 @@ export default {
                             .split(/\s+/)
                             .filter(i => i)
                             .concat(DEFAULT_ARGS, '--stdin', filePath);
-        const cwd = atom.project.getPaths()[0]
         const stdin = editor.getText();
+        const cwd = getProjectDirectory(filePath);
         const { stdout, stderr } = await helpers.exec(command[0], command.slice(1), { cwd, stdin, stream: 'both' });
         const { files } = parseFromStd(stdout, stderr);
         const offenses = files && files[0] && files[0].offenses;

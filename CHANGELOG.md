@@ -1,5 +1,10 @@
 # Changelog
 
+## [v1.1.1](https://github.com/AtomLinter/linter-rubocop/compare/v1.1.0...v1.1.1)
+
+###### Bug Fixes:
+* Run atom lint from project root instead of file current being edited -- makes sure .ruby-version is respected
+
 ## [v1.1.0](https://github.com/AtomLinter/linter-rubocop/compare/v1.0.0...v1.1.0)
 
 *   Use [atom-package-deps](https://www.npmjs.com/package/atom-package-deps) to ensure that Atom Linter is installed
