@@ -154,7 +154,7 @@ describe('The RuboCop provider for Linter', () => {
       waitsForPromise(() =>
         atom.workspace.open(ruby23Path).then(editor =>
           lint(editor).then(messages =>
-            expect(messages.length).toEqual(0),
+            expect(messages.length).toBe(0),
           ),
         ),
       );
