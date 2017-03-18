@@ -1,7 +1,7 @@
 'use babel';
 
 import * as path from 'path';
-import { truncateSync, writeFileSync, readFileSync } from 'fs';
+import { truncateSync, writeFileSync, readFileSync, unlinkSync } from 'fs';
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 import tmp from 'tmp';
@@ -52,7 +52,7 @@ describe('The RuboCop provider for Linter', () => {
     });
 
     it('verifies the first message', () => {
-      const msgText = 'unterminated string meets end of file\n(Using Ruby 2.2 parser; ' +
+      const msgText = 'unterminated string meets end of file\n(Using Ruby 2.3 parser; ' +
         'configure using `TargetRubyVersion` parameter, under `AllCops`) (Syntax)';
 
       waitsForPromise(() =>
@@ -61,7 +61,7 @@ describe('The RuboCop provider for Linter', () => {
           expect(messages[0].html).toBe(msgText);
           expect(messages[0].text).not.toBeDefined();
           expect(messages[0].filePath).toEqual(badPath);
-          expect(messages[0].range).toEqual([[0, 6], [0, 7]]);
+          expect(messages[0].range).toEqual([[1, 6], [1, 7]]);
         }),
       );
     });
@@ -87,7 +87,7 @@ describe('The RuboCop provider for Linter', () => {
           expect(messages[0].html).toBe(msgText);
           expect(messages[0].text).not.toBeDefined();
           expect(messages[0].filePath).toEqual(invalidWithUrlPath);
-          expect(messages[0].range).toEqual([[0, 6], [0, 20]]);
+          expect(messages[0].range).toEqual([[1, 6], [1, 20]]);
         }),
       );
     });
@@ -112,7 +112,7 @@ describe('The RuboCop provider for Linter', () => {
           expect(messages[0].html).toBe(msgText);
           expect(messages[0].text).not.toBeDefined();
           expect(messages[0].filePath).toEqual(invalidWithoutUrlPath);
-          expect(messages[0].range).toEqual([[4, 0], [4, 1]]);
+          expect(messages[0].range).toEqual([[5, 0], [5, 1]]);
         }),
       );
     });
@@ -139,18 +139,21 @@ describe('The RuboCop provider for Linter', () => {
   });
 
   describe('respects .ruby-version when .rubycop.yml has not defined ruby version', () => {
-    let rubocopYmlText;
+    it('finds violations when .rubocop.yml sets syntax to Ruby 2.2', () => {
+      writeFileSync(yml, 'AllCops:\n  TargetRubyVersion: 2.2', 'utf8');
 
-    beforeEach(() => {
-      rubocopYmlText = readFileSync(yml, 'utf8');
-      writeFileSync(yml, '', 'utf8');
+      waitsForPromise(() =>
+        atom.workspace.open(ruby23Path).then(editor =>
+          lint(editor).then(messages =>
+            expect(messages.length).toBe(1),
+          ),
+        ),
+      );
     });
 
-    afterEach(() => {
-      writeFileSync(yml, rubocopYmlText, 'utf8');
-    });
+    it('finds nothing wrong with a file when .rubocop.yml does not override the Ruby version', () => {
+      unlinkSync(yml);
 
-    it('finds nothing wrong with a file using 2.3 syntax', () => {
       waitsForPromise(() =>
         atom.workspace.open(ruby23Path).then(editor =>
           lint(editor).then(messages =>
