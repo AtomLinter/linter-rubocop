@@ -87,6 +87,7 @@ describe('The RuboCop provider for Linter', () => {
           return messages[0].description();
         })
         .then(description => expect(description).toBeTruthy()),
+        // TODO: Handle this? Spys on module request?
       );
     });
   });

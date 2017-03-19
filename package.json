@@ -33,7 +33,6 @@
   "dependencies": {
     "atom-linter": "^9.0.0",
     "atom-package-deps": "^4.5.0",
-    "escape-html": "^1.0.3",
     "pluralize": "^3.1.0",
     "request-promise": "^4.1.1"
   },
