@@ -33,14 +33,12 @@
   "dependencies": {
     "atom-linter": "^9.0.0",
     "atom-package-deps": "^4.5.0",
-    "cheerio-req": "^1.1.2",
     "escape-html": "^1.0.3",
-    "humanize-string": "^1.0.1",
     "pluralize": "^3.1.0",
     "request-promise": "^4.1.1"
   },
   "devDependencies": {
-    "eslint": "^3.18.0",
+    "eslint": "^3.15.0",
     "eslint-config-airbnb-base": "^11.1.0",
     "eslint-plugin-import": "^2.2.0",
     "tmp": "^0.0.31"
@@ -59,7 +57,6 @@
     "extends": "airbnb-base",
     "rules": {
       "global-require": "off",
-      "no-unused-vars": ["error", { "ignoreRestSiblings": true }],
       "import/no-unresolved": [
         "error",
         {
