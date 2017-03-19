@@ -84,10 +84,12 @@ describe('The RuboCop provider for Linter', () => {
           expect(messages[0].excerpt).toBe(msgText);
           expect(messages[0].location.file).toBe(invalidWithUrlPath);
           expect(messages[0].location.position).toEqual([[1, 6], [1, 20]]);
-          return messages[0].description();
-        })
-        .then(description => expect(description).toBeTruthy()),
-        // TODO: Handle this? Spys on module request?
+          let msgDesc;
+          waitsForPromise(() => messages[0].description().then((desc) => {
+            msgDesc = desc;
+            expect(msgDesc).toBeTruthy();
+          }));
+        }),
       );
     });
   });
