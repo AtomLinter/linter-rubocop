@@ -86,14 +86,14 @@ const getMarkDown = async (url) => {
 };
 
 const forwardRubocopToLinter =
-  ({ message: rawMessage, location, severity, cop_name: copName }, file) => {
+  ({ message: rawMessage, location, severity, cop_name: copName }, file, editor) => {
     const [excerpt, url] = rawMessage.split(/ \((.*)\)/, 2);
     let position;
     if (location) {
       const { line, column, length } = location;
       position = [[line - 1, column - 1], [line - 1, (column + length) - 1]];
     } else {
-      position = helpers.generateRange(atom.workspace.getActiveTextEditor(), 0);
+      position = helpers.generateRange(editor, 0);
     }
 
     const severityMapping = {
@@ -196,7 +196,8 @@ export default {
         const { stdout, stderr } = await helpers.exec(command[0], command.slice(1), { cwd, stdin, stream: 'both' });
         const { files } = parseFromStd(stdout, stderr);
         const offenses = files && files[0] && files[0].offenses;
-        return (offenses || []).map(offense => forwardRubocopToLinter(offense, filePath));
+        return (offenses || []).map(offense =>
+          forwardRubocopToLinter(offense, filePath, atom.workspace.getActiveTextEditor()));
       },
     };
   },
