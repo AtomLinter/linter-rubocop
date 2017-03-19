@@ -55,7 +55,7 @@ const getMarkDown = async (url) => {
     docsRuleCache.clear();
   }
 
-  if (docsRuleCache.get(anchor)) { return docsRuleCache.get(anchor); }
+  if (docsRuleCache.has(anchor)) { return docsRuleCache.get(anchor); }
 
   let rawRulesMarkdown;
   try {
