@@ -86,9 +86,15 @@ const getMarkDown = async (url) => {
 };
 
 const forwardRubocopToLinter =
-  ({ message: rawMessage, location, severity, cop_name: copName }, filePath) => {
+  ({ message: rawMessage, location, severity, cop_name: copName }, file) => {
     const [excerpt, url] = rawMessage.split(/ \((.*)\)/, 2);
-    const { line, column, length } = location;
+    let position;
+    if (location) {
+      const { line, column, length } = location;
+      position = [[line - 1, column - 1], [line - 1, (column + length) - 1]];
+    } else {
+      position = helpers.generateRange(atom.workspace.getActiveTextEditor(), 0);
+    }
 
     const severityMapping = {
       refactor: 'info',
@@ -102,15 +108,12 @@ const forwardRubocopToLinter =
       url,
       excerpt: `${excerpt} (${copName})`,
       severity: severityMapping[severity],
-      description: url ? getMarkDown.bind(this, url) : null,
+      description: url ? () => getMarkDown(url) : null,
+      location: {
+        file,
+        position,
+      },
     };
-
-    if (location) {
-      linterMessage.location = {
-        file: filePath,
-        position: [[line - 1, column - 1], [line - 1, (column + length) - 1]],
-      };
-    }
     return linterMessage;
   };
 
