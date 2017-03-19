@@ -75,7 +75,7 @@ describe('The RuboCop provider for Linter', () => {
     });
 
     it('verifies the first message', () => {
-      const msgText = 'Prefer single-quoted strings when you don\'t need ' +
+      const msgText = "Prefer single-quoted strings when you don't need " +
         'string interpolation or special symbols. (Style/StringLiterals)';
 
       waitsForPromise(() =>
