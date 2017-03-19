@@ -1,5 +1,5 @@
 {
-  "name": "linter-rubocop-mine",
+  "name": "linter-rubocop",
   "main": "./src/index.js",
   "version": "1.1.1",
   "description": "Lint Ruby on the fly, using rubocop",
@@ -32,7 +32,7 @@
   },
   "dependencies": {
     "atom-linter": "^9.0.0",
-    "atom-package-deps": "^4.4.1",
+    "atom-package-deps": "^4.5.0",
     "cheerio-req": "^1.1.2",
     "escape-html": "^1.0.3",
     "humanize-string": "^1.0.1",
@@ -40,18 +40,17 @@
     "request-promise": "^4.1.1"
   },
   "devDependencies": {
-    "eslint": "^3.15.0",
+    "eslint": "^3.18.0",
     "eslint-config-airbnb-base": "^11.1.0",
     "eslint-plugin-import": "^2.2.0",
     "tmp": "^0.0.31"
   },
   "package-deps": [
-    "linter"
+    "linter:2.0.0"
   ],
   "providedServices": {
     "linter": {
       "versions": {
-        "1.1.0": "provideLinter",
         "2.0.0": "provideLinter"
       }
     }
@@ -60,6 +59,7 @@
     "extends": "airbnb-base",
     "rules": {
       "global-require": "off",
+      "no-unused-vars": ["error", { "ignoreRestSiblings": true }],
       "import/no-unresolved": [
         "error",
         {

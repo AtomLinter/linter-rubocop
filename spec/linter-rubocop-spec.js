@@ -2,7 +2,6 @@
 
 import * as path from 'path';
 import { truncateSync, writeFileSync, readFileSync, unlinkSync } from 'fs';
-
 // eslint-disable-next-line import/no-extraneous-dependencies
 import tmp from 'tmp';
 
@@ -12,7 +11,6 @@ const badPath = path.join(__dirname, 'fixtures', 'lintableFiles', 'bad.rb');
 const emptyPath = path.join(__dirname, 'fixtures', 'lintableFiles', 'empty.rb');
 const goodPath = path.join(__dirname, 'fixtures', 'lintableFiles', 'good.rb');
 const invalidWithUrlPath = path.join(__dirname, 'fixtures', 'lintableFiles', 'invalid_with_url.rb');
-const invalidWithoutUrlPath = path.join(__dirname, 'fixtures', 'lintableFiles', 'invalid_without_url.rb');
 const ruby23Path = path.join(__dirname, 'fixtures', 'lintableFiles', 'ruby_2_3.rb');
 const yml = path.join(__dirname, 'fixtures', '.rubocop.yml');
 
@@ -57,11 +55,11 @@ describe('The RuboCop provider for Linter', () => {
 
       waitsForPromise(() =>
         lint(editor).then((messages) => {
-          expect(messages[0].type).toEqual('Error');
-          expect(messages[0].html).toBe(msgText);
-          expect(messages[0].text).not.toBeDefined();
-          expect(messages[0].filePath).toEqual(badPath);
-          expect(messages[0].range).toEqual([[1, 6], [1, 7]]);
+          expect(messages[0].severity).toEqual('error');
+          expect(messages[0].excerpt).toBe(msgText);
+          expect(messages[0].description).toBe(null);
+          expect(messages[0].location.file).toEqual(badPath);
+          expect(messages[0].location.position).toEqual([[1, 6], [1, 7]]);
         }),
       );
     });
@@ -77,43 +75,18 @@ describe('The RuboCop provider for Linter', () => {
     });
 
     it('verifies the first message', () => {
-      const msgText = 'Prefer single-quoted strings when you don&#39;t need ' +
-        'string interpolation or special symbols. ' +
-        '(<a href="https://github.com/bbatsov/ruby-style-guide#consistent-string-literals">Style/StringLiterals</a>)';
+      const msgText = 'Prefer single-quoted strings when you don\'t need ' +
+        'string interpolation or special symbols. (Style/StringLiterals)';
 
       waitsForPromise(() =>
         lint(editor).then((messages) => {
-          expect(messages[0].type).toEqual('Warning');
-          expect(messages[0].html).toBe(msgText);
-          expect(messages[0].text).not.toBeDefined();
-          expect(messages[0].filePath).toEqual(invalidWithUrlPath);
-          expect(messages[0].range).toEqual([[1, 6], [1, 20]]);
-        }),
-      );
-    });
-  });
-
-  describe('shows errors without a clickable link in a file with warnings', () => {
-    let editor = null;
-
-    beforeEach(() => {
-      waitsForPromise(() =>
-        atom.workspace.open(invalidWithoutUrlPath).then((openEditor) => { editor = openEditor; }),
-      );
-    });
-
-    it('verifies the first message', () => {
-      const msgText = 'Extra empty line detected at class body end. ' +
-        '(Style/EmptyLinesAroundClassBody)';
-
-      waitsForPromise(() =>
-        lint(editor).then((messages) => {
-          expect(messages[0].type).toEqual('Warning');
-          expect(messages[0].html).toBe(msgText);
-          expect(messages[0].text).not.toBeDefined();
-          expect(messages[0].filePath).toEqual(invalidWithoutUrlPath);
-          expect(messages[0].range).toEqual([[5, 0], [5, 1]]);
-        }),
+          expect(messages[0].severity).toEqual('info');
+          expect(messages[0].excerpt).toBe(msgText);
+          expect(messages[0].location.file).toEqual(invalidWithUrlPath);
+          expect(messages[0].location.position).toEqual([[1, 6], [1, 20]]);
+          return messages[0].description();
+        })
+        .then(description => expect(description).toBeTruthy()),
       );
     });
   });

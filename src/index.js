@@ -3,10 +3,9 @@
 // eslint-disable-next-line import/extensions, import/no-extraneous-dependencies
 import { CompositeDisposable } from 'atom';
 import path from 'path';
-import escapeHtml from 'escape-html';
 import pluralize from 'pluralize';
 import * as helpers from 'atom-linter';
-import cheerioReq from 'cheerio-req';
+import { get } from 'request-promise';
 
 const DEFAULT_ARGS = [
   '--cache', 'false',
@@ -14,16 +13,22 @@ const DEFAULT_ARGS = [
   '--format', 'json',
   '--display-style-guide',
 ];
+const DOCUMENTATION_LIFETIME = 86400 * 1000; // 1 day TODO: Configurable?
 
-const formatMessage = ({ message, cop_name: copName, url }) => {
-  const formattedMessage = escapeHtml(message || 'Unknown Error');
-  let formattedCopName = '';
-  if (copName && url) {
-    formattedCopName = ` (<a href="${escapeHtml(url)}">${escapeHtml(copName)}</a>)`;
-  } else if (copName) {
-    formattedCopName = ` (${escapeHtml(copName)})`;
+let docsRuleCache = {};
+let docsLastRetrieved;
+
+const takeWhile = (source, predicate) => {
+  const result = [];
+  const length = source.length;
+  let i = 0;
+
+  while (i < length && predicate(source[i], i)) {
+    result.push(source[i]);
+    i += 1;
   }
-  return formattedMessage + formattedCopName;
+
+  return result;
 };
 
 const parseFromStd = (stdout, stderr) => {
@@ -40,11 +45,46 @@ const parseFromStd = (stdout, stderr) => {
 const getProjectDirectory = filePath =>
                               atom.project.relativizePath(filePath)[0] || path.dirname(filePath);
 
+
+// Retrieves style guide documentation with cached responses
+const getMarkDown = async (url) => {
+  const anchor = url.split('#').slice(-1);
+  const docsExipired = (lastRetrieved, lifetime) => new Date().getTime() - lastRetrieved < lifetime;
+
+  if (docsRuleCache[anchor] && docsExipired(docsLastRetrieved, DOCUMENTATION_LIFETIME)) {
+    return docsRuleCache[anchor];
+  }
+
+  let rawRulesMarkdown;
+  try {
+    rawRulesMarkdown = await get('https://raw.githubusercontent.com/bbatsov/ruby-style-guide/master/README.md');
+  } catch (x) {
+    return '***\nError retrieving documentation';
+  }
+
+  const byLine = rawRulesMarkdown.split('\n');
+  const ruleAnchors = byLine.filter(l => l.match(/\* <a name=/g));
+
+  docsRuleCache = ruleAnchors.reduce((cache, rambo) => {
+    // not efficient but itll do
+    const startingLine = byLine.indexOf(rambo);
+    const ruleName = rambo.split('"')[1];
+    const beginSearch = byLine.slice(startingLine + 1);
+
+    // gobble all the documentation until you reach the next rule
+    const documentationForRule = takeWhile(beginSearch, x => !x.match(/\* <a name=/));
+    const markdownOutput = '***\n'.concat(documentationForRule.join('\n'));
+
+    return { [ruleName]: markdownOutput, ...cache };
+  }, docsRuleCache);
+
+  docsLastRetrieved = new Date().getTime();
+  return docsRuleCache[anchor];
+};
+
 const forwardRubocopToLinter =
-  ({ message: rawMessage, location, severity, cop_name }, filePath) => {
-    console.debug(...arguments);
-    // refactor, convention, warning, error and fatal
-    const [description, url] = rawMessage.split(/ \((.*)\)/, 2);
+  ({ message: rawMessage, location, severity, cop_name: copName }, filePath) => {
+    const [excerpt, url] = rawMessage.split(/ \((.*)\)/, 2);
     const { line, column, length } = location;
 
     const severityMapping = {
@@ -55,93 +95,25 @@ const forwardRubocopToLinter =
       fatal: 'error',
     };
 
-    function takeWhile(source, predicate) {
-      const result = [];
-      const length = source.length;
-      let i = 0;
-
-      while (i < length && predicate(source[i], i)) {
-        result.push(source[i]);
-        i++;
-      }
-
-      return result;
-    }
-
-
-    const getMarkDown = async () => {
-      const [urlz, ...anchor] = url.split('#');
-      const request = require('request-promise');
-      const body = await request.get('https://raw.githubusercontent.com/bbatsov/ruby-style-guide/master/README.md');
-      const byLine = body.split('\n');
-      const string = `"${anchor}"`;
-      const regex = new RegExp(string, 'g');
-
-      // not efficient but itll do
-      const startingLine = byLine.indexOf(byLine.find(l => l.match(regex)));
-      const [firstLine, ...segment] = byLine.slice(startingLine);
-      const lines = takeWhile(segment, l => !l.match(/\* <a name=/));
-      // if (line.length > 100) { throw 'Something is fucked' }
-      return lines.join('\n');
-    };
-
-
-
-    const newOutput = {
+    const linterMessage = {
       url,
+      excerpt: `${excerpt} (${copName})`,
       severity: severityMapping[severity],
-      description: url ? getMarkDown : "Syntax error",
-      excerpt: [cop_name, description].join(' -- '),
+      description: url ? getMarkDown.bind(this, url) : null,
     };
 
-    //
-    // let markdown
-    // request(, (error, response, body) => {
-    //   if (error) { return; }
-    //   console.log('hello')
-    //   const byLine = body.split('\n')
-    //   const string = `"${anchor}"`
-    //   const regex = new RegExp(string, "g");
-    //
-    //   //not efficient but itll do
-    //   const startingLine = byLine.indexOf(byLine.find(line => line.match(regex)))
-    //   const [firstLine, ...segment] = byLine.slice(startingLine)
-    //   const lines = takeWhile(segment, l => !l.match(/\* <a name=/))
-    //   if (line.length > 100) { console.log('Something is fucked'); }
-    //   markdown = firstLine.concat(lines)
-    //
-    //   const newOutput = {
-    //     url,
-    //     severity: severityMapping[severity],
-    //     description,
-    //     excerpt: cop_name,
-    //   };
-    // });
-
-
-    // <a name="user-content-underscore-unused-vars"></a>
-
-
-    // const outputToLinter = {
-    //   type: ['refactor', 'convention', 'warning'].includes(severity) ? 'Warning' : 'Error',
-    //   html: formatMessage({ cop_name, description, url }),
-    //   filePath,
-    // };
-    // return Object.assign(outputToLinter,
-    //   location && { range: [[line - 1, column - 1], [line - 1, (column + length) - 1]] },
-    // );
     if (location) {
-      newOutput.location = {
+      linterMessage.location = {
         file: filePath,
         position: [[line - 1, column - 1], [line - 1, (column + length) - 1]],
       };
     }
-    return newOutput;
+    return linterMessage;
   };
 
 export default {
   activate() {
-    console.log(atom.project.getPaths())
+    // console.log(atom.project.getPaths());
     require('atom-package-deps').install('linter-rubocop', true);
 
     this.subscriptions = new CompositeDisposable();
