@@ -15,7 +15,7 @@ const DEFAULT_ARGS = [
 ];
 const DOCUMENTATION_LIFETIME = 86400 * 1000; // 1 day TODO: Configurable?
 
-let docsRuleCache = {};
+const docsRuleCache = new Map();
 let docsLastRetrieved;
 
 const takeWhile = (source, predicate) => {
@@ -48,12 +48,14 @@ const getProjectDirectory = filePath =>
 
 // Retrieves style guide documentation with cached responses
 const getMarkDown = async (url) => {
-  const anchor = url.split('#').slice(-1);
-  const docsExipired = (lastRetrieved, lifetime) => new Date().getTime() - lastRetrieved < lifetime;
+  const anchor = url.split('#')[1];
 
-  if (docsRuleCache[anchor] && docsExipired(docsLastRetrieved, DOCUMENTATION_LIFETIME)) {
-    return docsRuleCache[anchor];
+  if (new Date().getTime() - docsLastRetrieved < DOCUMENTATION_LIFETIME) {
+    // If documentation is stale, clear cache
+    docsRuleCache.clear();
   }
+
+  if (docsRuleCache.get(anchor)) { return docsRuleCache.get(anchor); }
 
   let rawRulesMarkdown;
   try {
@@ -63,23 +65,24 @@ const getMarkDown = async (url) => {
   }
 
   const byLine = rawRulesMarkdown.split('\n');
-  const ruleAnchors = byLine.filter(l => l.match(/\* <a name=/g));
+  // eslint-disable-next-line no-confusing-arrow
+  const ruleAnchors = byLine.reduce((acc, line, idx) =>
+                                      line.match(/\* <a name=/g) ? acc.concat([[idx, line]]) : acc,
+                                      []);
 
-  docsRuleCache = ruleAnchors.reduce((cache, rambo) => {
-    // not efficient but itll do
-    const startingLine = byLine.indexOf(rambo);
-    const ruleName = rambo.split('"')[1];
-    const beginSearch = byLine.slice(startingLine + 1);
+  ruleAnchors.forEach(([startingIndex, startingLine]) => {
+    const ruleName = startingLine.split('"')[1];
+    const beginSearch = byLine.slice(startingIndex + 1);
 
     // gobble all the documentation until you reach the next rule
     const documentationForRule = takeWhile(beginSearch, x => !x.match(/\* <a name=/));
     const markdownOutput = '***\n'.concat(documentationForRule.join('\n'));
 
-    return { [ruleName]: markdownOutput, ...cache };
-  }, docsRuleCache);
+    docsRuleCache.set(ruleName, markdownOutput);
+  });
 
   docsLastRetrieved = new Date().getTime();
-  return docsRuleCache[anchor];
+  return docsRuleCache.get(anchor);
 };
 
 const forwardRubocopToLinter =
