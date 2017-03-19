@@ -33,11 +33,11 @@ describe('The RuboCop provider for Linter', () => {
   });
 
   it('should be in the packages list', () =>
-    expect(atom.packages.isPackageLoaded('linter-rubocop')).toEqual(true),
+    expect(atom.packages.isPackageLoaded('linter-rubocop')).toBe(true),
   );
 
   it('should be an active package', () =>
-    expect(atom.packages.isPackageActive('linter-rubocop')).toEqual(true),
+    expect(atom.packages.isPackageActive('linter-rubocop')).toBe(true),
   );
 
   describe('shows errors in a file with errors', () => {
@@ -55,10 +55,10 @@ describe('The RuboCop provider for Linter', () => {
 
       waitsForPromise(() =>
         lint(editor).then((messages) => {
-          expect(messages[0].severity).toEqual('error');
+          expect(messages[0].severity).toBe('error');
           expect(messages[0].excerpt).toBe(msgText);
           expect(messages[0].description).toBe(null);
-          expect(messages[0].location.file).toEqual(badPath);
+          expect(messages[0].location.file).toBe(badPath);
           expect(messages[0].location.position).toEqual([[1, 6], [1, 7]]);
         }),
       );
@@ -80,9 +80,9 @@ describe('The RuboCop provider for Linter', () => {
 
       waitsForPromise(() =>
         lint(editor).then((messages) => {
-          expect(messages[0].severity).toEqual('info');
+          expect(messages[0].severity).toBe('info');
           expect(messages[0].excerpt).toBe(msgText);
-          expect(messages[0].location.file).toEqual(invalidWithUrlPath);
+          expect(messages[0].location.file).toBe(invalidWithUrlPath);
           expect(messages[0].location.position).toEqual([[1, 6], [1, 20]]);
           return messages[0].description();
         })
@@ -96,7 +96,7 @@ describe('The RuboCop provider for Linter', () => {
     waitsForPromise(() =>
       atom.workspace.open(emptyPath).then(editor =>
         lint(editor).then(messages =>
-          expect(messages.length).toEqual(0),
+          expect(messages.length).toBe(0),
         ),
       ),
     );
@@ -106,7 +106,7 @@ describe('The RuboCop provider for Linter', () => {
     waitsForPromise(() =>
       atom.workspace.open(goodPath).then(editor =>
         lint(editor).then(messages =>
-          expect(messages.length).toEqual(0),
+          expect(messages.length).toBe(0),
         ),
       ),
     );
@@ -144,10 +144,10 @@ describe('The RuboCop provider for Linter', () => {
     const checkNotificaton = (notification) => {
       const message = notification.getMessage();
       if (message === 'Linter-Rubocop: No fixes were made') {
-        expect(notification.getType()).toEqual('info');
+        expect(notification.getType()).toBe('info');
       } else {
         expect(message).toMatch(/Linter-Rubocop: Fixed \d offenses/);
-        expect(notification.getType()).toEqual('success');
+        expect(notification.getType()).toBe('success');
       }
       doneCorrecting = true;
     };
