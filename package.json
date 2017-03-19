@@ -19,6 +19,11 @@
       "title": "Disable when no .rubocop.yml config file is found",
       "default": false,
       "description": "Only run linter if a RuboCop config file is found somewhere in the path for the current file."
+    },
+    "lintOnFly": {
+      "type": "boolean",
+      "title": "Lint on fly (instead of on save)",
+      "default": true
     }
   },
   "activationHooks": [
