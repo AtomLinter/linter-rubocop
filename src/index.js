@@ -196,8 +196,7 @@ export default {
         const { stdout, stderr } = await helpers.exec(command[0], command.slice(1), { cwd, stdin, stream: 'both' });
         const { files } = parseFromStd(stdout, stderr);
         const offenses = files && files[0] && files[0].offenses;
-        return (offenses || []).map(offense =>
-          forwardRubocopToLinter(offense, filePath, atom.workspace.getActiveTextEditor()));
+        return (offenses || []).map(offense => forwardRubocopToLinter(offense, filePath, editor));
       },
     };
   },
