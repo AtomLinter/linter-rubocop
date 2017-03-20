@@ -3,9 +3,9 @@
 // eslint-disable-next-line import/extensions, import/no-extraneous-dependencies
 import { CompositeDisposable } from 'atom';
 import path from 'path';
-import escapeHtml from 'escape-html';
 import pluralize from 'pluralize';
 import * as helpers from 'atom-linter';
+import { get } from 'request-promise';
 
 const DEFAULT_ARGS = [
   '--cache', 'false',
@@ -13,16 +13,22 @@ const DEFAULT_ARGS = [
   '--format', 'json',
   '--display-style-guide',
 ];
+const DOCUMENTATION_LIFETIME = 86400 * 1000; // 1 day TODO: Configurable?
 
-const formatMessage = ({ message, cop_name: copName, url }) => {
-  const formattedMessage = escapeHtml(message || 'Unknown Error');
-  let formattedCopName = '';
-  if (copName && url) {
-    formattedCopName = ` (<a href="${escapeHtml(url)}">${escapeHtml(copName)}</a>)`;
-  } else if (copName) {
-    formattedCopName = ` (${escapeHtml(copName)})`;
+const docsRuleCache = new Map();
+let docsLastRetrieved;
+
+const takeWhile = (source, predicate) => {
+  const result = [];
+  const length = source.length;
+  let i = 0;
+
+  while (i < length && predicate(source[i], i)) {
+    result.push(source[i]);
+    i += 1;
   }
-  return formattedMessage + formattedCopName;
+
+  return result;
 };
 
 const parseFromStd = (stdout, stderr) => {
@@ -39,18 +45,76 @@ const parseFromStd = (stdout, stderr) => {
 const getProjectDirectory = filePath =>
                               atom.project.relativizePath(filePath)[0] || path.dirname(filePath);
 
+
+// Retrieves style guide documentation with cached responses
+const getMarkDown = async (url) => {
+  const anchor = url.split('#')[1];
+
+  if (new Date().getTime() - docsLastRetrieved < DOCUMENTATION_LIFETIME) {
+    // If documentation is stale, clear cache
+    docsRuleCache.clear();
+  }
+
+  if (docsRuleCache.has(anchor)) { return docsRuleCache.get(anchor); }
+
+  let rawRulesMarkdown;
+  try {
+    rawRulesMarkdown = await get('https://raw.githubusercontent.com/bbatsov/ruby-style-guide/master/README.md');
+  } catch (x) {
+    return '***\nError retrieving documentation';
+  }
+
+  const byLine = rawRulesMarkdown.split('\n');
+  // eslint-disable-next-line no-confusing-arrow
+  const ruleAnchors = byLine.reduce((acc, line, idx) =>
+                                      line.match(/\* <a name=/g) ? acc.concat([[idx, line]]) : acc,
+                                      []);
+
+  ruleAnchors.forEach(([startingIndex, startingLine]) => {
+    const ruleName = startingLine.split('"')[1];
+    const beginSearch = byLine.slice(startingIndex + 1);
+
+    // gobble all the documentation until you reach the next rule
+    const documentationForRule = takeWhile(beginSearch, x => !x.match(/\* <a name=/));
+    const markdownOutput = '***\n'.concat(documentationForRule.join('\n'));
+
+    docsRuleCache.set(ruleName, markdownOutput);
+  });
+
+  docsLastRetrieved = new Date().getTime();
+  return docsRuleCache.get(anchor);
+};
+
 const forwardRubocopToLinter =
-  ({ message: rawMessage, location, severity, cop_name }, filePath) => {
-    const [message, url] = rawMessage.split(/ \((.*)\)/, 2);
-    const { line, column, length } = location;
-    const outputToLinter = {
-      type: ['refactor', 'convention', 'warning'].includes(severity) ? 'Warning' : 'Error',
-      html: formatMessage({ cop_name, message, url }),
-      filePath,
+  ({ message: rawMessage, location, severity, cop_name: copName }, file, editor) => {
+    const [excerpt, url] = rawMessage.split(/ \((.*)\)/, 2);
+    let position;
+    if (location) {
+      const { line, column, length } = location;
+      position = [[line - 1, column - 1], [line - 1, (column + length) - 1]];
+    } else {
+      position = helpers.generateRange(editor, 0);
+    }
+
+    const severityMapping = {
+      refactor: 'info',
+      convention: 'info',
+      warning: 'warning',
+      error: 'error',
+      fatal: 'error',
     };
-    return Object.assign(outputToLinter,
-      location && { range: [[line - 1, column - 1], [line - 1, (column + length) - 1]] },
-    );
+
+    const linterMessage = {
+      url,
+      excerpt: `${excerpt} (${copName})`,
+      severity: severityMapping[severity],
+      description: url ? () => getMarkDown(url) : null,
+      location: {
+        file,
+        position,
+      },
+    };
+    return linterMessage;
   };
 
 export default {
@@ -112,7 +176,7 @@ export default {
         'source.ruby.chef',
       ],
       scope: 'file',
-      lintOnFly: true,
+      lintsOnChange: true,
       lint: async (editor) => {
         const filePath = editor.getPath();
 
@@ -132,7 +196,8 @@ export default {
         const { stdout, stderr } = await helpers.exec(command[0], command.slice(1), { cwd, stdin, stream: 'both' });
         const { files } = parseFromStd(stdout, stderr);
         const offenses = files && files[0] && files[0].offenses;
-        return (offenses || []).map(offense => forwardRubocopToLinter(offense, filePath));
+        return (offenses || []).map(offense =>
+          forwardRubocopToLinter(offense, filePath, atom.workspace.getActiveTextEditor()));
       },
     };
   },
