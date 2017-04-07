@@ -83,7 +83,7 @@ describe('The RuboCop provider for Linter', () => {
           expect(messages[0].severity).toBe('info');
           expect(messages[0].excerpt).toBe(msgText);
           expect(messages[0].location.file).toBe(invalidWithUrlPath);
-          expect(messages[0].location.position).toEqual([[1, 6], [1, 20]]);
+          expect(messages[0].location.position).toEqual([[2, 6], [2, 20]]);
           waitsForPromise(() => messages[0].description().then(desc => expect(desc).toBeTruthy()));
         }),
       );
