@@ -112,7 +112,9 @@ describe('The RuboCop provider for Linter', () => {
 
   describe('respects .ruby-version when .rubycop.yml has not defined ruby version', () => {
     it('finds violations when .rubocop.yml sets syntax to Ruby 2.2', () => {
-      writeFileSync(yml, 'AllCops:\n  TargetRubyVersion: 2.2', 'utf8');
+      writeFileSync(yml,
+                    'AllCops:\n  TargetRubyVersion: 2.2\nStyle/EndOfLine:\n EnforcedStyle: lf',
+                    'utf8');
 
       waitsForPromise(() =>
         atom.workspace.open(ruby23Path).then(editor =>
