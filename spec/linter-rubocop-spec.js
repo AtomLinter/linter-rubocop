@@ -1,7 +1,7 @@
 'use babel';
 
 import * as path from 'path';
-import { truncateSync, writeFileSync, readFileSync, unlinkSync } from 'fs';
+import { truncateSync, writeFileSync, readFileSync } from 'fs';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import tmp from 'tmp';
 
