@@ -198,11 +198,18 @@ export default {
                             .concat(DEFAULT_ARGS, '--stdin', filePath)
         const stdin = editor.getText()
         const cwd = getProjectDirectory(filePath)
-        const { stdout, stderr } = await helpers.exec(command[0],
-                                                      command.slice(1),
-                                                      { cwd, stdin, stream: 'both', timeout: this.linterTimeout },
-                                                    )
-        const { files } = parseFromStd(stdout, stderr)
+        const exexOptions = {
+          cwd,
+          stdin,
+          stream: 'both',
+          timeout: this.linterTimeout,
+          uniqueKey: 'linter-rubocop',
+        }
+        const output = await helpers.exec(command[0], command.slice(1), exexOptions)
+        // Process was canceled by newer process
+        if (output === null) { return null }
+
+        const { files } = parseFromStd(output.stdout, output.stderr)
         const offenses = files && files[0] && files[0].offenses
         return (offenses || []).map(offense => forwardRubocopToLinter(offense, filePath, editor))
       },
