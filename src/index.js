@@ -75,7 +75,7 @@ const getMarkDown = async (url) => {
     const beginSearch = byLine.slice(startingIndex + 1)
 
     // gobble all the documentation until you reach the next rule
-    const documentationForRule = takeWhile(beginSearch, x => !x.match(/\* <a name=/))
+    const documentationForRule = takeWhile(beginSearch, x => !x.match(/\* <a name=|##/))
     const markdownOutput = '***\n'.concat(documentationForRule.join('\n'))
 
     docsRuleCache.set(ruleName, markdownOutput)
