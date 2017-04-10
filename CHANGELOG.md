@@ -1,5 +1,12 @@
 # Changelog
 
+## [v2.0.0](https://github.com/AtomLinter/linter-rubocop/compare/v1.1.1...v2.0.0)
+
+###### Changes:
+* Upgrade to work with Linter 2 API
+* Pull detailed documentation from bbatsov's style guide
+* Linter timeout configurable (defaults to 10 seconds)
+
 ## [v1.1.1](https://github.com/AtomLinter/linter-rubocop/compare/v1.1.0...v1.1.1)
 
 ###### Bug Fixes:
