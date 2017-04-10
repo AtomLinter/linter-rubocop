@@ -1,7 +1,7 @@
 'use babel';
 
 import * as path from 'path';
-import { truncateSync, writeFileSync, readFileSync, unlinkSync } from 'fs';
+import { truncateSync, writeFileSync, readFileSync } from 'fs';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import tmp from 'tmp';
 
@@ -12,10 +12,13 @@ const emptyPath = path.join(__dirname, 'fixtures', 'lintableFiles', 'empty.rb');
 const goodPath = path.join(__dirname, 'fixtures', 'lintableFiles', 'good.rb');
 const invalidWithUrlPath = path.join(__dirname, 'fixtures', 'lintableFiles', 'invalid_with_url.rb');
 const ruby23Path = path.join(__dirname, 'fixtures', 'lintableFiles', 'ruby_2_3.rb');
-const yml = path.join(__dirname, 'fixtures', '.rubocop.yml');
+const ruby23PathYml22 = path.join(__dirname, 'fixtures', 'yml2_2', 'ruby_2_3.rb');
 
 describe('The RuboCop provider for Linter', () => {
   beforeEach(() => {
+    // Reset/set project path to fixtures
+    atom.project.setPaths([path.join(__dirname, 'fixtures')]);
+
     atom.workspace.destroyActivePaneItem();
 
     // Info about this beforeEach() implementation:
@@ -83,7 +86,7 @@ describe('The RuboCop provider for Linter', () => {
           expect(messages[0].severity).toBe('info');
           expect(messages[0].excerpt).toBe(msgText);
           expect(messages[0].location.file).toBe(invalidWithUrlPath);
-          expect(messages[0].location.position).toEqual([[1, 6], [1, 20]]);
+          expect(messages[0].location.position).toEqual([[2, 6], [2, 20]]);
           waitsForPromise(() => messages[0].description().then(desc => expect(desc).toBeTruthy()));
         }),
       );
@@ -112,10 +115,9 @@ describe('The RuboCop provider for Linter', () => {
 
   describe('respects .ruby-version when .rubycop.yml has not defined ruby version', () => {
     it('finds violations when .rubocop.yml sets syntax to Ruby 2.2', () => {
-      writeFileSync(yml, 'AllCops:\n  TargetRubyVersion: 2.2', 'utf8');
-
+      atom.project.setPaths([path.join(__dirname, 'fixtures', 'yml2_2')]);
       waitsForPromise(() =>
-        atom.workspace.open(ruby23Path).then(editor =>
+        atom.workspace.open(ruby23PathYml22).then(editor =>
           lint(editor).then(messages =>
             expect(messages.length).toBe(1),
           ),
@@ -124,8 +126,6 @@ describe('The RuboCop provider for Linter', () => {
     });
 
     it('finds nothing wrong with a file when .rubocop.yml does not override the Ruby version', () => {
-      unlinkSync(yml);
-
       waitsForPromise(() =>
         atom.workspace.open(ruby23Path).then(editor =>
           lint(editor).then(messages =>
