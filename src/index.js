@@ -160,6 +160,11 @@ export default {
         this.disableWhenNoConfigFile = value
       }),
     )
+    this.subscriptions.add(
+      atom.config.observe('linter-rubocop.linterTimeout', (value) => {
+        this.linterTimeout = value
+      }),
+    )
   },
 
   deactivate() {
@@ -193,7 +198,10 @@ export default {
                             .concat(DEFAULT_ARGS, '--stdin', filePath)
         const stdin = editor.getText()
         const cwd = getProjectDirectory(filePath)
-        const { stdout, stderr } = await helpers.exec(command[0], command.slice(1), { cwd, stdin, stream: 'both' })
+        const { stdout, stderr } = await helpers.exec(command[0],
+                                                      command.slice(1),
+                                                      { cwd, stdin, stream: 'both', timeout: this.linterTimeout },
+                                                    )
         const { files } = parseFromStd(stdout, stderr)
         const offenses = files && files[0] && files[0].offenses
         return (offenses || []).map(offense => forwardRubocopToLinter(offense, filePath, editor))
