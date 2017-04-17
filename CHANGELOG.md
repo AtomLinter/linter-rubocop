@@ -1,5 +1,11 @@
 # Changelog
 
+## [v2.1.0](https://github.com/AtomLinter/linter-rubocop/compare/v2.0.0...v2.1.0)
+
+###### Changes:
+* Upgrade to `atom-linter@10.0.0`.
+* Unique process spawning -- newer linter process spawns will kill older processes
+
 ## [v2.0.0](https://github.com/AtomLinter/linter-rubocop/compare/v1.1.1...v2.0.0)
 
 ###### Changes:
