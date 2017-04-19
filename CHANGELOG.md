@@ -1,5 +1,10 @@
 # Changelog
 
+## [v2.1.1](https://github.com/AtomLinter/linter-rubocop/compare/v2.1.0...v2.1.1)
+
+###### Bug Fixes:
+* Unique process spawning -- key process id's by linter name + filepath
+
 ## [v2.1.0](https://github.com/AtomLinter/linter-rubocop/compare/v2.0.0...v2.1.0)
 
 ###### Changes:
