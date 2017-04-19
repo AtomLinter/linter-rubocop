@@ -203,7 +203,7 @@ export default {
           stdin,
           stream: 'both',
           timeout: this.linterTimeout,
-          uniqueKey: 'linter-rubocop',
+          uniqueKey: `linter-rubocop::${filePath}`,
         }
         const output = await helpers.exec(command[0], command.slice(1), exexOptions)
         // Process was canceled by newer process
