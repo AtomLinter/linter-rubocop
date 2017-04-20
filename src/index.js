@@ -160,11 +160,6 @@ export default {
         this.disableWhenNoConfigFile = value
       }),
     )
-    this.subscriptions.add(
-      atom.config.observe('linter-rubocop.linterTimeout', (value) => {
-        this.linterTimeout = value
-      }),
-    )
   },
 
   deactivate() {
@@ -202,7 +197,6 @@ export default {
           cwd,
           stdin,
           stream: 'both',
-          timeout: this.linterTimeout,
           uniqueKey: `linter-rubocop::${filePath}`,
         }
         const output = await helpers.exec(command[0], command.slice(1), exexOptions)
