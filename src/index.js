@@ -160,11 +160,6 @@ export default {
         this.disableWhenNoConfigFile = value
       }),
     )
-    this.subscriptions.add(
-      atom.config.observe('linter-rubocop.linterTimeout', (value) => {
-        this.linterTimeout = value
-      }),
-    )
   },
 
   deactivate() {
@@ -202,10 +197,25 @@ export default {
           cwd,
           stdin,
           stream: 'both',
-          timeout: this.linterTimeout,
+          timeout: 10000,
           uniqueKey: `linter-rubocop::${filePath}`,
         }
-        const output = await helpers.exec(command[0], command.slice(1), exexOptions)
+
+        let output
+        try {
+          output = await helpers.exec(command[0], command.slice(1), exexOptions)
+        } catch (e) {
+          if (e.message !== 'Process execution timed out') throw e
+          atom.notifications.addInfo(
+            'Linter-Rubocop: Linter timed out',
+            {
+              description: 'Make sure you are not running Rubocop with a slow-starting interpreter like JRuby. ' +
+                           'If you are still seeing timeouts, consider running your linter `on save` and not `on change`, ' +
+                           'or reference https://github.com/AtomLinter/linter-rubocop/issues/202 .',
+            },
+          )
+          return null
+        }
         // Process was canceled by newer process
         if (output === null) { return null }
 
