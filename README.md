@@ -46,17 +46,19 @@ You can configure linter-rubocop by editing `~/.atom/config.cson`
 
 If you're using RVM and receiving errors in Atom that indicate Rubocop can't be
 found, you may need to change `/bin` to `/wrappers` in the path that gets
-returned from `which rubocop` before using it as your `executablePath` setting.
+returned from `which rubocop` before using it as your `command` setting.
 For example, change:
 
-```text
-/Users/JohnDoe/.rvm/gems/ruby-2.2.4@global/bin/rubocop
+```cson
+"linter-rubocop":
+  command: "/Users/JohnDoe/.rvm/gems/ruby-2.2.4@global/bin/rubocop"
 ```
 
 To:
 
-```text
-/Users/JohnDoe/.rvm/gems/ruby-2.2.4@global/wrappers/rubocop
+```cson
+"linter-rubocop":
+  command: "/Users/JohnDoe/.rvm/gems/ruby-2.2.4@global/wrappers/rubocop"
 ```
 
 ## Contributing
