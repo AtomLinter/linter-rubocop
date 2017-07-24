@@ -29,7 +29,7 @@ describe('The RuboCop provider for Linter', () => {
     waitsForPromise(() =>
       atom.packages.activatePackage('language-ruby').then(() =>
         atom.workspace.open(goodPath),
-    ))
+      ))
 
     atom.packages.triggerDeferredActivationHooks()
     waitsForPromise(() => activationPromise)

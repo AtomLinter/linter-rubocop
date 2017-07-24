@@ -43,7 +43,7 @@ const parseFromStd = (stdout, stderr) => {
 }
 
 const getProjectDirectory = filePath =>
-                              atom.project.relativizePath(filePath)[0] || path.dirname(filePath)
+  atom.project.relativizePath(filePath)[0] || path.dirname(filePath)
 
 
 // Retrieves style guide documentation with cached responses
@@ -67,8 +67,8 @@ const getMarkDown = async (url) => {
   const byLine = rawRulesMarkdown.split('\n')
   // eslint-disable-next-line no-confusing-arrow
   const ruleAnchors = byLine.reduce((acc, line, idx) =>
-                                      line.match(/\* <a name=/g) ? acc.concat([[idx, line]]) : acc,
-                                      [])
+    line.match(/\* <a name=/g) ? acc.concat([[idx, line]]) : acc,
+  [])
 
   ruleAnchors.forEach(([startingIndex, startingLine]) => {
     const ruleName = startingLine.split('"')[1]
@@ -136,9 +136,9 @@ export default {
 
           const filePath = textEditor.getPath()
           const command = this.command
-                              .split(/\s+/)
-                              .filter(i => i)
-                              .concat(DEFAULT_ARGS, '--auto-correct', filePath)
+            .split(/\s+/)
+            .filter(i => i)
+            .concat(DEFAULT_ARGS, '--auto-correct', filePath)
           const cwd = getProjectDirectory(filePath)
           const { stdout, stderr } = await helpers.exec(command[0], command.slice(1), { cwd, stream: 'both' })
           const { summary: { offense_count: offenseCount } } = parseFromStd(stdout, stderr)
@@ -188,9 +188,9 @@ export default {
         }
 
         const command = this.command
-                            .split(/\s+/)
-                            .filter(i => i)
-                            .concat(DEFAULT_ARGS, '--stdin', filePath)
+          .split(/\s+/)
+          .filter(i => i)
+          .concat(DEFAULT_ARGS, '--stdin', filePath)
         const stdin = editor.getText()
         const cwd = getProjectDirectory(filePath)
         const exexOptions = {
