@@ -62,7 +62,7 @@ To:
 ```
 ### Using `rbenv`
 
-If you're using `rbenv`, it's recommended that you set your `command` to point to the Rubocop shim. This way, when you upgrade Ruby, the command will be a pointer to a Rubocop executable, regardless of current Ruby version.
+If you're using `rbenv`, it's recommended that you set your `command` to point to the Rubocop shim. This way, when you upgrade Ruby, the command will be a pointer to a Rubocop executable, regardless of your current Ruby version.
 
 ```cson
 "linter-rubocop":
