@@ -60,6 +60,14 @@ To:
 "linter-rubocop":
   command: "/Users/JohnDoe/.rvm/gems/ruby-2.2.4@global/wrappers/rubocop"
 ```
+### Using `rbenv`
+
+If you're using `rbenv`, it's recommended that you set your `command` to point to the Rubocop shim. This way, when you upgrade Ruby, the command will be a pointer to a Rubocop executable, regardless of your current Ruby version.
+
+```cson
+"linter-rubocop":
+  command: "/Users/JohnDoe/.rbenv/shims/rubocop"
+```
 
 ## Contributing
 
