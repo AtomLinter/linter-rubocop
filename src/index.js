@@ -171,6 +171,7 @@ export default {
       name: 'RuboCop',
       grammarScopes: [
         'source.ruby',
+        'source.ruby.gemfile',
         'source.ruby.rails',
         'source.ruby.rspec',
         'source.ruby.chef',
