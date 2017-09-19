@@ -53,8 +53,8 @@ describe('The RuboCop provider for Linter', () => {
     })
 
     it('verifies the first message', () => {
-      const msgText = 'unterminated string meets end of file\n(Using Ruby 2.3 parser; ' +
-        'configure using `TargetRubyVersion` parameter, under `AllCops`) (Syntax)'
+      const msgText = 'unterminated string meets end of file\n' +
+        '(Using Ruby 2.3 parser; configure using `TargetRubyVersion` parameter, under `AllCops`) (Lint/Syntax)'
 
       waitsForPromise(() =>
         lint(editor).then((messages) => {
