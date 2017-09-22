@@ -1,6 +1,6 @@
 # Changelog
 
-## [v2.1.1](https://github.com/AtomLinter/linter-rubocop/compare/v2.1.1...v2.2.0)
+## [v2.2.0](https://github.com/AtomLinter/linter-rubocop/compare/v2.1.1...v2.2.0)
 
 ###### Changes:
 * Remove linter timeout config, replace with a helpful warning in the case of timeouts
