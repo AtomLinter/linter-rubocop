@@ -5,7 +5,7 @@ import { truncateSync, writeFileSync, readFileSync } from 'fs'
 // eslint-disable-next-line import/no-extraneous-dependencies
 import tmp from 'tmp'
 
-const lint = require('../src/index.js').provideLinter().lint
+const { lint } = require('../src/index.js').provideLinter()
 
 const badPath = path.join(__dirname, 'fixtures', 'lintableFiles', 'bad.rb')
 const emptyPath = path.join(__dirname, 'fixtures', 'lintableFiles', 'empty.rb')
@@ -28,28 +28,24 @@ describe('The RuboCop provider for Linter', () => {
 
     waitsForPromise(() =>
       atom.packages.activatePackage('language-ruby').then(() =>
-        atom.workspace.open(goodPath),
-      ))
+        atom.workspace.open(goodPath)))
 
     atom.packages.triggerDeferredActivationHooks()
     waitsForPromise(() => activationPromise)
   })
 
   it('should be in the packages list', () =>
-    expect(atom.packages.isPackageLoaded('linter-rubocop')).toBe(true),
-  )
+    expect(atom.packages.isPackageLoaded('linter-rubocop')).toBe(true))
 
   it('should be an active package', () =>
-    expect(atom.packages.isPackageActive('linter-rubocop')).toBe(true),
-  )
+    expect(atom.packages.isPackageActive('linter-rubocop')).toBe(true))
 
   describe('shows errors in a file with errors', () => {
     let editor = null
 
     beforeEach(() => {
       waitsForPromise(() =>
-        atom.workspace.open(badPath).then((openEditor) => { editor = openEditor }),
-      )
+        atom.workspace.open(badPath).then((openEditor) => { editor = openEditor }))
     })
 
     it('verifies the first message', () => {
@@ -63,8 +59,7 @@ describe('The RuboCop provider for Linter', () => {
           expect(messages[0].description).toBe(null)
           expect(messages[0].location.file).toBe(badPath)
           expect(messages[0].location.position).toEqual([[1, 6], [1, 7]])
-        }),
-      )
+        }))
     })
   })
 
@@ -73,8 +68,7 @@ describe('The RuboCop provider for Linter', () => {
 
     beforeEach(() => {
       waitsForPromise(() =>
-        atom.workspace.open(invalidWithUrlPath).then((openEditor) => { editor = openEditor }),
-      )
+        atom.workspace.open(invalidWithUrlPath).then((openEditor) => { editor = openEditor }))
     })
 
     it('verifies the first message', () => {
@@ -88,8 +82,7 @@ describe('The RuboCop provider for Linter', () => {
           expect(messages[0].location.file).toBe(invalidWithUrlPath)
           expect(messages[0].location.position).toEqual([[2, 6], [2, 20]])
           waitsForPromise(() => messages[0].description().then(desc => expect(desc).toBeTruthy()))
-        }),
-      )
+        }))
     })
   })
 
@@ -97,20 +90,14 @@ describe('The RuboCop provider for Linter', () => {
     waitsForPromise(() =>
       atom.workspace.open(emptyPath).then(editor =>
         lint(editor).then(messages =>
-          expect(messages.length).toBe(0),
-        ),
-      ),
-    )
+          expect(messages.length).toBe(0))))
   })
 
   it('finds nothing wrong with a valid file', () => {
     waitsForPromise(() =>
       atom.workspace.open(goodPath).then(editor =>
         lint(editor).then(messages =>
-          expect(messages.length).toBe(0),
-        ),
-      ),
-    )
+          expect(messages.length).toBe(0))))
   })
 
   describe('respects .ruby-version when .rubycop.yml has not defined ruby version', () => {
@@ -119,20 +106,14 @@ describe('The RuboCop provider for Linter', () => {
       waitsForPromise(() =>
         atom.workspace.open(ruby23PathYml22).then(editor =>
           lint(editor).then(messages =>
-            expect(messages.length).toBe(1),
-          ),
-        ),
-      )
+            expect(messages.length).toBe(1))))
     })
 
     it('finds nothing wrong with a file when .rubocop.yml does not override the Ruby version', () => {
       waitsForPromise(() =>
         atom.workspace.open(ruby23Path).then(editor =>
           lint(editor).then(messages =>
-            expect(messages.length).toBe(0),
-          ),
-        ),
-      )
+            expect(messages.length).toBe(0))))
     })
   })
 
@@ -161,8 +142,7 @@ describe('The RuboCop provider for Linter', () => {
         atom.workspace.open(tmpobj.name).then((editor) => {
           atom.notifications.onDidAddNotification(checkNotificaton)
           atom.commands.dispatch(atom.views.getView(editor), 'linter-rubocop:fix-file')
-        }),
-      )
+        }))
       waitsFor(
         () => doneCorrecting,
         'Notification type should be checked',
@@ -174,8 +154,7 @@ describe('The RuboCop provider for Linter', () => {
         atom.workspace.open(goodPath).then((editor) => {
           atom.notifications.onDidAddNotification(checkNotificaton)
           atom.commands.dispatch(atom.views.getView(editor), 'linter-rubocop:fix-file')
-        }),
-      )
+        }))
       waitsFor(
         () => doneCorrecting,
         'Notification type should be checked',
