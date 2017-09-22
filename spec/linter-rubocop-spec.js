@@ -1,9 +1,10 @@
 'use babel'
 
-import * as path from 'path'
-import { truncateSync, writeFileSync, readFileSync } from 'fs'
-// eslint-disable-next-line import/no-extraneous-dependencies
 import tmp from 'tmp'
+import * as path from 'path'
+// eslint-disable-next-line no-unused-vars
+import { it, fit, wait, beforeEach, afterEach } from 'jasmine-fix'
+import { truncateSync, writeFileSync, readFileSync } from 'fs'
 
 const { lint } = require('../src/index.js').provideLinter()
 
@@ -14,8 +15,27 @@ const invalidWithUrlPath = path.join(__dirname, 'fixtures', 'lintableFiles', 'in
 const ruby23Path = path.join(__dirname, 'fixtures', 'lintableFiles', 'ruby_2_3.rb')
 const ruby23PathYml22 = path.join(__dirname, 'fixtures', 'yml2_2', 'ruby_2_3.rb')
 
+async function getNotification(expected) {
+  return new Promise((resolve) => {
+    let notificationSub
+    const newNotification = (notification) => {
+      if (!notification.getMessage().startsWith(expected)) {
+        // As the specs execute asynchronously, it's possible a notification
+        // from a different spec was grabbed, if the message doesn't match what
+        // is expected simply return and keep waiting for the next message.
+        return
+      }
+      // Dispose of the notification subscription
+      notificationSub.dispose()
+      resolve(notification)
+    }
+    // Subscribe to Atom's notifications
+    notificationSub = atom.notifications.onDidAddNotification(newNotification)
+  })
+}
+
 describe('The RuboCop provider for Linter', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     // Reset/set project path to fixtures
     atom.project.setPaths([path.join(__dirname, 'fixtures')])
 
@@ -26,12 +46,11 @@ describe('The RuboCop provider for Linter', () => {
     const activationPromise =
       atom.packages.activatePackage('linter-rubocop')
 
-    waitsForPromise(() =>
-      atom.packages.activatePackage('language-ruby').then(() =>
-        atom.workspace.open(goodPath)))
+    await atom.packages.activatePackage('language-ruby')
+    await atom.workspace.open(goodPath)
 
     atom.packages.triggerDeferredActivationHooks()
-    waitsForPromise(() => activationPromise)
+    await activationPromise
   })
 
   it('should be in the packages list', () =>
@@ -43,122 +62,97 @@ describe('The RuboCop provider for Linter', () => {
   describe('shows errors in a file with errors', () => {
     let editor = null
 
-    beforeEach(() => {
-      waitsForPromise(() =>
-        atom.workspace.open(badPath).then((openEditor) => { editor = openEditor }))
+    beforeEach(async () => {
+      editor = await atom.workspace.open(badPath)
     })
 
-    it('verifies the first message', () => {
+    it('verifies the first message', async () => {
       const msgText = 'unterminated string meets end of file\n' +
         '(Using Ruby 2.3 parser; configure using `TargetRubyVersion` parameter, under `AllCops`) (Lint/Syntax)'
 
-      waitsForPromise(() =>
-        lint(editor).then((messages) => {
-          expect(messages[0].severity).toBe('error')
-          expect(messages[0].excerpt).toBe(msgText)
-          expect(messages[0].description).toBe(null)
-          expect(messages[0].location.file).toBe(badPath)
-          expect(messages[0].location.position).toEqual([[1, 6], [1, 7]])
-        }))
+      const messages = await lint(editor)
+
+      expect(messages[0].severity).toBe('error')
+      expect(messages[0].excerpt).toBe(msgText)
+      expect(messages[0].description).toBe(null)
+      expect(messages[0].location.file).toBe(badPath)
+      expect(messages[0].location.position).toEqual([[1, 6], [1, 7]])
     })
   })
 
   describe('shows errors with a clickable link in a file with warnings', () => {
     let editor = null
 
-    beforeEach(() => {
-      waitsForPromise(() =>
-        atom.workspace.open(invalidWithUrlPath).then((openEditor) => { editor = openEditor }))
+    beforeEach(async () => {
+      editor = await atom.workspace.open(invalidWithUrlPath)
     })
 
-    it('verifies the first message', () => {
+    it('verifies the first message', async () => {
       const msgText = "Prefer single-quoted strings when you don't need " +
         'string interpolation or special symbols. (Style/StringLiterals)'
 
-      waitsForPromise(() =>
-        lint(editor).then((messages) => {
-          expect(messages[0].severity).toBe('info')
-          expect(messages[0].excerpt).toBe(msgText)
-          expect(messages[0].location.file).toBe(invalidWithUrlPath)
-          expect(messages[0].location.position).toEqual([[2, 6], [2, 20]])
-          waitsForPromise(() => messages[0].description().then(desc => expect(desc).toBeTruthy()))
-        }))
+      const messages = await lint(editor)
+
+      expect(messages[0].severity).toBe('info')
+      expect(messages[0].excerpt).toBe(msgText)
+      expect(messages[0].location.file).toBe(invalidWithUrlPath)
+      expect(messages[0].location.position).toEqual([[2, 6], [2, 20]])
+      const desc = await messages[0].description()
+      expect(desc).toBeTruthy()
     })
   })
 
-  it('finds nothing wrong with an empty file', () => {
-    waitsForPromise(() =>
-      atom.workspace.open(emptyPath).then(editor =>
-        lint(editor).then(messages =>
-          expect(messages.length).toBe(0))))
+  it('finds nothing wrong with an empty file', async () => {
+    const editor = await atom.workspace.open(emptyPath)
+    const messages = await lint(editor)
+    expect(messages.length).toBe(0)
   })
 
-  it('finds nothing wrong with a valid file', () => {
-    waitsForPromise(() =>
-      atom.workspace.open(goodPath).then(editor =>
-        lint(editor).then(messages =>
-          expect(messages.length).toBe(0))))
+  it('finds nothing wrong with a valid file', async () => {
+    const editor = await atom.workspace.open(goodPath)
+    const messages = await lint(editor)
+    expect(messages.length).toBe(0)
   })
 
   describe('respects .ruby-version when .rubycop.yml has not defined ruby version', () => {
-    it('finds violations when .rubocop.yml sets syntax to Ruby 2.2', () => {
+    it('finds violations when .rubocop.yml sets syntax to Ruby 2.2', async () => {
       atom.project.setPaths([path.join(__dirname, 'fixtures', 'yml2_2')])
-      waitsForPromise(() =>
-        atom.workspace.open(ruby23PathYml22).then(editor =>
-          lint(editor).then(messages =>
-            expect(messages.length).toBe(1))))
+      const editor = await atom.workspace.open(ruby23PathYml22)
+      const messages = await lint(editor)
+      expect(messages.length).toBe(1)
     })
 
-    it('finds nothing wrong with a file when .rubocop.yml does not override the Ruby version', () => {
-      waitsForPromise(() =>
-        atom.workspace.open(ruby23Path).then(editor =>
-          lint(editor).then(messages =>
-            expect(messages.length).toBe(0))))
+    it('finds nothing wrong with a file when .rubocop.yml does not override the Ruby version', async () => {
+      const editor = await atom.workspace.open(ruby23Path)
+      const messages = await lint(editor)
+      expect(messages.length).toBe(0)
     })
   })
 
   describe('allows the user to autocorrect the current file', () => {
-    let doneCorrecting
     const tmpobj = tmp.fileSync({ postfix: '.rb' })
-    const checkNotificaton = (notification) => {
-      const message = notification.getMessage()
-      if (message === 'Linter-Rubocop: No fixes were made') {
-        expect(notification.getType()).toBe('info')
-      } else {
-        expect(message).toMatch(/Linter-Rubocop: Fixed \d offenses/)
-        expect(notification.getType()).toBe('success')
-      }
-      doneCorrecting = true
-    }
 
     beforeEach(() => {
       truncateSync(tmpobj.name)
-      doneCorrecting = false
     })
 
-    it('corrects the bad file', () => {
+    it('corrects the bad file', async () => {
       writeFileSync(tmpobj.name, readFileSync(invalidWithUrlPath))
-      waitsForPromise(() =>
-        atom.workspace.open(tmpobj.name).then((editor) => {
-          atom.notifications.onDidAddNotification(checkNotificaton)
-          atom.commands.dispatch(atom.views.getView(editor), 'linter-rubocop:fix-file')
-        }))
-      waitsFor(
-        () => doneCorrecting,
-        'Notification type should be checked',
-      )
+      const editor = await atom.workspace.open(tmpobj.name)
+      atom.commands.dispatch(atom.views.getView(editor), 'linter-rubocop:fix-file')
+      const expectedMessage = 'Linter-Rubocop: Fixed'
+      const notification = await getNotification(expectedMessage)
+      expect(notification.getMessage()).toMatch(/Linter-Rubocop: Fixed \d offenses/)
+      expect(notification.getType()).toBe('success')
     })
 
-    it("doesn't modify a good file", () => {
-      waitsForPromise(() =>
-        atom.workspace.open(goodPath).then((editor) => {
-          atom.notifications.onDidAddNotification(checkNotificaton)
-          atom.commands.dispatch(atom.views.getView(editor), 'linter-rubocop:fix-file')
-        }))
-      waitsFor(
-        () => doneCorrecting,
-        'Notification type should be checked',
-      )
+    it("doesn't modify a good file", async () => {
+      const editor = await atom.workspace.open(goodPath)
+      atom.commands.dispatch(atom.views.getView(editor), 'linter-rubocop:fix-file')
+      const expectedMessage = 'Linter-Rubocop: No fixes were made'
+      const notification = await getNotification(expectedMessage)
+      expect(notification.getMessage()).toBe(expectedMessage)
+      expect(notification.getType()).toBe('info')
     })
   })
 })
