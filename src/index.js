@@ -20,7 +20,7 @@ let docsLastRetrieved
 
 const takeWhile = (source, predicate) => {
   const result = []
-  const length = source.length
+  const { length } = source
   let i = 0
 
   while (i < length && predicate(source[i], i)) {
@@ -66,9 +66,11 @@ const getMarkDown = async (url) => {
 
   const byLine = rawRulesMarkdown.split('\n')
   // eslint-disable-next-line no-confusing-arrow
-  const ruleAnchors = byLine.reduce((acc, line, idx) =>
-    line.match(/\* <a name=/g) ? acc.concat([[idx, line]]) : acc,
-  [])
+  const ruleAnchors = byLine.reduce(
+    (acc, line, idx) =>
+      (line.match(/\* <a name=/g) ? acc.concat([[idx, line]]) : acc),
+    [],
+  )
 
   ruleAnchors.forEach(([startingIndex, startingLine]) => {
     const ruleName = startingLine.split('"')[1]
@@ -86,7 +88,9 @@ const getMarkDown = async (url) => {
 }
 
 const forwardRubocopToLinter =
-  ({ message: rawMessage, location, severity, cop_name: copName }, file, editor) => {
+  ({
+    message: rawMessage, location, severity, cop_name: copName,
+  }, file, editor) => {
     const [excerpt, url] = rawMessage.split(/ \((.*)\)/, 2)
     let position
     if (location) {
@@ -147,15 +151,9 @@ export default {
             atom.notifications.addSuccess(`Linter-Rubocop: Fixed ${pluralize('offenses', offenseCount, true)}`)
         },
       }),
-    )
-
-    // Config observers
-    this.subscriptions.add(
       atom.config.observe('linter-rubocop.command', (value) => {
         this.command = value
       }),
-    )
-    this.subscriptions.add(
       atom.config.observe('linter-rubocop.disableWhenNoConfigFile', (value) => {
         this.disableWhenNoConfigFile = value
       }),
