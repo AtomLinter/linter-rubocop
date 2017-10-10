@@ -19,6 +19,12 @@
       "title": "Disable when no .rubocop.yml config file is found",
       "default": false,
       "description": "Only run linter if a RuboCop config file is found somewhere in the path for the current file."
+    },
+    "disableRubocopStdin": {
+      "type": "boolean",
+      "title": "Disable source code piping to Rubocop from the stdin",
+      "default": false,
+      "description": "This option removes the `--stdin` flag when calling Rubocop, which forces Rubocop to read the file itself. (Useful when using Rubocop in a Docker container)"
     }
   },
   "activationHooks": [

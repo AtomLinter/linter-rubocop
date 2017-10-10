@@ -157,6 +157,9 @@ export default {
       atom.config.observe('linter-rubocop.disableWhenNoConfigFile', (value) => {
         this.disableWhenNoConfigFile = value
       }),
+      atom.config.observe('linter-rubocop.disableRubocopStdin', (value) => {
+        this.disableRubocopStdin = value
+      }),
     )
   },
 
@@ -186,10 +189,14 @@ export default {
           }
         }
 
+        let additionalFlag = '--stdin'
+
+        if (this.disableRubocopStdin === true) { additionalFlag = null }
+
         const command = this.command
           .split(/\s+/)
           .filter(i => i)
-          .concat(DEFAULT_ARGS, '--stdin', filePath)
+          .concat(DEFAULT_ARGS, additionalFlag, filePath)
         const stdin = editor.getText()
         const cwd = getProjectDirectory(filePath)
         const exexOptions = {
