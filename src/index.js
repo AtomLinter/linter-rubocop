@@ -189,14 +189,10 @@ export default {
           }
         }
 
-        let additionalFlag = '--stdin'
-
-        if (this.disableRubocopStdin === true) { additionalFlag = null }
-
         const command = this.command
           .split(/\s+/)
           .filter(i => i)
-          .concat(DEFAULT_ARGS, additionalFlag, filePath)
+          .concat(DEFAULT_ARGS, this.disableRubocopStdin ? null : '--stdin', filePath)
         const stdin = editor.getText()
         const cwd = getProjectDirectory(filePath)
         const exexOptions = {
