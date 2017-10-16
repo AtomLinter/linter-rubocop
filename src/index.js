@@ -178,7 +178,7 @@ export default {
         'source.ruby.chef',
       ],
       scope: 'file',
-      lintsOnChange: true,
+      lintsOnChange: this.disableRubocopStdin !== true,
       lint: async (editor) => {
         const filePath = editor.getPath()
 
