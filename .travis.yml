@@ -11,7 +11,7 @@ matrix:
       env: ATOM_CHANNEL=beta
 
 install:
-  - gem install --no-document rubocop
+  - gem install --no-document rubocop -v '~> 0.50'
 
 before_script:
   - rubocop --version
