@@ -12,6 +12,7 @@ const DEFAULT_ARGS = [
   '--force-exclusion',
   '--format', 'json',
   '--display-style-guide',
+  '--no-display-cop-names',
 ]
 const DOCUMENTATION_LIFETIME = 86400 * 1000 // 1 day TODO: Configurable?
 
@@ -110,7 +111,7 @@ const forwardRubocopToLinter =
 
     const linterMessage = {
       url,
-      excerpt: `${excerpt} (${copName})`,
+      excerpt: `${copName}: ${excerpt}`,
       severity: severityMapping[severity],
       description: url ? () => getMarkDown(url) : null,
       location: {

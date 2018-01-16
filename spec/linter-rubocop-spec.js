@@ -67,8 +67,8 @@ describe('The RuboCop provider for Linter', () => {
     })
 
     it('verifies the first message', async () => {
-      const msgText = 'unterminated string meets end of file\n' +
-        '(Using Ruby 2.3 parser; configure using `TargetRubyVersion` parameter, under `AllCops`) (Lint/Syntax)'
+      const msgText = 'Lint/Syntax: unterminated string meets end of file\n' +
+        '(Using Ruby 2.3 parser; configure using `TargetRubyVersion` parameter, under `AllCops`)'
 
       const messages = await lint(editor)
 
@@ -88,8 +88,8 @@ describe('The RuboCop provider for Linter', () => {
     })
 
     it('verifies the first message', async () => {
-      const msgText = "Prefer single-quoted strings when you don't need " +
-        'string interpolation or special symbols. (Style/StringLiterals)'
+      const msgText = 'Style/StringLiterals: Prefer single-quoted strings ' +
+        "when you don't need string interpolation or special symbols."
 
       const messages = await lint(editor)
 
