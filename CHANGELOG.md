@@ -1,5 +1,13 @@
 # Changelog
 
+## [v2.2.1](https://github.com/AtomLinter/linter-rubocop/compare/v2.2.0...v2.2.1)
+
+###### Changes:
+* Update message style to match RuboCop v0.52.0+
+
+###### Bug Fixes:
+* Ensure the file has a path before attempting to lint it (#252)
+
 ## [v2.2.0](https://github.com/AtomLinter/linter-rubocop/compare/v2.1.1...v2.2.0)
 
 ###### Changes:
