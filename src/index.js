@@ -140,6 +140,8 @@ export default {
           }
 
           const filePath = textEditor.getPath()
+          if (!filePath) { return null }
+
           const command = this.command
             .split(/\s+/)
             .filter(i => i)
@@ -179,6 +181,7 @@ export default {
       lintsOnChange: true,
       lint: async (editor) => {
         const filePath = editor.getPath()
+        if (!filePath) { return null }
 
         if (this.disableWhenNoConfigFile === true) {
           const config = await helpers.findAsync(filePath, '.rubocop.yml')
