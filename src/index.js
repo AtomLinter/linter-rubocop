@@ -160,6 +160,9 @@ export default {
       atom.config.observe('linter-rubocop.disableWhenNoConfigFile', (value) => {
         this.disableWhenNoConfigFile = value
       }),
+      atom.config.observe('linter-rubocop.disableRubocopStdin', (value) => {
+        this.disableRubocopStdin = value
+      }),
     )
   },
 
@@ -178,7 +181,7 @@ export default {
         'source.ruby.chef',
       ],
       scope: 'file',
-      lintsOnChange: true,
+      lintsOnChange: this.disableRubocopStdin !== true,
       lint: async (editor) => {
         const filePath = editor.getPath()
         if (!filePath) { return null }
@@ -193,7 +196,7 @@ export default {
         const command = this.command
           .split(/\s+/)
           .filter(i => i)
-          .concat(DEFAULT_ARGS, '--stdin', filePath)
+          .concat(DEFAULT_ARGS, this.disableRubocopStdin ? null : '--stdin', filePath)
         const stdin = editor.getText()
         const cwd = getProjectDirectory(filePath)
         const exexOptions = {
