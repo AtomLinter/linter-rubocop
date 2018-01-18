@@ -35,7 +35,8 @@
     "atom-package-deps": "^4.5.0",
     "pluralize": "^7.0.0",
     "request": "^2.81.0",
-    "request-promise": "^4.1.1"
+    "request-promise": "^4.1.1",
+    "semver": "^5.5.0"
   },
   "devDependencies": {
     "eslint": "^4.6.0",
