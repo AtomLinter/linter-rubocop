@@ -122,29 +122,45 @@ const forwardRubocopToLinter =
     return linterMessage
   }
 
-const determineExecVersion = async (execPath) => {
-  const versionString = await helpers.exec(execPath, ['--version'], { ignoreExitCode: true })
+const determineExecVersion = async (command, cwd) => {
+  const args = command.slice(1)
+  args.push('--version')
+  const versionString = await helpers.exec(command[0], args, { cwd, ignoreExitCode: true })
   const versionPattern = /^(\d+\.\d+\.\d+)/i
   const match = versionString.match(versionPattern)
   if (match !== null && match[1]) {
-    execPathVersions.set(execPath, match[1])
+    return match[1]
   }
+  throw new Error(`Unable to parse rubocop version from command output: ${versionString}`)
 }
 
-const getRubocopVersion = async (execPath) => {
-  if (!execPathVersions.has(execPath)) {
-    await determineExecVersion(execPath)
+const getRubocopVersion = async (command, cwd) => {
+  const key = [cwd, command].toString()
+  if (!execPathVersions.has(key)) {
+    execPathVersions.set(key, await determineExecVersion(command, cwd))
   }
-  return execPathVersions.get(execPath)
+  return execPathVersions.get(key)
 }
 
-const getCopNameArg = async (execPath) => {
-  const version = await getRubocopVersion(execPath)
+const getCopNameArg = async (command, cwd) => {
+  const version = await getRubocopVersion(command, cwd)
   if (semver.gte(version, '0.52.0')) {
     return ['--no-display-cop-names']
   }
 
   return []
+}
+
+const getCorrectedOffenseCount = (parsedOutput) => {
+  const files = parsedOutput.files || []
+  let count = 0
+  for (let i = 0; i < files.length; i += 1) {
+    const offenses = files[i].offenses || []
+    for (let o = 0; o < offenses.length; o += 1) {
+      if (offenses[o].corrected) count += 1
+    }
+  }
+  return count
 }
 
 export default {
@@ -153,42 +169,26 @@ export default {
 
     this.subscriptions = new CompositeDisposable()
 
-    // Register fix command
-    this.subscriptions.add(
-      atom.commands.add('atom-text-editor', {
-        'linter-rubocop:fix-file': async () => {
-          const textEditor = atom.workspace.getActiveTextEditor()
+    this.subscriptions.add(atom.workspace.observeTextEditors((editor) => {
+      editor.onDidSave(async () => {
+        if (atom.config.get('linter-rubocop.fixOnSave')) {
+          await this.fixJob(true)
+        }
+      })
+    }))
 
-          if (!atom.workspace.isTextEditor(textEditor) || textEditor.isModified()) {
-            // Abort for invalid or unsaved text editors
-            return atom.notifications.addError('Linter-Rubocop: Please save before fixing')
-          }
+    this.subscriptions.add(atom.commands.add('atom-text-editor', {
+      'linter-rubocop:fix-file': async () => {
+        await this.fixJob()
+      },
+    }))
 
-          const filePath = textEditor.getPath()
-          if (!filePath) { return null }
-
-          const command = this.command
-            .split(/\s+/)
-            .filter(i => i)
-            .concat(DEFAULT_ARGS, '--auto-correct')
-          command.push(...(await getCopNameArg(command[0])))
-          command.push(filePath)
-
-          const cwd = getProjectDirectory(filePath)
-          const { stdout, stderr } = await helpers.exec(command[0], command.slice(1), { cwd, stream: 'both' })
-          const { summary: { offense_count: offenseCount } } = parseFromStd(stdout, stderr)
-          return offenseCount === 0 ?
-            atom.notifications.addInfo('Linter-Rubocop: No fixes were made') :
-            atom.notifications.addSuccess(`Linter-Rubocop: Fixed ${pluralize('offenses', offenseCount, true)}`)
-        },
-      }),
-      atom.config.observe('linter-rubocop.command', (value) => {
-        this.command = value
-      }),
-      atom.config.observe('linter-rubocop.disableWhenNoConfigFile', (value) => {
-        this.disableWhenNoConfigFile = value
-      }),
-    )
+    atom.config.observe('linter-rubocop.command', (value) => {
+      this.command = value
+    })
+    atom.config.observe('linter-rubocop.disableWhenNoConfigFile', (value) => {
+      this.disableWhenNoConfigFile = value
+    })
   },
 
   deactivate() {
@@ -218,14 +218,14 @@ export default {
           }
         }
 
+        const cwd = getProjectDirectory(filePath)
         const command = this.command
           .split(/\s+/)
           .filter(i => i)
           .concat(DEFAULT_ARGS)
-        command.push(...(await getCopNameArg(command[0])))
+        command.push(...(await getCopNameArg(command, cwd)))
         command.push('--stdin', filePath)
         const stdin = editor.getText()
-        const cwd = getProjectDirectory(filePath)
         const exexOptions = {
           cwd,
           stdin,
@@ -256,6 +256,35 @@ export default {
         const offenses = files && files[0] && files[0].offenses
         return (offenses || []).map(offense => forwardRubocopToLinter(offense, filePath, editor))
       },
+    }
+  },
+
+  async fixJob(isSave = false) {
+    const textEditor = atom.workspace.getActiveTextEditor()
+
+    if (!atom.workspace.isTextEditor(textEditor) || textEditor.isModified()) {
+      // Abort for invalid or unsaved text editors
+      return atom.notifications.addError('Linter-Rubocop: Please save before fixing')
+    }
+
+    const filePath = textEditor.getPath()
+    if (!filePath) { return null }
+
+    const cwd = getProjectDirectory(filePath)
+    const command = this.command
+      .split(/\s+/)
+      .filter(i => i)
+      .concat(DEFAULT_ARGS, '--auto-correct')
+    command.push(...(await getCopNameArg(command, cwd)))
+    command.push(filePath)
+
+    const { stdout, stderr } = await helpers.exec(command[0], command.slice(1), { cwd, stream: 'both' })
+
+    if (!isSave) {
+      const offenseCount = getCorrectedOffenseCount(parseFromStd(stdout, stderr))
+      return offenseCount === 0 ?
+        atom.notifications.addInfo('Linter-Rubocop: No fixes were made') :
+        atom.notifications.addSuccess(`Linter-Rubocop: Fixed ${pluralize('offenses', offenseCount, true)}`)
     }
   },
 }
