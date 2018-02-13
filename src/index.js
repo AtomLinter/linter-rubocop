@@ -122,24 +122,28 @@ const forwardRubocopToLinter =
     return linterMessage
   }
 
-const determineExecVersion = async (execPath) => {
-  const versionString = await helpers.exec(execPath, ['--version'], { ignoreExitCode: true })
+const determineExecVersion = async (command, cwd) => {
+  const args = command.slice(1)
+  args.push('--version')
+  const versionString = await helpers.exec(command[0], args, { cwd, ignoreExitCode: true })
   const versionPattern = /^(\d+\.\d+\.\d+)/i
   const match = versionString.match(versionPattern)
   if (match !== null && match[1]) {
-    execPathVersions.set(execPath, match[1])
+    return match[1]
   }
+  throw new Error(`Unable to parse rubocop version from command output: ${versionString}`)
 }
 
-const getRubocopVersion = async (execPath) => {
-  if (!execPathVersions.has(execPath)) {
-    await determineExecVersion(execPath)
+const getRubocopVersion = async (command, cwd) => {
+  const key = [cwd, command].toString()
+  if (!execPathVersions.has(key)) {
+    execPathVersions.set(key, await determineExecVersion(command, cwd))
   }
-  return execPathVersions.get(execPath)
+  return execPathVersions.get(key)
 }
 
-const getCopNameArg = async (execPath) => {
-  const version = await getRubocopVersion(execPath)
+const getCopNameArg = async (command, cwd) => {
+  const version = await getRubocopVersion(command, cwd)
   if (semver.gte(version, '0.52.0')) {
     return ['--no-display-cop-names']
   }
@@ -167,14 +171,14 @@ export default {
           const filePath = textEditor.getPath()
           if (!filePath) { return null }
 
+          const cwd = getProjectDirectory(filePath)
           const command = this.command
             .split(/\s+/)
             .filter(i => i)
             .concat(DEFAULT_ARGS, '--auto-correct')
-          command.push(...(await getCopNameArg(command[0])))
+          command.push(...(await getCopNameArg(command, cwd)))
           command.push(filePath)
 
-          const cwd = getProjectDirectory(filePath)
           const { stdout, stderr } = await helpers.exec(command[0], command.slice(1), { cwd, stream: 'both' })
           const { summary: { offense_count: offenseCount } } = parseFromStd(stdout, stderr)
           return offenseCount === 0 ?
@@ -218,14 +222,14 @@ export default {
           }
         }
 
+        const cwd = getProjectDirectory(filePath)
         const command = this.command
           .split(/\s+/)
           .filter(i => i)
           .concat(DEFAULT_ARGS)
-        command.push(...(await getCopNameArg(command[0])))
+        command.push(...(await getCopNameArg(command, cwd)))
         command.push('--stdin', filePath)
         const stdin = editor.getText()
-        const cwd = getProjectDirectory(filePath)
         const exexOptions = {
           cwd,
           stdin,
