@@ -1,5 +1,10 @@
 # Changelog
 
+## [v2.2.3](https://github.com/AtomLinter/linter-rubocop/compare/v2.2.2...v2.2.3)
+
+###### Bug Fixes:
+* Fix determination of RuboCop version for `rbenv`/`bundler` (#262)
+
 ## [v2.2.2](https://github.com/AtomLinter/linter-rubocop/compare/v2.2.1...v2.2.2)
 
 ###### Bug Fixes:
