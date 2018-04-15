@@ -33,6 +33,7 @@
     "source.chef.recipes:root-scope-used"
   ],
   "scripts": {
+    "commitmsg": "commitlint -e $GIT_PARAMS",
     "lint": "eslint .",
     "test": "apm test"
   },
@@ -43,10 +44,16 @@
     "semver": "6.0.0"
   },
   "devDependencies": {
+    "@commitlint/cli": "^6.1.3",
+    "@commitlint/config-conventional": "^6.1.3",
+    "@commitlint/travis-cli": "^6.1.3",
+    "@semantic-release/apm-config": "^2.0.1",
     "eslint": "5.16.0",
     "eslint-config-airbnb-base": "13.1.0",
     "eslint-plugin-import": "2.17.2",
+    "husky": "^0.14.3",
     "jasmine-fix": "1.3.1",
+    "semantic-release": "^15.1.7",
     "tmp": "0.1.0"
   },
   "package-deps": [
@@ -98,5 +105,13 @@
       "node": true,
       "browser": true
     }
+  },
+  "release": {
+    "extends": "@semantic-release/apm-config"
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
   }
 }
