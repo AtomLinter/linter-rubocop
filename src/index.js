@@ -208,6 +208,8 @@ export default {
         'source.ruby.rails',
         'source.ruby.rspec',
         'source.ruby.chef',
+        'source.chef.metadata',
+        'source.chef.recipes',
       ],
       scope: 'file',
       lintsOnChange: true,
