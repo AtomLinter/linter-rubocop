@@ -1,0 +1,123 @@
+version: 2
+
+defaults: &defaults
+  working_directory: /tmp/project
+  docker:
+    - image: arcanemagus/atom-docker-ci:stable
+  environment:
+    APM_TEST_PACKAGES: "language-puppet"
+  steps:
+    # Restore project state
+    - attach_workspace:
+        at: /tmp
+    - run:
+        name: Install Ruby
+        # Note, using ruby-full instead of ruby for the headers to compile rubocop
+        command: |
+          sudo apt-get update && \
+          sudo apt-get install --assume-yes --quiet --no-install-suggests \
+            --no-install-recommends ruby-full
+    - run:
+        name: Ruby version
+        command: ruby --version
+    - run:
+        name: Update gem
+        command: sudo gem update --system --no-document
+    - run:
+        name: Install rubocop
+        command: sudo gem install rubocop --no-document
+    - run:
+        name: Create VFB for Atom to run in
+        command: /usr/local/bin/xvfb_start
+    - run:
+        name: Atom version
+        command: ${ATOM_SCRIPT_PATH} --version
+    - run:
+        name: APM version
+        command: ${APM_SCRIPT_PATH} --version
+    - run:
+        name: rubocop version
+        command: rubocop --version
+    - run:
+        name: Cleaning package
+        command: ${APM_SCRIPT_PATH} clean
+    - run:
+        name: Package APM package dependencies
+        command: |
+          if [ -n "${APM_TEST_PACKAGES}" ]; then
+            for pack in ${APM_TEST_PACKAGES}; do
+            ${APM_SCRIPT_PATH} install "${pack}"
+            done
+          fi;
+    - run:
+        name: Package dependencies
+        command: ${APM_SCRIPT_PATH} install
+    - run:
+        name: Package specs
+        command: ${ATOM_SCRIPT_PATH} --test spec
+    # Cache node_modules
+    - save_cache:
+        paths:
+          - node_modules
+        key: v1-dependencies-{{ checksum "package.json" }}
+
+jobs:
+  checkout_code:
+    <<: *defaults
+    docker:
+      - image: circleci/node:latest
+    steps:
+      - checkout
+      # Restore node_modules from the last build
+      - restore_cache:
+          keys:
+          # Get latest cache for this package.json
+          - v1-dependencies-{{ checksum "package.json" }}
+          # Fallback to the last available cache
+          - v1-dependencies
+      # Save project state for next steps
+      - persist_to_workspace:
+          root: /tmp
+          paths:
+            - project
+  lint:
+    <<: *defaults
+    docker:
+      - image: circleci/node:latest
+    steps:
+      # Restore project state
+      - attach_workspace:
+          at: /tmp
+      - run:
+          name: Node.js Version
+          command: node --version
+      - run:
+          name: NPM Version
+          command: npm --version
+      - run:
+          name: Install any remaining dependencies
+          command: npm install
+      - run:
+          name: Lint code
+          command: npm run lint
+  stable:
+    <<: *defaults
+  beta:
+    <<: *defaults
+    docker:
+      - image: arcanemagus/atom-docker-ci:beta
+
+workflows:
+  version: 2
+  test_package:
+    jobs:
+      - checkout_code
+      - lint:
+          requires:
+            - checkout_code
+      - stable:
+          requires:
+            - lint
+      - beta:
+          requires:
+            - lint
