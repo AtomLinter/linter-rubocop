@@ -142,7 +142,7 @@ describe('The RuboCop provider for Linter', () => {
       atom.commands.dispatch(atom.views.getView(editor), 'linter-rubocop:fix-file')
       const expectedMessage = 'Linter-Rubocop: Fixed'
       const notification = await getNotification(expectedMessage)
-      expect(notification.getMessage()).toMatch(/Linter-Rubocop: Fixed \d offenses/)
+      expect(notification.getMessage()).toMatch(/Linter-Rubocop: Fixed \d+ offenses?/)
       expect(notification.getType()).toBe('success')
     })
 
