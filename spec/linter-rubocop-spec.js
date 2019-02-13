@@ -2,8 +2,10 @@
 
 import tmp from 'tmp'
 import * as path from 'path'
-// eslint-disable-next-line no-unused-vars
-import { it, fit, wait, beforeEach, afterEach } from 'jasmine-fix'
+import {
+  // eslint-disable-next-line no-unused-vars
+  it, fit, wait, beforeEach, afterEach,
+} from 'jasmine-fix'
 import { truncateSync, writeFileSync, readFileSync } from 'fs'
 
 const { lint } = require('../src/index.js').provideLinter()
@@ -43,8 +45,7 @@ describe('The RuboCop provider for Linter', () => {
 
     // Info about this beforeEach() implementation:
     // https://github.com/AtomLinter/Meta/issues/15
-    const activationPromise =
-      atom.packages.activatePackage('linter-rubocop')
+    const activationPromise = atom.packages.activatePackage('linter-rubocop')
 
     await atom.packages.activatePackage('language-ruby')
     await atom.workspace.open(goodPath)
@@ -53,11 +54,13 @@ describe('The RuboCop provider for Linter', () => {
     await activationPromise
   })
 
-  it('should be in the packages list', () =>
-    expect(atom.packages.isPackageLoaded('linter-rubocop')).toBe(true))
+  it('should be in the packages list', () => {
+    expect(atom.packages.isPackageLoaded('linter-rubocop')).toBe(true)
+  })
 
-  it('should be an active package', () =>
-    expect(atom.packages.isPackageActive('linter-rubocop')).toBe(true))
+  it('should be an active package', () => {
+    expect(atom.packages.isPackageActive('linter-rubocop')).toBe(true)
+  })
 
   describe('shows errors in a file with errors', () => {
     let editor = null
@@ -67,8 +70,8 @@ describe('The RuboCop provider for Linter', () => {
     })
 
     it('verifies the first message', async () => {
-      const msgText = 'Lint/Syntax: unterminated string meets end of file\n' +
-        '(Using Ruby 2.3 parser; configure using `TargetRubyVersion` parameter, under `AllCops`)'
+      const msgText = 'Lint/Syntax: unterminated string meets end of file\n'
+        + '(Using Ruby 2.3 parser; configure using `TargetRubyVersion` parameter, under `AllCops`)'
 
       const messages = await lint(editor)
 
@@ -88,8 +91,8 @@ describe('The RuboCop provider for Linter', () => {
     })
 
     it('verifies the first message', async () => {
-      const msgText = 'Style/StringLiterals: Prefer single-quoted strings ' +
-        "when you don't need string interpolation or special symbols."
+      const msgText = 'Style/StringLiterals: Prefer single-quoted strings '
+        + "when you don't need string interpolation or special symbols."
 
       const messages = await lint(editor)
 

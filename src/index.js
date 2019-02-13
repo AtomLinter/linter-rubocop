@@ -44,8 +44,8 @@ const parseFromStd = (stdout, stderr) => {
   return parsed
 }
 
-const getProjectDirectory = filePath =>
-  atom.project.relativizePath(filePath)[0] || path.dirname(filePath)
+const getProjectDirectory = filePath => (
+  atom.project.relativizePath(filePath)[0] || path.dirname(filePath))
 
 // Retrieves style guide documentation with cached responses
 const getMarkDown = async (url) => {
@@ -68,8 +68,7 @@ const getMarkDown = async (url) => {
   const byLine = rawRulesMarkdown.split('\n')
   // eslint-disable-next-line no-confusing-arrow
   const ruleAnchors = byLine.reduce(
-    (acc, line, idx) =>
-      (line.match(/\* <a name=/g) ? acc.concat([[idx, line]]) : acc),
+    (acc, line, idx) => (line.match(/\* <a name=/g) ? acc.concat([[idx, line]]) : acc),
     [],
   )
 
@@ -88,39 +87,38 @@ const getMarkDown = async (url) => {
   return docsRuleCache.get(anchor)
 }
 
-const forwardRubocopToLinter =
-  ({
-    message: rawMessage, location, severity, cop_name: copName,
-  }, file, editor) => {
-    const [excerpt, url] = rawMessage.split(/ \((.*)\)/, 2)
-    let position
-    if (location) {
-      const { line, column, length } = location
-      position = [[line - 1, column - 1], [line - 1, (column + length) - 1]]
-    } else {
-      position = helpers.generateRange(editor, 0)
-    }
-
-    const severityMapping = {
-      refactor: 'info',
-      convention: 'info',
-      warning: 'warning',
-      error: 'error',
-      fatal: 'error',
-    }
-
-    const linterMessage = {
-      url,
-      excerpt: `${copName}: ${excerpt}`,
-      severity: severityMapping[severity],
-      description: url ? () => getMarkDown(url) : null,
-      location: {
-        file,
-        position,
-      },
-    }
-    return linterMessage
+const forwardRubocopToLinter = ({
+  message: rawMessage, location, severity, cop_name: copName,
+}, file, editor) => {
+  const [excerpt, url] = rawMessage.split(/ \((.*)\)/, 2)
+  let position
+  if (location) {
+    const { line, column, length } = location
+    position = [[line - 1, column - 1], [line - 1, (column + length) - 1]]
+  } else {
+    position = helpers.generateRange(editor, 0)
   }
+
+  const severityMapping = {
+    refactor: 'info',
+    convention: 'info',
+    warning: 'warning',
+    error: 'error',
+    fatal: 'error',
+  }
+
+  const linterMessage = {
+    url,
+    excerpt: `${copName}: ${excerpt}`,
+    severity: severityMapping[severity],
+    description: url ? () => getMarkDown(url) : null,
+    location: {
+      file,
+      position,
+    },
+  }
+  return linterMessage
+}
 
 const determineExecVersion = async (command, cwd) => {
   const args = command.slice(1)
@@ -181,9 +179,9 @@ export default {
 
           const { stdout, stderr } = await helpers.exec(command[0], command.slice(1), { cwd, stream: 'both' })
           const { summary: { offense_count: offenseCount } } = parseFromStd(stdout, stderr)
-          return offenseCount === 0 ?
-            atom.notifications.addInfo('Linter-Rubocop: No fixes were made') :
-            atom.notifications.addSuccess(`Linter-Rubocop: Fixed ${pluralize('offenses', offenseCount, true)}`)
+          return offenseCount === 0
+            ? atom.notifications.addInfo('Linter-Rubocop: No fixes were made')
+            : atom.notifications.addSuccess(`Linter-Rubocop: Fixed ${pluralize('offenses', offenseCount, true)}`)
         },
       }),
       atom.config.observe('linter-rubocop.command', (value) => {
@@ -246,9 +244,9 @@ export default {
           atom.notifications.addInfo(
             'Linter-Rubocop: Linter timed out',
             {
-              description: 'Make sure you are not running Rubocop with a slow-starting interpreter like JRuby. ' +
-                           'If you are still seeing timeouts, consider running your linter `on save` and not `on change`, ' +
-                           'or reference https://github.com/AtomLinter/linter-rubocop/issues/202 .',
+              description: 'Make sure you are not running Rubocop with a slow-starting interpreter like JRuby. '
+                           + 'If you are still seeing timeouts, consider running your linter `on save` and not `on change`, '
+                           + 'or reference https://github.com/AtomLinter/linter-rubocop/issues/202 .',
             },
           )
           return null
