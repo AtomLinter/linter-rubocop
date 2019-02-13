@@ -2,6 +2,7 @@
   "name": "linter-rubocop",
   "main": "./src/index.js",
   "version": "2.2.3",
+  "private": true,
   "description": "Lint Ruby on the fly, using rubocop",
   "repository": "https://github.com/AtomLinter/linter-rubocop",
   "license": "MIT",
@@ -54,6 +55,21 @@
         "2.0.0": "provideLinter"
       }
     }
+  },
+  "renovate": {
+    "extends": [
+      "config:base"
+    ],
+    "semanticCommits": true,
+    "rangeStrategy": "pin",
+    "packageRules": [
+      {
+        "packagePatterns": [
+          "^eslint"
+        ],
+        "groupName": "ESLint packages"
+      }
+    ]
   },
   "eslintConfig": {
     "extends": "airbnb-base",
