@@ -55,6 +55,21 @@
       }
     }
   },
+  "renovate": {
+    "extends": [
+      "config:base"
+    ],
+    "semanticCommits": true,
+    "rangeStrategy": "pin",
+    "packageRules": [
+      {
+        "packagePatterns": [
+          "^eslint"
+        ],
+        "groupName": "ESLint packages"
+      }
+    ]
+  },
   "eslintConfig": {
     "extends": "airbnb-base",
     "rules": {
