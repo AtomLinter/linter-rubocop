@@ -23,9 +23,9 @@
     }
   },
   "activationHooks": [
-    "language-ruby:grammar-used",
-    "language-ruby-on-rails:grammar-used",
-    "language-chef:grammar-used"
+    "source.ruby:root-scope-used",
+    "source.ruby.rails:root-scope-used",
+    "source.chef.recipes:root-scope-used"
   ],
   "scripts": {
     "lint": "eslint .",
