@@ -2,11 +2,7 @@
 
 // eslint-disable-next-line import/extensions, import/no-extraneous-dependencies
 import { CompositeDisposable } from 'atom'
-import path from 'path'
-import pluralize from 'pluralize'
-import * as helpers from 'atom-linter'
 import { get } from 'request-promise'
-import semver from 'semver'
 
 const DEFAULT_ARGS = [
   '--cache', 'false',
@@ -19,6 +15,26 @@ const DOCUMENTATION_LIFETIME = 86400 * 1000 // 1 day TODO: Configurable?
 const docsRuleCache = new Map()
 const execPathVersions = new Map()
 let docsLastRetrieved
+
+let helpers
+let path
+let pluralize
+let semver
+
+const loadDeps = () => {
+  if (!helpers) {
+    helpers = require('atom-linter')
+  }
+  if (!path) {
+    path = require('path')
+  }
+  if (!pluralize) {
+    pluralize = require('pluralize')
+  }
+  if (!semver) {
+    semver = require('semver')
+  }
+}
 
 const takeWhile = (source, predicate) => {
   const result = []
@@ -151,7 +167,17 @@ const getCopNameArg = async (command, cwd) => {
 
 export default {
   activate() {
-    require('atom-package-deps').install('linter-rubocop', true)
+    this.idleCallbacks = new Set()
+    let depsCallbackID
+    const installLinterRubocopDeps = () => {
+      this.idleCallbacks.delete(depsCallbackID)
+      if (!atom.inSpecMode()) {
+        require('atom-package-deps').install('linter-rubocop', true)
+      }
+      loadDeps()
+    }
+    depsCallbackID = window.requestIdleCallback(installLinterRubocopDeps)
+    this.idleCallbacks.add(depsCallbackID)
 
     this.subscriptions = new CompositeDisposable()
 
@@ -194,6 +220,8 @@ export default {
   },
 
   deactivate() {
+    this.idleCallbacks.forEach(callbackID => window.cancelIdleCallback(callbackID))
+    this.idleCallbacks.clear()
     this.subscriptions.dispose()
   },
 
@@ -212,6 +240,8 @@ export default {
       lint: async (editor) => {
         const filePath = editor.getPath()
         if (!filePath) { return null }
+
+        loadDeps()
 
         if (this.disableWhenNoConfigFile === true) {
           const config = await helpers.findAsync(filePath, '.rubocop.yml')
