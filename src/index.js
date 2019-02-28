@@ -167,9 +167,17 @@ const getCopNameArg = async (command, cwd) => {
 
 export default {
   activate() {
-    require('atom-package-deps').install('linter-rubocop', true)
-
-    loadDeps()
+    this.idleCallbacks = new Set()
+    let depsCallbackID
+    const installLinterRubocopDeps = () => {
+      this.idleCallbacks.delete(depsCallbackID)
+      if (!atom.inSpecMode()) {
+        require('atom-package-deps').install('linter-rubocop', true)
+      }
+      loadDeps()
+    }
+    depsCallbackID = window.requestIdleCallback(installLinterRubocopDeps)
+    this.idleCallbacks.add(depsCallbackID)
 
     this.subscriptions = new CompositeDisposable()
 
@@ -212,6 +220,8 @@ export default {
   },
 
   deactivate() {
+    this.idleCallbacks.forEach(callbackID => window.cancelIdleCallback(callbackID))
+    this.idleCallbacks.clear()
     this.subscriptions.dispose()
   },
 
