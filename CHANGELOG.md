@@ -1,5 +1,13 @@
 # Changelog
 
+## [v2.2.4](https://github.com/AtomLinter/linter-rubocop/compare/v2.2.3...v2.2.4)
+
+###### Performance improvements:
+* Lazy load dependencies on activation and use scopes instead of language names (#294)
+
+###### Bug Fixes:
+* Dependency updates
+
 ## [v2.2.3](https://github.com/AtomLinter/linter-rubocop/compare/v2.2.2...v2.2.3)
 
 ###### Bug Fixes:
