@@ -3,7 +3,7 @@
 const DOCUMENTATION_LIFETIME = 86400 * 1000
 const docsRuleCache = new Map()
 
-export function takeWhile(source, predicate, excludes) {
+function takeWhile(source, predicate, excludes) {
   const result = []
   const { length } = source
   let i = 0
@@ -19,7 +19,7 @@ export function takeWhile(source, predicate, excludes) {
 }
 
 // Retrieves style guide documentation with cached responses
-export async function getRuleMarkDown(url) {
+export default async function getRuleMarkDown(url) {
   const rule = url.split('#')[1]
   if (docsRuleCache.has(rule)) {
     const cachedRule = docsRuleCache.get(rule)

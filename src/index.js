@@ -2,7 +2,7 @@
 
 // eslint-disable-next-line import/extensions, import/no-extraneous-dependencies
 import { CompositeDisposable } from 'atom'
-import * as RuleHelpers from './rule-helpers'
+import getRuleMarkDown from './rule-helpers'
 
 const DEFAULT_ARGS = [
   '--cache', 'false',
@@ -71,7 +71,7 @@ const forwardRubocopToLinter = ({
     url,
     excerpt: `${copName}: ${excerpt}`,
     severity: severityMapping[severity],
-    description: url ? () => RuleHelpers.getRuleMarkDown(url) : null,
+    description: url ? () => getRuleMarkDown(url) : null,
     location: {
       file,
       position,
