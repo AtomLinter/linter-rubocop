@@ -5,7 +5,6 @@ import { CompositeDisposable } from 'atom'
 import { get } from 'request-promise'
 
 const DEFAULT_ARGS = [
-  '--cache', 'false',
   '--force-exclusion',
   '--format', 'json',
   '--display-style-guide',
@@ -216,6 +215,9 @@ export default {
       atom.config.observe('linter-rubocop.disableWhenNoConfigFile', (value) => {
         this.disableWhenNoConfigFile = value
       }),
+      atom.config.observe('linter-rubocop.useParallelExecution', (value) => {
+        this.useParallelExecution = value
+      }),
     )
   },
 
@@ -256,6 +258,9 @@ export default {
           .filter(i => i)
           .concat(DEFAULT_ARGS)
         command.push(...(await getCopNameArg(command, cwd)))
+        if (this.useParallelExecution) {
+          command.push('--parallel')
+        }
         command.push('--stdin', filePath)
         const stdin = editor.getText()
         const exexOptions = {
