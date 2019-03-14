@@ -216,6 +216,9 @@ export default {
       atom.config.observe('linter-rubocop.disableWhenNoConfigFile', (value) => {
         this.disableWhenNoConfigFile = value
       }),
+      atom.config.observe('linter-rubocop.runExtraRailsCops', (value) => {
+        this.runExtraRailsCops = value
+      }),
     )
   },
 
@@ -256,6 +259,9 @@ export default {
           .filter(i => i)
           .concat(DEFAULT_ARGS)
         command.push(...(await getCopNameArg(command, cwd)))
+        if (this.runExtraRailsCops) {
+          command.push('--rails')
+        }
         command.push('--stdin', filePath)
         const stdin = editor.getText()
         const exexOptions = {
