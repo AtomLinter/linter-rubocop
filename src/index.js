@@ -18,6 +18,7 @@ let docsLastRetrieved
 let helpers
 let path
 let pluralize
+let semver
 
 const loadDeps = () => {
   if (!helpers) {
@@ -28,6 +29,9 @@ const loadDeps = () => {
   }
   if (!pluralize) {
     pluralize = require('pluralize')
+  }
+  if (!semver) {
+    semver = require('semver')
   }
 }
 
@@ -103,8 +107,8 @@ const getMarkDown = async (url) => {
   return docsRuleCache.get(anchor)
 }
 
-const forwardRubocopToLinter = ({
-  message: rawMessage, location, severity,
+const forwardRubocopToLinter = (version, {
+  message: rawMessage, location, severity, cop_name: copName,
 }, file, editor) => {
   const [excerpt, url] = rawMessage.split(/ \((.*)\)/, 2)
   let position
@@ -125,7 +129,7 @@ const forwardRubocopToLinter = ({
 
   const linterMessage = {
     url,
-    excerpt,
+    excerpt: semver.gte(version, '0.52.0') ? excerpt : `${copName}: ${excerpt}`,
     severity: severityMapping[severity],
     description: url ? () => getMarkDown(url) : null,
     location: {
@@ -247,9 +251,18 @@ export default {
         // Process was canceled by newer process
         if (output === null) { return null }
 
-        const { files } = parseFromStd(output.stdout, output.stderr)
+        const {
+          metadata: { rubocop_version: rubocopVersion }, files,
+        } = parseFromStd(output.stdout, output.stderr)
+
+        if (rubocopVersion == null || rubocopVersion === '') {
+          throw new Error('Unable to get rubocop version from linting output results.')
+        }
+
         const offenses = files && files[0] && files[0].offenses
-        return (offenses || []).map(offense => forwardRubocopToLinter(offense, filePath, editor))
+        return (offenses || []).map(
+          offense => forwardRubocopToLinter(rubocopVersion, offense, filePath, editor),
+        )
       },
     }
   },
