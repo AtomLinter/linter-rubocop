@@ -13,13 +13,11 @@ const DEFAULT_ARGS = [
 const DOCUMENTATION_LIFETIME = 86400 * 1000 // 1 day TODO: Configurable?
 
 const docsRuleCache = new Map()
-const execPathVersions = new Map()
 let docsLastRetrieved
 
 let helpers
 let path
 let pluralize
-let semver
 
 const loadDeps = () => {
   if (!helpers) {
@@ -30,9 +28,6 @@ const loadDeps = () => {
   }
   if (!pluralize) {
     pluralize = require('pluralize')
-  }
-  if (!semver) {
-    semver = require('semver')
   }
 }
 
@@ -62,6 +57,11 @@ const parseFromStd = (stdout, stderr) => {
 
 const getProjectDirectory = filePath => (
   atom.project.relativizePath(filePath)[0] || path.dirname(filePath))
+
+const getRubocopBaseCommand = command => command
+  .split(/\s+/)
+  .filter(i => i)
+  .concat(DEFAULT_ARGS)
 
 // Retrieves style guide documentation with cached responses
 const getMarkDown = async (url) => {
@@ -104,7 +104,7 @@ const getMarkDown = async (url) => {
 }
 
 const forwardRubocopToLinter = ({
-  message: rawMessage, location, severity, cop_name: copName,
+  message: rawMessage, location, severity,
 }, file, editor) => {
   const [excerpt, url] = rawMessage.split(/ \((.*)\)/, 2)
   let position
@@ -125,7 +125,7 @@ const forwardRubocopToLinter = ({
 
   const linterMessage = {
     url,
-    excerpt: `${copName}: ${excerpt}`,
+    excerpt,
     severity: severityMapping[severity],
     description: url ? () => getMarkDown(url) : null,
     location: {
@@ -134,35 +134,6 @@ const forwardRubocopToLinter = ({
     },
   }
   return linterMessage
-}
-
-const determineExecVersion = async (command, cwd) => {
-  const args = command.slice(1)
-  args.push('--version')
-  const versionString = await helpers.exec(command[0], args, { cwd, ignoreExitCode: true })
-  const versionPattern = /^(\d+\.\d+\.\d+)/i
-  const match = versionString.match(versionPattern)
-  if (match !== null && match[1]) {
-    return match[1]
-  }
-  throw new Error(`Unable to parse rubocop version from command output: ${versionString}`)
-}
-
-const getRubocopVersion = async (command, cwd) => {
-  const key = [cwd, command].toString()
-  if (!execPathVersions.has(key)) {
-    execPathVersions.set(key, await determineExecVersion(command, cwd))
-  }
-  return execPathVersions.get(key)
-}
-
-const getCopNameArg = async (command, cwd) => {
-  const version = await getRubocopVersion(command, cwd)
-  if (semver.gte(version, '0.52.0')) {
-    return ['--no-display-cop-names']
-  }
-
-  return []
 }
 
 export default {
@@ -196,11 +167,7 @@ export default {
           if (!filePath) { return null }
 
           const cwd = getProjectDirectory(filePath)
-          const command = this.command
-            .split(/\s+/)
-            .filter(i => i)
-            .concat(DEFAULT_ARGS, '--auto-correct')
-          command.push(...(await getCopNameArg(command, cwd)))
+          const command = getRubocopBaseCommand(this.command).concat('--auto-correct')
           command.push(filePath)
 
           const { stdout, stderr } = await helpers.exec(command[0], command.slice(1), { cwd, stream: 'both' })
@@ -251,11 +218,7 @@ export default {
         }
 
         const cwd = getProjectDirectory(filePath)
-        const command = this.command
-          .split(/\s+/)
-          .filter(i => i)
-          .concat(DEFAULT_ARGS)
-        command.push(...(await getCopNameArg(command, cwd)))
+        const command = getRubocopBaseCommand(this.command)
         command.push('--stdin', filePath)
         const stdin = editor.getText()
         const exexOptions = {
