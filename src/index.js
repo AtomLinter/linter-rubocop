@@ -2,7 +2,7 @@
 
 // eslint-disable-next-line import/extensions, import/no-extraneous-dependencies
 import { CompositeDisposable } from 'atom'
-import { get } from 'request-promise'
+import getRuleMarkDown from './rule-helpers'
 
 const DEFAULT_ARGS = [
   '--cache', 'false',
@@ -10,11 +10,8 @@ const DEFAULT_ARGS = [
   '--format', 'json',
   '--display-style-guide',
 ]
-const DOCUMENTATION_LIFETIME = 86400 * 1000 // 1 day TODO: Configurable?
 
-const docsRuleCache = new Map()
 const execPathVersions = new Map()
-let docsLastRetrieved
 
 let helpers
 let path
@@ -36,19 +33,6 @@ const loadDeps = () => {
   }
 }
 
-const takeWhile = (source, predicate) => {
-  const result = []
-  const { length } = source
-  let i = 0
-
-  while (i < length && predicate(source[i], i)) {
-    result.push(source[i])
-    i += 1
-  }
-
-  return result
-}
-
 const parseFromStd = (stdout, stderr) => {
   let parsed
   try {
@@ -62,46 +46,6 @@ const parseFromStd = (stdout, stderr) => {
 
 const getProjectDirectory = filePath => (
   atom.project.relativizePath(filePath)[0] || path.dirname(filePath))
-
-// Retrieves style guide documentation with cached responses
-const getMarkDown = async (url) => {
-  const anchor = url.split('#')[1]
-
-  if (new Date().getTime() - docsLastRetrieved < DOCUMENTATION_LIFETIME) {
-    // If documentation is stale, clear cache
-    docsRuleCache.clear()
-  }
-
-  if (docsRuleCache.has(anchor)) { return docsRuleCache.get(anchor) }
-
-  let rawRulesMarkdown
-  try {
-    rawRulesMarkdown = await get('https://raw.githubusercontent.com/bbatsov/ruby-style-guide/master/README.md')
-  } catch (x) {
-    return '***\nError retrieving documentation'
-  }
-
-  const byLine = rawRulesMarkdown.split('\n')
-  // eslint-disable-next-line no-confusing-arrow
-  const ruleAnchors = byLine.reduce(
-    (acc, line, idx) => (line.match(/\* <a name=/g) ? acc.concat([[idx, line]]) : acc),
-    [],
-  )
-
-  ruleAnchors.forEach(([startingIndex, startingLine]) => {
-    const ruleName = startingLine.split('"')[1]
-    const beginSearch = byLine.slice(startingIndex + 1)
-
-    // gobble all the documentation until you reach the next rule
-    const documentationForRule = takeWhile(beginSearch, x => !x.match(/\* <a name=|##/))
-    const markdownOutput = '***\n'.concat(documentationForRule.join('\n'))
-
-    docsRuleCache.set(ruleName, markdownOutput)
-  })
-
-  docsLastRetrieved = new Date().getTime()
-  return docsRuleCache.get(anchor)
-}
 
 const forwardRubocopToLinter = ({
   message: rawMessage, location, severity, cop_name: copName,
@@ -127,7 +71,7 @@ const forwardRubocopToLinter = ({
     url,
     excerpt: `${copName}: ${excerpt}`,
     severity: severityMapping[severity],
-    description: url ? () => getMarkDown(url) : null,
+    description: url ? () => getRuleMarkDown(url) : null,
     location: {
       file,
       position,
