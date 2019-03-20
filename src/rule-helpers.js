@@ -20,7 +20,12 @@ function takeWhile(source, predicate, excludes) {
 
 // Retrieves style guide documentation with cached responses
 export default async function getRuleMarkDown(url) {
-  const rule = url.split('#')[1]
+  const ruleMatch = /https:\/\/github.com\/rubocop-hq\/ruby-style-guide#(.*)/g.exec(url)
+  if (ruleMatch == null) {
+    return null
+  }
+
+  const rule = ruleMatch[1]
   if (docsRuleCache.has(rule)) {
     const cachedRule = docsRuleCache.get(rule)
     if (new Date().getTime() >= cachedRule.expires) {
