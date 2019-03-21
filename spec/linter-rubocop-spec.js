@@ -14,6 +14,7 @@ const badPath = path.join(__dirname, 'fixtures', 'lintableFiles', 'bad.rb')
 const emptyPath = path.join(__dirname, 'fixtures', 'lintableFiles', 'empty.rb')
 const goodPath = path.join(__dirname, 'fixtures', 'lintableFiles', 'good.rb')
 const invalidWithUrlPath = path.join(__dirname, 'fixtures', 'lintableFiles', 'invalid_with_url.rb')
+const abcSizePath = path.join(__dirname, 'fixtures', 'lintableFiles', 'abc_size.rb')
 const ruby23Path = path.join(__dirname, 'fixtures', 'lintableFiles', 'ruby_2_3.rb')
 const ruby23PathYml22 = path.join(__dirname, 'fixtures', 'yml2_2', 'ruby_2_3.rb')
 
@@ -91,6 +92,7 @@ describe('The RuboCop provider for Linter', () => {
     })
 
     it('verifies the first message', async () => {
+      const urlRegex = /https:\/\/github.com\/.*\/ruby-style-guide#consistent-string-literals/g
       const msgText = 'Style/StringLiterals: Prefer single-quoted strings '
         + "when you don't need string interpolation or special symbols."
 
@@ -98,10 +100,34 @@ describe('The RuboCop provider for Linter', () => {
 
       expect(messages[0].severity).toBe('info')
       expect(messages[0].excerpt).toBe(msgText)
+      expect(messages[0].url).toMatch(urlRegex)
       expect(messages[0].location.file).toBe(invalidWithUrlPath)
       expect(messages[0].location.position).toEqual([[2, 6], [2, 20]])
       const desc = await messages[0].description()
       expect(desc).toBeTruthy()
+    })
+  })
+
+  describe('shows errors without a clickable link in a file with warnings', () => {
+    let editor = null
+
+    beforeEach(async () => {
+      editor = await atom.workspace.open(abcSizePath)
+    })
+
+    it('verifies the first message', async () => {
+      const ruleUrl = 'http://c2.com/cgi/wiki?AbcMetric'
+      const msgText = 'Metrics/AbcSize: Assignment Branch Condition size for defaults is too high. [18.25/15]'
+
+      const messages = await lint(editor)
+
+      expect(messages[0].severity).toBe('info')
+      expect(messages[0].excerpt).toBe(msgText)
+      expect(messages[0].url).toBe(ruleUrl)
+      expect(messages[0].location.file).toBe(abcSizePath)
+      expect(messages[0].location.position).toEqual([[0, 0], [0, 214]])
+      const desc = await messages[0].description()
+      expect(desc).toBeFalsy()
     })
   })
 
