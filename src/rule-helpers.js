@@ -20,7 +20,7 @@ function takeWhile(source, predicate, excludes) {
 
 // Retrieves style guide documentation with cached responses
 export default async function getRuleMarkDown(url) {
-  const ruleMatch = /https:\/\/github.com\/rubocop-hq\/ruby-style-guide#(.*)/g.exec(url)
+  const ruleMatch = /https:\/\/github.com\/.*\/ruby-style-guide#(.*)/g.exec(url)
   if (ruleMatch == null) {
     return null
   }
