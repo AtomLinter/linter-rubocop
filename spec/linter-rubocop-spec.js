@@ -116,16 +116,16 @@ describe('The RuboCop provider for Linter', () => {
     })
 
     it('verifies the first message', async () => {
-      const ruleUrl = 'http://c2.com/cgi/wiki?AbcMetric'
+      const urlRegex = /(http:\/\/c2.com\/cgi\/wiki\?AbcMetric)/g
       const msgText = 'Metrics/AbcSize: Assignment Branch Condition size for defaults is too high. [18.25/15]'
 
       const messages = await lint(editor)
 
       expect(messages[0].severity).toBe('info')
       expect(messages[0].excerpt).toBe(msgText)
-      expect(messages[0].url).toBe(ruleUrl)
+      expect(messages[0].url).toMatch(urlRegex)
       expect(messages[0].location.file).toBe(abcSizePath)
-      expect(messages[0].location.position).toEqual([[0, 0], [0, 214]])
+      expect(messages[0].location.position).toEqual([[2, 0], [2, 214]])
       const desc = await messages[0].description()
       expect(desc).toBeFalsy()
     })
