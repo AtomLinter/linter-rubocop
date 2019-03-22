@@ -78,7 +78,7 @@ describe('The RuboCop provider for Linter', () => {
 
       expect(messages[0].severity).toBe('error')
       expect(messages[0].excerpt).toBe(msgText)
-      expect(messages[0].description).toBe(null)
+      expect(messages[0].description).not.toBeDefined()
       expect(messages[0].location.file).toBe(badPath)
       expect(messages[0].location.position).toEqual([[1, 6], [1, 7]])
     })
@@ -103,8 +103,7 @@ describe('The RuboCop provider for Linter', () => {
       expect(messages[0].url).toMatch(urlRegex)
       expect(messages[0].location.file).toBe(invalidWithUrlPath)
       expect(messages[0].location.position).toEqual([[2, 6], [2, 20]])
-      const desc = await messages[0].description()
-      expect(desc).toBeTruthy()
+      expect(messages[0].description).not.toBe(null)
     })
   })
 
@@ -126,8 +125,7 @@ describe('The RuboCop provider for Linter', () => {
       expect(messages[0].url).toMatch(urlRegex)
       expect(messages[0].location.file).toBe(abcSizePath)
       expect(messages[0].location.position).toEqual([[2, 0], [2, 3]])
-      const desc = await messages[0].description()
-      expect(desc).toBeFalsy()
+      expect(messages[0].description).not.toBeDefined()
     })
   })
 

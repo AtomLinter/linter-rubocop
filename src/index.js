@@ -79,12 +79,18 @@ const forwardRubocopToLinter = (version, {
     url,
     excerpt: latestRubocops ? excerpt : `${copName}: ${excerpt}`,
     severity: severityMapping[severity],
-    description: url ? () => getRuleMarkDown(url) : null,
     location: {
       file,
       position,
     },
   }
+
+  getRuleMarkDown(url).then((markdown) => {
+    if (markdown) {
+      linterMessage.description = markdown
+    }
+  })
+
   return linterMessage
 }
 
