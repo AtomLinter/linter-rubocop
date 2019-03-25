@@ -58,11 +58,7 @@ const forwardRubocopToLinter = (version, {
   let position
   if (location) {
     const { line, column, length } = location
-    if (latestRubocops) {
-      position = [[line - 1, column - 1], [line - 1, location.last_column]]
-    } else {
-      position = [[line - 1, column - 1], [line - 1, (column + length) - 1]]
-    }
+    position = [[line - 1, column - 1], [line - 1, (length + column) - 1]]
   } else {
     position = helpers.generateRange(editor, 0)
   }

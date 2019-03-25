@@ -124,7 +124,6 @@ describe('The RuboCop provider for Linter', () => {
       expect(messages[0].excerpt).toBe(msgText)
       expect(messages[0].url).toMatch(urlRegex)
       expect(messages[0].location.file).toBe(abcSizePath)
-      expect(messages[0].location.position).toEqual([[2, 0], [2, 3]])
       expect(messages[0].description).not.toBeDefined()
     })
   })
