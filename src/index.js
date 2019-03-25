@@ -5,7 +5,6 @@ import { CompositeDisposable } from 'atom'
 import getRuleMarkDown from './rule-helpers'
 
 const DEFAULT_ARGS = [
-  '--cache', 'false',
   '--force-exclusion',
   '--format', 'json',
   '--display-style-guide',
