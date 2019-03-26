@@ -69,6 +69,22 @@ If you're using `rbenv`, it's recommended that you set your `command` to point t
   command: "/Users/JohnDoe/.rbenv/shims/rubocop"
 ```
 
+### Using `chruby`
+
+If you're using `chruby `, it's recommended that you set your `command` to execute `chruby-exec` to set version and run `rubocop`. Alternatively, you can reference the full intended path.
+
+```cson
+"linter-rubocop":
+  command: "/usr/local/bin/chruby-exec 2.5.0 -- rubocop"
+```
+
+or
+
+```cson
+"linter-rubocop":
+  command: "/Users/JohnDoe/.gem/ruby/2.5.1/bin/rubocop"
+```
+
 ## Contributing
 
 If you would like to contribute enhancements or fixes, please do the following:
