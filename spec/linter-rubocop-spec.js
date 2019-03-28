@@ -120,6 +120,8 @@ describe('The RuboCop provider for Linter', () => {
 
       const messages = await lint(editor)
 
+      // We skip the position test because Rubocop versions before 0.52.0 returns
+      // a different length for the offense
       expect(messages[0].severity).toBe('info')
       expect(messages[0].excerpt).toBe(msgText)
       expect(messages[0].url).toMatch(urlRegex)
