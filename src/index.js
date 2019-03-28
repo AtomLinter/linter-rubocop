@@ -53,7 +53,7 @@ const getRubocopBaseCommand = command => command
 const forwardRubocopToLinter = (version, {
   message: rawMessage, location, severity, cop_name: copName,
 }, file, editor) => {
-  const latestRubocops = semver.gte(version, '0.52.0')
+  const hasCopName = semver.gte(version, '0.52.0')
   const [excerpt, url] = rawMessage.split(/ \((.*)\)/, 2)
   let position
   if (location) {
@@ -73,7 +73,7 @@ const forwardRubocopToLinter = (version, {
 
   const linterMessage = {
     url,
-    excerpt: latestRubocops ? excerpt : `${copName}: ${excerpt}`,
+    excerpt: hasCopName ? excerpt : `${copName}: ${excerpt}`,
     severity: severityMapping[severity],
     location: {
       file,
