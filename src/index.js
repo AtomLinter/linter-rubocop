@@ -11,8 +11,6 @@ const DEFAULT_ARGS = [
   '--display-style-guide',
 ]
 
-const execPathVersions = new Map()
-
 let helpers
 let path
 let pluralize
@@ -47,14 +45,20 @@ const parseFromStd = (stdout, stderr) => {
 const getProjectDirectory = filePath => (
   atom.project.relativizePath(filePath)[0] || path.dirname(filePath))
 
-const forwardRubocopToLinter = ({
+const getRubocopBaseCommand = command => command
+  .split(/\s+/)
+  .filter(i => i)
+  .concat(DEFAULT_ARGS)
+
+const forwardRubocopToLinter = (version, {
   message: rawMessage, location, severity, cop_name: copName,
 }, file, editor) => {
+  const hasCopName = semver.gte(version, '0.52.0')
   const [excerpt, url] = rawMessage.split(/ \((.*)\)/, 2)
   let position
   if (location) {
     const { line, column, length } = location
-    position = [[line - 1, column - 1], [line - 1, (column + length) - 1]]
+    position = [[line - 1, column - 1], [line - 1, (length + column) - 1]]
   } else {
     position = helpers.generateRange(editor, 0)
   }
@@ -69,44 +73,21 @@ const forwardRubocopToLinter = ({
 
   const linterMessage = {
     url,
-    excerpt: `${copName}: ${excerpt}`,
+    excerpt: hasCopName ? excerpt : `${copName}: ${excerpt}`,
     severity: severityMapping[severity],
-    description: url ? () => getRuleMarkDown(url) : null,
     location: {
       file,
       position,
     },
   }
+
+  getRuleMarkDown(url).then((markdown) => {
+    if (markdown) {
+      linterMessage.description = markdown
+    }
+  })
+
   return linterMessage
-}
-
-const determineExecVersion = async (command, cwd) => {
-  const args = command.slice(1)
-  args.push('--version')
-  const versionString = await helpers.exec(command[0], args, { cwd, ignoreExitCode: true })
-  const versionPattern = /^(\d+\.\d+\.\d+)/i
-  const match = versionString.match(versionPattern)
-  if (match !== null && match[1]) {
-    return match[1]
-  }
-  throw new Error(`Unable to parse rubocop version from command output: ${versionString}`)
-}
-
-const getRubocopVersion = async (command, cwd) => {
-  const key = [cwd, command].toString()
-  if (!execPathVersions.has(key)) {
-    execPathVersions.set(key, await determineExecVersion(command, cwd))
-  }
-  return execPathVersions.get(key)
-}
-
-const getCopNameArg = async (command, cwd) => {
-  const version = await getRubocopVersion(command, cwd)
-  if (semver.gte(version, '0.52.0')) {
-    return ['--no-display-cop-names']
-  }
-
-  return []
 }
 
 export default {
@@ -140,11 +121,7 @@ export default {
           if (!filePath) { return null }
 
           const cwd = getProjectDirectory(filePath)
-          const command = this.command
-            .split(/\s+/)
-            .filter(i => i)
-            .concat(DEFAULT_ARGS, '--auto-correct')
-          command.push(...(await getCopNameArg(command, cwd)))
+          const command = getRubocopBaseCommand(this.command).concat('--auto-correct')
           command.push(filePath)
 
           const { stdout, stderr } = await helpers.exec(command[0], command.slice(1), { cwd, stream: 'both' })
@@ -198,14 +175,7 @@ export default {
         }
 
         const cwd = getProjectDirectory(filePath)
-        const command = this.command
-          .split(/\s+/)
-          .filter(i => i)
-          .concat(DEFAULT_ARGS)
-        command.push(...(await getCopNameArg(command, cwd)))
-        if (this.runExtraRailsCops) {
-          command.push('--rails')
-        }
+        const command = getRubocopBaseCommand(this.command)
         command.push('--stdin', filePath)
         const stdin = editor.getText()
         const exexOptions = {
@@ -234,9 +204,18 @@ export default {
         // Process was canceled by newer process
         if (output === null) { return null }
 
-        const { files } = parseFromStd(output.stdout, output.stderr)
+        const {
+          metadata: { rubocop_version: rubocopVersion }, files,
+        } = parseFromStd(output.stdout, output.stderr)
+
+        if (rubocopVersion == null || rubocopVersion === '') {
+          throw new Error('Unable to get rubocop version from linting output results.')
+        }
+
         const offenses = files && files[0] && files[0].offenses
-        return (offenses || []).map(offense => forwardRubocopToLinter(offense, filePath, editor))
+        return (offenses || []).map(
+          offense => forwardRubocopToLinter(rubocopVersion, offense, filePath, editor),
+        )
       },
     }
   },
