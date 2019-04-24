@@ -80,7 +80,7 @@
       }
     ],
     "ignorePaths": [
-      "spec/fixtures/*"
+      "spec/fixtures/**"
     ]
   },
   "eslintConfig": {
