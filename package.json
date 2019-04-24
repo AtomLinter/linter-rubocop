@@ -78,6 +78,9 @@
         ],
         "groupName": "ESLint packages"
       }
+    ],
+    "ignorePaths": [
+      "spec/fixtures/*"
     ]
   },
   "eslintConfig": {
