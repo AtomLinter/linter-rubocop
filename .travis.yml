@@ -21,9 +21,11 @@ jobs:
 
     # Check the commit messages
     - stage: test
+      language: node_js
+      node_js: lts/*
+      before_script: skip
       install:
         - npm install
-      before_script: skip
       script:
         - commitlint-travis
 
