@@ -39,9 +39,6 @@ defaults: &defaults
         name: rubocop version
         command: rubocop --version
     - run:
-        name: Cleaning package
-        command: ${APM_SCRIPT_PATH} clean
-    - run:
         name: Package APM package dependencies
         command: |
           if [ -n "${APM_TEST_PACKAGES}" ]; then
@@ -53,13 +50,16 @@ defaults: &defaults
         name: Package dependencies
         command: ${APM_SCRIPT_PATH} install
     - run:
+        name: Cleaning package
+        command: ${APM_SCRIPT_PATH} clean
+    - run:
         name: Package specs
         command: ${ATOM_SCRIPT_PATH} --test spec
     # Cache node_modules
     - save_cache:
         paths:
           - node_modules
-        key: v1-dependencies-{{ checksum "package.json" }}
+        key: v2-dependencies-{{ .Branch }}-{{ checksum "package.json" }}-{{ checksum "package-lock.json"}}
 
 jobs:
   checkout_code:
@@ -71,10 +71,14 @@ jobs:
       # Restore node_modules from the last build
       - restore_cache:
           keys:
-          # Get latest cache for this package.json
-          - v1-dependencies-{{ checksum "package.json" }}
-          # Fallback to the last available cache
-          - v1-dependencies
+          # Get latest cache for this package.json and package-lock.json
+          - v2-dependencies-{{ .Branch }}-{{ checksum "package.json" }}-{{ checksum "package-lock.json"}}
+          # Fallback to the current package.json
+          - v2-dependencies-{{ .Branch }}-{{ checksum "package.json" }}-
+          # Fallback to the last build for this branch
+          - v2-dependencies-{{ .Branch }}-
+          # Fallback to the last available master branch cache
+          - v2-dependencies-master-
       # Save project state for next steps
       - persist_to_workspace:
           root: /tmp

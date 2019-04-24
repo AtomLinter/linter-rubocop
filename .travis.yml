@@ -1,25 +1,48 @@
 ### Project specific config ###
 language: ruby
+rvm: 2.3.1
+os: linux
+install:
+  - gem install --no-document rubocop
 
-matrix:
+jobs:
   include:
-    - os: linux
-      rvm: 2.3.1
+    # Test Atom versions
+    - stage: test
       env: ATOM_CHANNEL=stable
       install:
         - gem install --no-document rubocop -v '< 0.52.0'
 
-    - os: linux
-      rvm: 2.3.1
+    - stage: test
       env: ATOM_CHANNEL=stable
-      install:
-        - gem install --no-document rubocop
 
-    - os: linux
-      rvm: 2.3.1
+    - stage: test
       env: ATOM_CHANNEL=beta
+
+    # Check the commit messages
+    - stage: test
+      # commitlint requires a current version of Node.js
+      language: node_js
+      node_js: lts/*
+      before_script: skip
       install:
-        - gem install --no-document rubocop
+        - npm install
+      script:
+        - commitlint-travis
+
+    - stage: release
+      # Semantic-release requires a current version of Node.js
+      language: node_js
+      node_js: lts/*
+      # Since the deploy needs APM, currently the simplest method is to run
+      # build-package.sh, which requires the specs to pass.
+      before_deploy:
+        - export PATH=${PATH}:${HOME}/atom/usr/bin/
+      deploy:
+        provider: script
+        skip_cleanup: true
+        script:
+          - npx semantic-release
 
 before_script:
   - rubocop --version
@@ -28,7 +51,7 @@ before_script:
 script:
   - curl -s -O https://raw.githubusercontent.com/atom/ci/master/build-package.sh
   - chmod u+x build-package.sh
-  - ./build-package.sh
+  - "./build-package.sh"
 
 notifications:
   email:
@@ -48,10 +71,13 @@ sudo: false
 
 addons:
   apt:
-    sources:
-    - ubuntu-toolchain-r-test
     packages:
-    - g++-6
+    - build-essential
     - fakeroot
     - git
     - libsecret-1-dev
+
+stages:
+  - test
+  - name: release
+    if: (NOT type = pull_request) AND branch = master
