@@ -21,6 +21,7 @@ jobs:
 
     # Check the commit messages
     - stage: test
+      # commitlint requires a current version of Node.js
       language: node_js
       node_js: lts/*
       before_script: skip
@@ -30,6 +31,9 @@ jobs:
         - commitlint-travis
 
     - stage: release
+      # Semantic-release requires a current version of Node.js
+      language: node_js
+      node_js: lts/*
       # Since the deploy needs APM, currently the simplest method is to run
       # build-package.sh, which requires the specs to pass.
       before_deploy:
