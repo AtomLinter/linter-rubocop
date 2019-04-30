@@ -1,3 +1,10 @@
+## [2.2.7](https://github.com/AtomLinter/linter-rubocop/compare/v2.2.6...v2.2.7) (2019-04-30)
+
+
+### Bug Fixes
+
+* updated minimum Atom version to 1.30 ([5f16450](https://github.com/AtomLinter/linter-rubocop/commit/5f16450)), closes [#314](https://github.com/AtomLinter/linter-rubocop/issues/314)
+
 ## [2.2.6](https://github.com/AtomLinter/linter-rubocop/compare/v2.2.5...v2.2.6) (2019-04-30)
 
 
