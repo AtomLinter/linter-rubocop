@@ -7,7 +7,7 @@
   "repository": "https://github.com/AtomLinter/linter-rubocop",
   "license": "MIT",
   "engines": {
-    "atom": ">=1.4.0 <2.0.0"
+    "atom": ">=1.30.0 <2.0.0"
   },
   "configSchema": {
     "command": {
