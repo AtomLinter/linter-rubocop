@@ -1,3 +1,10 @@
+## [2.2.6](https://github.com/AtomLinter/linter-rubocop/compare/v2.2.5...v2.2.6) (2019-04-30)
+
+
+### Bug Fixes
+
+* rubocop v0.68.0 doesn't include the cop name in the message anymore ([c71ec58](https://github.com/AtomLinter/linter-rubocop/commit/c71ec58))
+
 ## [2.2.5](https://github.com/AtomLinter/linter-rubocop/compare/v2.2.4...v2.2.5) (2019-04-24)
 
 

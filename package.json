@@ -1,7 +1,7 @@
 {
   "name": "linter-rubocop",
   "main": "./src/index.js",
-  "version": "2.2.5",
+  "version": "2.2.6",
   "private": true,
   "description": "Lint Ruby on the fly, using rubocop",
   "repository": "https://github.com/AtomLinter/linter-rubocop",
