@@ -1,3 +1,10 @@
+# [2.3.0](https://github.com/AtomLinter/linter-rubocop/compare/v2.2.7...v2.3.0) (2019-05-01)
+
+
+### Features
+
+* implements [#306](https://github.com/AtomLinter/linter-rubocop/issues/306) ([c7fc64f](https://github.com/AtomLinter/linter-rubocop/commit/c7fc64f))
+
 ## [2.2.7](https://github.com/AtomLinter/linter-rubocop/compare/v2.2.6...v2.2.7) (2019-04-30)
 
 
