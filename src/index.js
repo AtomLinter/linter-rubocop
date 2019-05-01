@@ -5,7 +5,6 @@ import { CompositeDisposable } from 'atom'
 import getRuleMarkDown from './rule-helpers'
 
 const DEFAULT_ARGS = [
-  '--cache', 'false',
   '--force-exclusion',
   '--format', 'json',
   '--display-style-guide',
@@ -101,6 +100,7 @@ export default {
       }
       loadDeps()
     }
+
     depsCallbackID = window.requestIdleCallback(installLinterRubocopDeps)
     this.idleCallbacks.add(depsCallbackID)
 
@@ -176,19 +176,24 @@ export default {
 
         const cwd = getProjectDirectory(filePath)
         const command = getRubocopBaseCommand(this.command)
-        command.push('--stdin', filePath)
-        const stdin = editor.getText()
-        const exexOptions = {
+        const execOptions = {
           cwd,
-          stdin,
           stream: 'both',
           timeout: 10000,
           uniqueKey: `linter-rubocop::${filePath}`,
         }
 
+        if (editor.isModified()) {
+          execOptions.stdin = editor.getText()
+          command.push('--stdin', filePath)
+        } else {
+          execOptions.ignoreExitCode = true
+          command.push(filePath)
+        }
+
         let output
         try {
-          output = await helpers.exec(command[0], command.slice(1), exexOptions)
+          output = await helpers.exec(command[0], command.slice(1), execOptions)
         } catch (e) {
           if (e.message !== 'Process execution timed out') throw e
           atom.notifications.addInfo(
