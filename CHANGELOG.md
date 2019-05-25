@@ -1,3 +1,10 @@
+## [2.3.1](https://github.com/AtomLinter/linter-rubocop/compare/v2.3.0...v2.3.1) (2019-05-25)
+
+
+### Bug Fixes
+
+* fixed ruby file for 2.4, added unsupported lambda style ([c72bba0](https://github.com/AtomLinter/linter-rubocop/commit/c72bba0))
+
 # [2.3.0](https://github.com/AtomLinter/linter-rubocop/compare/v2.2.7...v2.3.0) (2019-05-01)
 
 
