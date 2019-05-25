@@ -15,8 +15,8 @@ const emptyPath = path.join(__dirname, 'fixtures', 'lintableFiles', 'empty.rb')
 const goodPath = path.join(__dirname, 'fixtures', 'lintableFiles', 'good.rb')
 const invalidWithUrlPath = path.join(__dirname, 'fixtures', 'lintableFiles', 'invalid_with_url.rb')
 const abcSizePath = path.join(__dirname, 'fixtures', 'lintableFiles', 'abc_size.rb')
-const ruby23Path = path.join(__dirname, 'fixtures', 'lintableFiles', 'ruby_2_3.rb')
-const ruby23PathYml22 = path.join(__dirname, 'fixtures', 'yml2_2', 'ruby_2_3.rb')
+const ruby24Path = path.join(__dirname, 'fixtures', 'lintableFiles', 'ruby_2_4.rb')
+const ruby24PathYml23 = path.join(__dirname, 'fixtures', 'yml2_3', 'ruby_2_4.rb')
 
 async function getNotification(expected) {
   return new Promise((resolve) => {
@@ -142,16 +142,16 @@ describe('The RuboCop provider for Linter', () => {
     expect(messages.length).toBe(0)
   })
 
-  describe('respects .ruby-version when .rubycop.yml has not defined ruby version', () => {
-    it('finds violations when .rubocop.yml sets syntax to Ruby 2.2', async () => {
-      atom.project.setPaths([path.join(__dirname, 'fixtures', 'yml2_2')])
-      const editor = await atom.workspace.open(ruby23PathYml22)
+  describe('respects .ruby-version when .rubocop.yml has not defined ruby version', () => {
+    it('finds violations when .rubocop.yml sets syntax to Ruby 2.3', async () => {
+      atom.project.setPaths([path.join(__dirname, 'fixtures', 'yml2_3')])
+      const editor = await atom.workspace.open(ruby24PathYml23)
       const messages = await lint(editor)
       expect(messages.length).toBe(1)
     })
 
     it('finds nothing wrong with a file when .rubocop.yml does not override the Ruby version', async () => {
-      const editor = await atom.workspace.open(ruby23Path)
+      const editor = await atom.workspace.open(ruby24Path)
       const messages = await lint(editor)
       expect(messages.length).toBe(0)
     })
