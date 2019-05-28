@@ -1,3 +1,10 @@
+## [2.3.2](https://github.com/AtomLinter/linter-rubocop/compare/v2.3.1...v2.3.2) (2019-05-28)
+
+
+### Bug Fixes
+
+* **deps:** update dependency pluralize to v8 ([8095f32](https://github.com/AtomLinter/linter-rubocop/commit/8095f32))
+
 ## [2.3.1](https://github.com/AtomLinter/linter-rubocop/compare/v2.3.0...v2.3.1) (2019-05-25)
 
 
