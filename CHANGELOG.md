@@ -1,3 +1,10 @@
+## [2.3.4](https://github.com/AtomLinter/linter-rubocop/compare/v2.3.3...v2.3.4) (2019-06-06)
+
+
+### Bug Fixes
+
+* rule cache ([5de081e](https://github.com/AtomLinter/linter-rubocop/commit/5de081e))
+
 ## [2.3.3](https://github.com/AtomLinter/linter-rubocop/compare/v2.3.2...v2.3.3) (2019-05-28)
 
 
