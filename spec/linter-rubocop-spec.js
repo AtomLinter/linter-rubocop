@@ -6,7 +6,7 @@ import {
   // eslint-disable-next-line no-unused-vars
   it, fit, wait, beforeEach, afterEach,
 } from 'jasmine-fix'
-import { truncateSync, writeFileSync, readFileSync } from 'fs'
+import { copyFileSync } from 'fs'
 
 const { lint } = require('../src/index.js').provideLinter()
 
@@ -158,15 +158,11 @@ describe('The RuboCop provider for Linter', () => {
   })
 
   describe('allows the user to autocorrect the current file', () => {
-    const tmpobj = tmp.fileSync({ postfix: '.rb' })
-
-    beforeEach(() => {
-      truncateSync(tmpobj.name)
-    })
+    const tmpFile = `${tmp.dirSync().name}/invalid_with_url.rb`
 
     it('corrects the bad file', async () => {
-      writeFileSync(tmpobj.name, readFileSync(invalidWithUrlPath))
-      const editor = await atom.workspace.open(tmpobj.name)
+      copyFileSync(invalidWithUrlPath, tmpFile)
+      const editor = await atom.workspace.open(tmpFile)
       atom.commands.dispatch(atom.views.getView(editor), 'linter-rubocop:fix-file')
       const expectedMessage = 'Linter-Rubocop: Fixed'
       const notification = await getNotification(expectedMessage)
