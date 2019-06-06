@@ -1,3 +1,15 @@
+# [2.4.0](https://github.com/AtomLinter/linter-rubocop/compare/v2.3.4...v2.4.0) (2019-06-06)
+
+
+### Bug Fixes
+
+* 'Naming/FileName' rule on test tmp file ([07c3453](https://github.com/AtomLinter/linter-rubocop/commit/07c3453))
+
+
+### Features
+
+* fix file refactor, added fix file option to contextual menu ([2b5c5db](https://github.com/AtomLinter/linter-rubocop/commit/2b5c5db))
+
 ## [2.3.4](https://github.com/AtomLinter/linter-rubocop/compare/v2.3.3...v2.3.4) (2019-06-06)
 
 
