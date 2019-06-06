@@ -1,17 +1,16 @@
 'use babel'
 
+const RULE_INDEX_REGEX = /===.*\[\[(.*)\]\]/g
 const DOCUMENTATION_LIFETIME = 86400 * 1000
 const docsRuleCache = new Map()
 
-function takeWhile(source, predicate, excludes) {
+function takeWhile(source, predicate) {
   const result = []
   const { length } = source
   let i = 0
 
   while (i < length && predicate(source[i], i)) {
-    if (!excludes(source[i], i)) {
-      result.push(source[i])
-    }
+    result.push(source[i])
     i += 1
   }
 
@@ -40,7 +39,7 @@ export default async function getRuleMarkDown(url) {
   }
 
   let rawRulesMarkdown
-  const response = await fetch('https://raw.githubusercontent.com/bbatsov/ruby-style-guide/master/README.md')
+  const response = await fetch('https://raw.githubusercontent.com/bbatsov/ruby-style-guide/master/README.adoc')
   if (response.ok) {
     rawRulesMarkdown = await response.text()
   } else {
@@ -48,18 +47,21 @@ export default async function getRuleMarkDown(url) {
   }
 
   const byLine = rawRulesMarkdown.split('\n')
-  const ruleAnchors = byLine.reduce(
-    (acc, line, idx) => (line.match(/\* <a name=/g) ? acc.concat([[idx, line]]) : acc),
+  const ruleIndexes = byLine.reduce(
+    (acc, line, idx) => (line.match(RULE_INDEX_REGEX) ? acc.concat([[idx, line]]) : acc),
     [],
   )
 
-  ruleAnchors.forEach(([startingIndex, startingLine]) => {
-    const ruleName = startingLine.split('"')[1]
+  ruleIndexes.forEach(([startingIndex, startingLine]) => {
+    const ruleName = RULE_INDEX_REGEX.exec(startingLine)[1]
+
+    if (ruleName == null) { return }
+
     const beginSearch = byLine.slice(startingIndex + 1)
 
     // gobble all the documentation until you reach the next rule
-    const documentationForRule = takeWhile(beginSearch, x => !x.match(/\* <a name=|##/), y => y.match(/.*<sup>.*<\/sup>/))
-    const markdownOutput = '***\n'.concat(documentationForRule.join('\n'))
+    const documentationForRule = takeWhile(beginSearch, x => !x.match(RULE_INDEX_REGEX))
+    const markdownOutput = '\n'.concat(documentationForRule.join('\n'))
 
     docsRuleCache.set(ruleName, {
       markdown: markdownOutput,
