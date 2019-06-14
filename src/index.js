@@ -174,7 +174,7 @@ export default {
       }),
       atom.config.observe('linter-rubocop.disableWhenNoConfigFile', (value) => {
         this.disableWhenNoConfigFile = value
-      })
+      }),
     )
   },
 
