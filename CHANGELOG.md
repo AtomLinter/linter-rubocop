@@ -1,3 +1,11 @@
+## [2.4.1](https://github.com/AtomLinter/linter-rubocop/compare/v2.4.0...v2.4.1) (2019-06-17)
+
+
+### Bug Fixes
+
+* fixed missing trailing comma, comma-dangle ([116c35a](https://github.com/AtomLinter/linter-rubocop/commit/116c35a))
+* removed configuration to run Rubocop with extra Rails cops ([9086d2c](https://github.com/AtomLinter/linter-rubocop/commit/9086d2c))
+
 # [2.4.0](https://github.com/AtomLinter/linter-rubocop/compare/v2.3.4...v2.4.0) (2019-06-06)
 
 
