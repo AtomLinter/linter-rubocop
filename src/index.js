@@ -4,12 +4,7 @@
 import { CompositeDisposable } from 'atom'
 import getRuleMarkDown from './rule-helpers'
 import hasValidScope from './scope-util'
-
-const DEFAULT_ARGS = [
-  '--force-exclusion',
-  '--format', 'json',
-  '--display-style-guide',
-]
+import RubocopConfig from './rubocop-config'
 
 let helpers
 let path
@@ -42,22 +37,10 @@ const parseFromStd = (stdout, stderr) => {
   return parsed
 }
 
-const getBaseCommand = command => command
-  .split(/\s+/)
-  .filter(i => i)
-  .concat(DEFAULT_ARGS)
-
-const getBaseExecutionOpts = filePath => ({
-  cwd: atom.project.relativizePath(filePath)[0] || path.dirname(filePath),
-  stream: 'both',
-  timeout: 10000,
-  uniqueKey: `linter-rubocop::${filePath}`,
-})
-
-const executeRubocop = async (execOptions, command) => {
+const executeRubocop = async (runner, filePath, args, options) => {
   let output
   try {
-    output = await helpers.exec(command[0], command.slice(1), execOptions)
+    output = await runner.executeRubocop(filePath, args, options)
   } catch (e) {
     if (e.message !== 'Process execution timed out') throw e
     atom.notifications.addInfo(
@@ -175,7 +158,16 @@ export default {
       atom.config.observe('linter-rubocop.disableWhenNoConfigFile', (value) => {
         this.disableWhenNoConfigFile = value
       }),
+      atom.config.observe('linter-rubocop.useBundler', (value) => {
+        this.useBundler = value
+      }),
     )
+
+    this.rubocopConfig = new RubocopConfig({
+      command: this.command,
+      disableWhenNoConfigFile: this.disableWhenNoConfigFile,
+      useBundler: this.useBundler,
+    }, atom.workspace.getActiveTextEditor())
   },
 
   deactivate() {
@@ -200,11 +192,7 @@ export default {
 
     const filePath = textEditor.getPath()
 
-    const command = getBaseCommand(this.command)
-    command.push('--auto-correct')
-    command.push(filePath)
-
-    const output = await executeRubocop(getBaseExecutionOpts(filePath), command)
+    const output = executeRubocop(this.rubocopConfig, filePath, ['--auto-correct', filePath])
     const {
       files,
       summary: { offense_count: offenseCount },
@@ -245,18 +233,18 @@ export default {
           }
         }
 
-        const execOptions = getBaseExecutionOpts(filePath)
-        const command = getBaseCommand(this.command)
+        const args = []
+        const options = {}
 
         if (editor.isModified()) {
-          execOptions.stdin = editor.getText()
-          command.push('--stdin', filePath)
+          options.stdin = editor.getText()
+          args.push('--stdin', filePath)
         } else {
-          execOptions.ignoreExitCode = true
-          command.push(filePath)
+          options.ignoreExitCode = true
+          args.push(filePath)
         }
 
-        const output = await executeRubocop(execOptions, command)
+        const output = executeRubocop(this.rubocopConfig, filePath, args, options)
 
         // Process was canceled by newer process
         if (output === null) { return null }
