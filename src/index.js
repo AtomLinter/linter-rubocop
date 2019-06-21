@@ -16,6 +16,14 @@ let path
 let pluralize
 let semver
 
+const severityMapping = {
+  refactor: 'info',
+  convention: 'info',
+  warning: 'warning',
+  error: 'error',
+  fatal: 'error',
+}
+
 const loadDeps = () => {
   if (!helpers) {
     helpers = require('atom-linter')
@@ -73,6 +81,15 @@ const executeRubocop = async (execOptions, command) => {
   return output
 }
 
+const forwardErrorToLinter = (message, editor) => [{
+  excerpt: `Linter-Rubocop: ${message}`,
+  severity: severityMapping.error,
+  location: {
+    file: editor.getPath(),
+    position: helpers.generateRange(editor, 0),
+  },
+}]
+
 const forwardRubocopToLinter = (version, {
   message: rawMessage, location, severity, cop_name: copName,
 }, file, editor) => {
@@ -84,14 +101,6 @@ const forwardRubocopToLinter = (version, {
     position = [[line - 1, column - 1], [line - 1, (length + column) - 1]]
   } else {
     position = helpers.generateRange(editor, 0)
-  }
-
-  const severityMapping = {
-    refactor: 'info',
-    convention: 'info',
-    warning: 'warning',
-    error: 'error',
-    fatal: 'error',
   }
 
   const linterMessage = {
@@ -204,25 +213,31 @@ export default {
     command.push('--auto-correct')
     command.push(filePath)
 
-    const output = await executeRubocop(getBaseExecutionOpts(filePath), command)
-    const {
-      files,
-      summary: { offense_count: offenseCount },
-    } = parseFromStd(output.stdout, output.stderr)
+    let output
+    try {
+      output = await executeRubocop(getBaseExecutionOpts(filePath), command)
 
-    const offenses = files && files[0] && files[0].offenses
+      const {
+        files,
+        summary: { offense_count: offenseCount },
+      } = parseFromStd(output.stdout, output.stderr)
 
-    if (offenseCount === 0) {
-      atom.notifications.addInfo('Linter-Rubocop: No fixes were made')
-    } else {
-      const corrections = Object.values(offenses)
-        .reduce((off, { corrected }) => off + corrected, 0)
-      const message = `Linter-Rubocop: Fixed ${pluralize('offenses', corrections, true)} of ${offenseCount}`
-      if (corrections < offenseCount) {
-        atom.notifications.addInfo(message)
+      const offenses = files && files[0] && files[0].offenses
+
+      if (offenseCount === 0) {
+        atom.notifications.addInfo('Linter-Rubocop: No fixes were made')
       } else {
-        atom.notifications.addSuccess(message)
+        const corrections = Object.values(offenses)
+          .reduce((off, { corrected }) => off + corrected, 0)
+        const message = `Linter-Rubocop: Fixed ${pluralize('offenses', corrections, true)} of ${offenseCount}`
+        if (corrections < offenseCount) {
+          atom.notifications.addInfo(message)
+        } else {
+          atom.notifications.addSuccess(message)
+        }
       }
+    } catch (e) {
+      atom.notifications.addError('Linter-Rubocop: Unexpected error', { description: e.message })
     }
   },
 
@@ -256,24 +271,28 @@ export default {
           command.push(filePath)
         }
 
-        const output = await executeRubocop(execOptions, command)
+        let output
+        try {
+          output = await executeRubocop(execOptions, command)
+          // Process was canceled by newer process
+          if (output === null) { return null }
 
-        // Process was canceled by newer process
-        if (output === null) { return null }
+          const {
+            metadata: { rubocop_version: rubocopVersion }, files,
+          } = parseFromStd(output.stdout, output.stderr)
 
-        const {
-          metadata: { rubocop_version: rubocopVersion }, files,
-        } = parseFromStd(output.stdout, output.stderr)
+          if (rubocopVersion == null || rubocopVersion === '') {
+            throw new Error('Unable to get rubocop version from linting output results.')
+          }
 
-        if (rubocopVersion == null || rubocopVersion === '') {
-          throw new Error('Unable to get rubocop version from linting output results.')
+          const offenses = files && files[0] && files[0].offenses
+
+          return (offenses || []).map(
+            offense => forwardRubocopToLinter(rubocopVersion, offense, filePath, editor),
+          )
+        } catch (e) {
+          return forwardErrorToLinter(e.message, editor)
         }
-
-        const offenses = files && files[0] && files[0].offenses
-
-        return (offenses || []).map(
-          offense => forwardRubocopToLinter(rubocopVersion, offense, filePath, editor),
-        )
       },
     }
   },
