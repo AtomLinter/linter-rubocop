@@ -16,21 +16,11 @@ const DEFAULT_ARGS = [
 const BUNDLE_SHOW_CMD = 'bundle show rubocop'
 const BUNDLE_EXEC_CMD = 'bundle exec'
 
-async function detectBundledRubocop() {
-  try {
-    const cwd = atom.project.relativizePath(this[editor].getPath())[0]
-    await exec(BUNDLE_SHOW_CMD[0], BUNDLE_SHOW_CMD.slice(1), { cwd })
-    return true
-  } catch (e) {
-    return false
-  }
-}
-
 export default class RubocopConfig {
   constructor(newOptions, newEditor) {
     this[options] = newOptions
     this[editor] = newEditor
-    this[bundledRubocop] = detectBundledRubocop()
+    this[bundledRubocop] = this.detectBundledRubocop()
     this[baseCommand] = this.buildBaseCommand()
   }
 
@@ -82,5 +72,15 @@ export default class RubocopConfig {
       .filter(i => i)
       .concat(DEFAULT_ARGS)
       .concat(args)
+  }
+
+  async detectBundledRubocop() {
+    try {
+      const cwd = atom.project.relativizePath(this[editor].getPath())[0]
+      await exec(BUNDLE_SHOW_CMD[0], BUNDLE_SHOW_CMD.slice(1), { cwd })
+      return true
+    } catch (e) {
+      return false
+    }
   }
 }
