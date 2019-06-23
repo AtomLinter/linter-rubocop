@@ -24,7 +24,7 @@
     "useBundler": {
       "type": "boolean",
       "default": false,
-      "description": "Use 'bundler' to execute Rubucop."
+      "description": "Use 'bundler' to execute Rubocop."
     }
   },
   "activationHooks": [
