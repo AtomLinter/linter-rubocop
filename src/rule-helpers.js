@@ -30,6 +30,7 @@ export default async function getRuleMarkDown(url) {
   const rule = ruleMatch[1]
   if (docsRuleCache.has(rule)) {
     const cachedRule = docsRuleCache.get(rule)
+
     if (new Date().getTime() >= cachedRule.expires) {
       // If documentation is stale, clear cache
       docsRuleCache.delete(rule)
@@ -69,5 +70,8 @@ export default async function getRuleMarkDown(url) {
     })
   })
 
-  return docsRuleCache.get(rule).markdown
+  if (docsRuleCache.has(rule)) {
+    return docsRuleCache.get(rule).markdown
+  }
+  return null
 }
