@@ -1,7 +1,10 @@
 'use babel'
 
 const RULE_INDEX_REGEX = /===.*\[\[(.*)\]\]/g
+const RULE_MATCH_REGEX = /https:\/\/github.com\/.*\/ruby-style-guide#(.*)/g
+const DOC_URL = 'https://raw.githubusercontent.com/bbatsov/ruby-style-guide/master/README.adoc'
 const DOCUMENTATION_LIFETIME = 86400 * 1000
+
 const docsRuleCache = new Map()
 
 function takeWhile(source, predicate) {
@@ -22,7 +25,7 @@ export default async function getRuleMarkDown(url) {
   if (url == null) {
     return null
   }
-  const ruleMatch = /https:\/\/github.com\/.*\/ruby-style-guide#(.*)/g.exec(url)
+  const ruleMatch = RULE_MATCH_REGEX.exec(url)
   if (ruleMatch == null) {
     return null
   }
@@ -40,7 +43,7 @@ export default async function getRuleMarkDown(url) {
   }
 
   let rawRulesMarkdown
-  const response = await fetch('https://raw.githubusercontent.com/bbatsov/ruby-style-guide/master/README.adoc')
+  const response = await fetch(DOC_URL)
   if (response.ok) {
     rawRulesMarkdown = await response.text()
   } else {

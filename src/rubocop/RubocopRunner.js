@@ -2,6 +2,8 @@
 
 import { exec, findAsync } from 'atom-linter'
 
+const CFG_FILE = '.rubocop.yml'
+
 function getBaseExecutionOpts(filePath, extraOptions = {}) {
   const baseExecOptions = {
     cwd: atom.project.relativizePath(filePath)[0],
@@ -19,7 +21,7 @@ export default class RubocopRunner {
 
   async executeRubocop(filePath, args, options = {}) {
     if (this.config.disableWhenNoConfigFile === true) {
-      const configFile = await findAsync(filePath, '.rubocop.yml')
+      const configFile = await findAsync(filePath, CFG_FILE)
       if (configFile === null) {
         return null
       }

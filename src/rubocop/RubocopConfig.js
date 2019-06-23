@@ -11,14 +11,15 @@ const DEFAULT_ARGS = [
   '--force-exclusion',
   '--format', 'json',
   '--display-style-guide',
-  '--cache', 'false',
 ]
+
+const BUNDLE_SHOW_CMD = 'bundle show rubocop'
+const BUNDLE_EXEC_CMD = 'bundle exec'
 
 async function detectBundledRubocop() {
   try {
-    const command = 'bundle show rubocop'
     const cwd = atom.project.relativizePath(this[editor].getPath())[0]
-    await exec(command[0], command.slice(1), { cwd })
+    await exec(BUNDLE_SHOW_CMD[0], BUNDLE_SHOW_CMD.slice(1), { cwd })
     return true
   } catch (e) {
     return false
@@ -72,7 +73,7 @@ export default class RubocopConfig {
   buildBaseCommand(args = []) {
     let cmd
     if (this[options].useBundler || this[options].bundledRubocop) {
-      cmd = `bundle exec ${this[options].command}`
+      cmd = `${BUNDLE_EXEC_CMD} ${this[options].command}`
     } else if (this[options].command.length !== 0) {
       cmd = this[options].command
     }
