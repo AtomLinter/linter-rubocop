@@ -162,19 +162,8 @@ export default {
 
         loadDeps()
 
-        const args = []
-        const options = {}
-
-        if (editor.isModified()) {
-          options.stdin = editor.getText()
-          args.push('--stdin', filePath)
-        } else {
-          options.ignoreExitCode = true
-          args.push(filePath)
-        }
-
         const output = await new RubocopRunner(this.rubocopConfig)
-          .executeRubocop(filePath, args, options)
+          .executeRubocop(filePath, ['--stdin', filePath], { stdin: editor.getText() })
         try {
           // Process was canceled by newer process or there is nothing to parse
           if (output === null) { return null }

@@ -11,6 +11,7 @@ const DEFAULT_ARGS = [
   '--force-exclusion',
   '--format', 'json',
   '--display-style-guide',
+  '--cache', 'false',
 ]
 
 async function detectBundledRubocop() {
