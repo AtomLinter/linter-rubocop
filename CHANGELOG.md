@@ -1,3 +1,10 @@
+## [2.4.2](https://github.com/AtomLinter/linter-rubocop/compare/v2.4.1...v2.4.2) (2019-06-24)
+
+
+### Bug Fixes
+
+* **deps:** update dependency semver to v6.1.2 ([60957d2](https://github.com/AtomLinter/linter-rubocop/commit/60957d2))
+
 ## [2.4.1](https://github.com/AtomLinter/linter-rubocop/compare/v2.4.0...v2.4.1) (2019-06-17)
 
 
