@@ -18,7 +18,7 @@ const VERSION_RANGE = '>=0.52.0 <0.68.0'
 export default class OffenseFormatter extends ErrorFormatter {
   toLinter(version, {
     message: rawMessage, location, severity, cop_name: copName,
-  }, file) {
+  }, filePath) {
     const hasCopName = satisfies(version, VERSION_RANGE)
     const [excerpt, url] = rawMessage.split(/ \((.*)\)/, 2)
     let position
@@ -26,7 +26,7 @@ export default class OffenseFormatter extends ErrorFormatter {
       const { line, column, length } = location
       position = [[line - 1, column - 1], [line - 1, (length + column) - 1]]
     } else {
-      position = this.generateRange(this.editor, 0)
+      position = this.topFileRange
     }
 
     const linterMessage = {
@@ -34,7 +34,7 @@ export default class OffenseFormatter extends ErrorFormatter {
       excerpt: hasCopName ? excerpt : `${copName}: ${excerpt}`,
       severity: SEVERITY_MAPPING[severity],
       location: {
-        file,
+        file: filePath,
         position,
       },
     }
