@@ -6,22 +6,6 @@ import RubocopConfig from './rubocop/RubocopConfig'
 import hasValidScope from './helpers/validate-scopes'
 import Rubocop from './rubocop/Rubocop'
 
-let helpers
-let path
-let pluralize
-
-const loadDeps = () => {
-  if (!helpers) {
-    helpers = require('atom-linter')
-  }
-  if (!path) {
-    path = require('path')
-  }
-  if (!pluralize) {
-    pluralize = require('pluralize')
-  }
-}
-
 export default {
   activate() {
     this.scopes = [
@@ -40,7 +24,6 @@ export default {
       if (!atom.inSpecMode()) {
         require('atom-package-deps').install('linter-rubocop', true)
       }
-      loadDeps()
     }
 
     depsCallbackID = window.requestIdleCallback(installLinterRubocopDeps)
@@ -128,8 +111,6 @@ export default {
       lint: async (editor) => {
         const filePath = editor.getPath()
         if (!filePath) { return null }
-
-        loadDeps()
 
         const messages = await new Rubocop(this.rubocopConfig)
           .analyze(editor.getText(), filePath)
