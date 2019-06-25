@@ -1,7 +1,7 @@
 'use babel'
 
 const RULE_INDEX_REGEX = /===.*\[\[(.*)\]\]/g
-const RULE_MATCH_REGEX = /https:\/\/github.com\/.*\/ruby-style-guide#(.*)/g
+const RULE_MATCH_REGEX = /https:\/\/rubystyle.guide#(.*)/g
 const DOC_URL = 'https://raw.githubusercontent.com/bbatsov/ruby-style-guide/master/README.adoc'
 const DOCUMENTATION_LIFETIME = 86400 * 1000
 
