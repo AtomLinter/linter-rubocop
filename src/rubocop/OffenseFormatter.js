@@ -16,7 +16,7 @@ const SEVERITY_MAPPING = {
 const VERSION_RANGE = '>=0.52.0 <0.68.0'
 
 export default class OffenseFormatter extends ErrorFormatter {
-  toLinter(version, {
+  format(version, {
     message: rawMessage, location, severity, cop_name: copName,
   }, filePath) {
     const hasCopName = satisfies(version, VERSION_RANGE)

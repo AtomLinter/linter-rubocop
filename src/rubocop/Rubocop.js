@@ -61,10 +61,10 @@ export default class Rubocop {
       const offenses = files && files[0] && files[0].offenses
 
       return (offenses || []).map(
-        offense => new OffenseFormatter().toLinter(rubocopVersion, offense, filePath),
+        offense => new OffenseFormatter().format(rubocopVersion, offense, filePath),
       )
     } catch (e) {
-      return new ErrorFormatter().toLinter(filePath, e.message)
+      return new ErrorFormatter().format(filePath, e.message)
     }
   }
 }

@@ -7,7 +7,7 @@ export default class ErrorFormatter {
     this.topFileRange = TOP_FILE_RANGE
   }
 
-  toLinter(filePath, message) {
+  format(filePath, message) {
     return [{
       excerpt: `Linter-Rubocop: ${message}`,
       severity: 'error',
