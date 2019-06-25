@@ -92,7 +92,7 @@ describe('The RuboCop provider for Linter', () => {
     })
 
     it('verifies the first message', async () => {
-      const url = 'https://rubystyle.guide#consistent-string-literals'
+      const urlRegex = /https:\/\/.*#consistent-string-literals/g
       const msgText = 'Style/StringLiterals: Prefer single-quoted strings '
         + "when you don't need string interpolation or special symbols."
 
@@ -100,7 +100,7 @@ describe('The RuboCop provider for Linter', () => {
 
       expect(messages[0].severity).toBe('info')
       expect(messages[0].excerpt).toBe(msgText)
-      expect(messages[0].url).toBe(url)
+      expect(messages[0].url).toMatch(urlRegex)
       expect(messages[0].location.file).toBe(invalidWithUrlPath)
       expect(messages[0].location.position).toEqual([[2, 6], [2, 20]])
       expect(messages[0].description).not.toBe(null)
