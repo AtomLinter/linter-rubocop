@@ -12,6 +12,8 @@ export default class Rubocop {
   }
 
   async autocorrect(filePath) {
+    if (!filePath) { return }
+
     const output = await new RubocopRunner(this.config).executeRubocop(filePath, ['--auto-correct', filePath])
     try {
       // Process was canceled by newer process or there is nothing to parse
