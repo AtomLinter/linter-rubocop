@@ -19,7 +19,7 @@ export default class RubocopRunner {
     this.config = config
   }
 
-  async executeRubocop(filePath, args, options = {}) {
+  async run(filePath, args, options = {}) {
     if (this.config.disableWhenNoConfigFile === true) {
       const configFile = await findAsync(filePath, CFG_FILE)
       if (configFile === null) {

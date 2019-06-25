@@ -14,7 +14,7 @@ export default class Rubocop {
   async autocorrect(filePath) {
     if (!filePath) { return }
 
-    const output = await new RubocopRunner(this.config).executeRubocop(filePath, ['--auto-correct', filePath])
+    const output = await new RubocopRunner(this.config).run(filePath, ['--auto-correct', filePath])
     try {
       // Process was canceled by newer process or there is nothing to parse
       if (output === null) { return }
@@ -46,7 +46,7 @@ export default class Rubocop {
   async analyze(text, filePath) {
     if (!filePath) { return null }
 
-    const output = await new RubocopRunner(this.config).executeRubocop(filePath, ['--stdin', filePath], { stdin: text })
+    const output = await new RubocopRunner(this.config).run(filePath, ['--stdin', filePath], { stdin: text })
     try {
       if (output === null) { return null }
 
