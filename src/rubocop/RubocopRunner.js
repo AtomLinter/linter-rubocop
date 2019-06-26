@@ -4,12 +4,13 @@ import { exec, findAsync } from 'atom-linter'
 
 const CFG_FILE = '.rubocop.yml'
 
-function getBaseExecutionOpts(filePath, extraOptions = {}) {
+function buildBaseExecutionOpts(filePath, extraOptions = {}) {
   const baseExecOptions = {
     cwd: atom.project.relativizePath(filePath)[0],
     stream: 'both',
     timeout: 10000,
     uniqueKey: `linter-rubocop::${filePath}`,
+    ignoreExitCode: true,
   }
   return Object.assign(baseExecOptions, extraOptions)
 }
@@ -26,13 +27,14 @@ export default class RubocopRunner {
         return null
       }
     }
+
     const baseCommand = this.config.baseCommand.concat(args)
     let output
     try {
       output = await exec(
         baseCommand[0],
         baseCommand.slice(1),
-        getBaseExecutionOpts(filePath, options),
+        buildBaseExecutionOpts(filePath, options),
       )
     } catch (e) {
       if (e.message !== 'Process execution timed out') throw e
