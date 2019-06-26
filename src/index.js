@@ -1,10 +1,9 @@
 'use babel'
 
-// eslint-disable-next-line import/extensions, import/no-extraneous-dependencies
 import { CompositeDisposable } from 'atom'
 import RubocopConfig from './rubocop/RubocopConfig'
-import hasValidScope from './helpers/validate-scopes'
 import Rubocop from './rubocop/Rubocop'
+import hasValidScope from './helpers/validate-scopes'
 
 export default {
   activate() {
@@ -85,21 +84,21 @@ export default {
     this.subscriptions.dispose()
   },
 
-  async fixFile(textEditor) {
-    if (!textEditor || !atom.workspace.isTextEditor(textEditor)) {
+  async fixFile(editor) {
+    if (!editor || !atom.workspace.isTextEditor(editor)) {
       return
     }
 
-    if (textEditor.isModified()) {
+    if (editor.isModified()) {
       atom.notifications.addError('Linter-Rubocop: Please save before fix file')
     }
 
-    const text = textEditor.getText()
+    const text = editor.getText()
     if (text.length === 0) {
       return
     }
 
-    new Rubocop(this.rubocopConfig).autocorrect(textEditor.getPath())
+    new Rubocop(this.rubocopConfig).autocorrect(editor.getPath())
   },
 
   provideLinter() {
