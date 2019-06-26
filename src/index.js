@@ -75,7 +75,7 @@ export default {
       command: this.command,
       disableWhenNoConfigFile: this.disableWhenNoConfigFile,
       useBundler: this.useBundler,
-    }, atom.workspace.getActiveTextEditor())
+    })
   },
 
   deactivate() {
