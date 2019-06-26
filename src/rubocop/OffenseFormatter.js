@@ -32,7 +32,7 @@ export default class OffenseFormatter extends ErrorFormatter {
     const linterMessage = {
       url,
       excerpt: hasCopName ? excerpt : `${copName}: ${excerpt}`,
-      severity: SEVERITY_MAPPING[severity],
+      severity: SEVERITY_MAPPING[severity] || SEVERITY_MAPPING.error,
       location: {
         file: filePath,
         position,
