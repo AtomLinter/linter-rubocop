@@ -1,6 +1,6 @@
 'use babel'
 
-const TOP_FILE_RANGE = [[0, 0], [0, 0]]
+const TOP_FILE_RANGE = [[0, 0], [0, Infinity]]
 
 export default class ErrorFormatter {
   constructor() {
