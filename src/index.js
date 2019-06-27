@@ -3,7 +3,7 @@
 import { CompositeDisposable } from 'atom'
 import RubocopConfig from './rubocop/RubocopConfig'
 import Rubocop from './rubocop/Rubocop'
-import hasValidScope from './helpers/validate-scopes'
+import hasValidScope from './helpers/scope-validator'
 
 export default {
   activate() {
