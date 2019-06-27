@@ -4,6 +4,13 @@ import { exec, findAsync } from 'atom-linter'
 
 const CFG_FILE = '.rubocop.yml'
 
+const TIMEOUT_ERROR_MSG = 'Process execution timed out'
+const LINTER_TIMEOUT_INFO_MSG = 'Linter-Rubocop: Linter timed out'
+const LINTER_TIMEOUT_INFO_DESC = 'Make sure you are not running Rubocop with a slow-starting interpreter like JRuby. '
+                                 + 'If you are still seeing timeouts, consider running your linter `on save` and not `on change`, '
+                                 + 'or reference https://github.com/AtomLinter/linter-rubocop/issues/202 .'
+
+
 function buildBaseExecutionOpts(filePath, extraOptions = {}) {
   const baseExecOptions = {
     cwd: atom.project.relativizePath(filePath)[0],
@@ -37,15 +44,10 @@ export default class RubocopRunner {
         buildBaseExecutionOpts(filePath, options),
       )
     } catch (e) {
-      if (e.message !== 'Process execution timed out') throw e
-      atom.notifications.addInfo(
-        'Linter-Rubocop: Linter timed out',
-        {
-          description: 'Make sure you are not running Rubocop with a slow-starting interpreter like JRuby. '
-                       + 'If you are still seeing timeouts, consider running your linter `on save` and not `on change`, '
-                       + 'or reference https://github.com/AtomLinter/linter-rubocop/issues/202 .',
-        },
-      )
+      if (e.message !== TIMEOUT_ERROR_MSG) {
+        throw e
+      }
+      atom.notifications.addInfo(LINTER_TIMEOUT_INFO_MSG, { description: LINTER_TIMEOUT_INFO_DESC })
       return null
     }
     return output

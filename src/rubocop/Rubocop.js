@@ -6,6 +6,11 @@ import RubocopRunner from './RubocopRunner'
 import ErrorFormatter from '../ErrorFormatter'
 import OffenseFormatter from './OffenseFormatter'
 
+const PARSE_ERROR_MSG = 'Rubocop: Parse error'
+const UNEXPECTED_ERROR_MSG = 'Rubocop: Unexpected error'
+const UNDEF_VERSION_ERROR_MSG = 'Unable to get rubocop version from linting output results.'
+const NO_FIXES_INFO_MSG = 'Linter-Rubocop: No fixes were made'
+
 export default class Rubocop {
   constructor(config) {
     this.config = config
@@ -28,7 +33,7 @@ export default class Rubocop {
         const offenses = files && files[0] && files[0].offenses
 
         if (offenseCount === 0) {
-          atom.notifications.addInfo('Linter-Rubocop: No fixes were made')
+          atom.notifications.addInfo(NO_FIXES_INFO_MSG)
         } else {
           const corrections = Object.values(offenses)
             .reduce((off, { corrected }) => off + corrected, 0)
@@ -40,10 +45,10 @@ export default class Rubocop {
           }
         }
       } catch (e) {
-        atom.notifications.addError('Rubocop: Prase error', { description: e.message })
+        atom.notifications.addError(PARSE_ERROR_MSG, { description: e.message })
       }
     } catch (e) {
-      atom.notifications.addError('Rubocop: Unexpected error', { description: e.message })
+      atom.notifications.addError(UNEXPECTED_ERROR_MSG, { description: e.message })
     }
   }
 
@@ -59,7 +64,7 @@ export default class Rubocop {
         } = parseFromStd(output.stdout, output.stderr)
 
         if (rubocopVersion == null || rubocopVersion === '') {
-          throw new Error('Unable to get rubocop version from linting output results.')
+          throw new Error(UNDEF_VERSION_ERROR_MSG)
         }
 
         const offenses = files && files[0] && files[0].offenses
@@ -71,7 +76,7 @@ export default class Rubocop {
         return new ErrorFormatter().format(filePath, e.message)
       }
     } catch (e) {
-      atom.notifications.addError('Rubocop: Unexpected error', { description: e.message })
+      atom.notifications.addError(UNEXPECTED_ERROR_MSG, { description: e.message })
       return null
     }
   }
