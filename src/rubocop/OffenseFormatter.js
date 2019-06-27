@@ -5,6 +5,14 @@ import getRuleDocumentation from './helpers/documentation-cache'
 
 import ErrorFormatter from '../ErrorFormatter'
 
+const SEVERITY_MAPPING = {
+  refactor: 'info',
+  convention: 'info',
+  warning: 'warning',
+  error: 'error',
+  fatal: 'error',
+}
+
 const HASCOPNAME_VERSION_RANGE = '>=0.52.0 <0.68.0'
 const RULE_MATCH_REGEX = /https:\/\/.*#(.*)/g
 
@@ -25,7 +33,7 @@ export default class OffenseFormatter extends ErrorFormatter {
     const linterMessage = {
       url,
       excerpt: hasCopName ? excerpt : `${copName}: ${excerpt}`,
-      severity: this.severityMapping[severity] || this.severityMapping.error,
+      severity: SEVERITY_MAPPING[severity] || SEVERITY_MAPPING.error,
       location: {
         file: filePath,
         position,
