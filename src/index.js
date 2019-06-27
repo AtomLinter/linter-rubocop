@@ -44,18 +44,17 @@ export default {
       'atom-text-editor:not(.mini), .overlayer': [{
         label: 'Fix file with Rubocop',
         command: 'linter-rubocop:fix-file',
-        shouldDisplay: (evt) => {
+        shouldDisplay: ({ path }) => {
           const activeEditor = atom.workspace.getActiveTextEditor()
           if (!activeEditor) {
             return false
           }
           // Black magic!
           // Compares the private component property of the active TextEditor
-          //   against the components of the elements
-          const evtIsActiveEditor = evt.path.some(elem => (
-            // Atom v1.19.0+
-            elem.component && activeEditor.component
-              && elem.component === activeEditor.component))
+          // against the components of the elements
+          // Atom v1.19.0+
+          const evtIsActiveEditor = path.some(({ component }) => component && activeEditor.component
+            && component === activeEditor.component)
           // Only show if it was the active editor and it is a valid scope
           return evtIsActiveEditor && hasValidScope(activeEditor, this.scopes)
         },
