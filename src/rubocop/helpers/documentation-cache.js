@@ -1,7 +1,6 @@
 'use babel'
 
 const RULE_INDEX_REGEX = /===.*\[\[(.*)\]\]/g
-const RULE_MATCH_REGEX = /https:\/\/.*#(.*)/g
 const DOC_URL = 'https://raw.githubusercontent.com/bbatsov/ruby-style-guide/master/README.adoc'
 const DOCUMENTATION_LIFETIME = 86400 * 1000
 
@@ -21,16 +20,11 @@ function takeWhile(source, predicate) {
 }
 
 // Retrieves style guide documentation with cached responses
-export default async function getRuleMarkDown(url) {
-  if (url == null) {
-    return null
-  }
-  const ruleMatch = RULE_MATCH_REGEX.exec(url)
-  if (ruleMatch == null) {
+export default async function getRuleDocumentation(rule) {
+  if (rule == null) {
     return null
   }
 
-  const rule = ruleMatch[1]
   if (docsRuleCache.has(rule)) {
     const cachedRule = docsRuleCache.get(rule)
 
@@ -38,19 +32,19 @@ export default async function getRuleMarkDown(url) {
       // If documentation is stale, clear cache
       docsRuleCache.delete(rule)
     } else {
-      return cachedRule.markdown
+      return cachedRule.documentation
     }
   }
 
-  let rawRulesMarkdown
+  let rawRulesDoc
   const response = await fetch(DOC_URL)
   if (response.ok) {
-    rawRulesMarkdown = await response.text()
+    rawRulesDoc = await response.text()
   } else {
     return `***\nError retrieving documentation: ${response.statusText}`
   }
 
-  const byLine = rawRulesMarkdown.split('\n')
+  const byLine = rawRulesDoc.split('\n')
   const ruleIndexes = byLine.reduce(
     (acc, line, idx) => (line.match(RULE_INDEX_REGEX) ? acc.concat([[idx, line]]) : acc),
     [],
@@ -64,17 +58,17 @@ export default async function getRuleMarkDown(url) {
     const beginSearch = byLine.slice(startingIndex + 1)
 
     // gobble all the documentation until you reach the next rule
-    const documentationForRule = takeWhile(beginSearch, x => !x.match(RULE_INDEX_REGEX))
-    const markdownOutput = '\n'.concat(documentationForRule.join('\n'))
+    const rawRuleDoc = takeWhile(beginSearch, x => !x.match(RULE_INDEX_REGEX))
+    const documentation = '\n'.concat(rawRuleDoc.join('\n'))
 
     docsRuleCache.set(ruleName, {
-      markdown: markdownOutput,
+      documentation,
       expires: new Date().getTime() + DOCUMENTATION_LIFETIME,
     })
   })
 
   if (docsRuleCache.has(rule)) {
-    return docsRuleCache.get(rule).markdown
+    return docsRuleCache.get(rule).documentation
   }
   return null
 }

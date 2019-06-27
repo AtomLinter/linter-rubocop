@@ -1,11 +1,12 @@
 'use babel'
 
 import { satisfies } from 'semver'
-import getRuleMarkDown from './helpers/rule-cache'
+import getRuleDocumentation from './helpers/documentation-cache'
 
 import ErrorFormatter from '../ErrorFormatter'
 
 const HASCOPNAME_VERSION_RANGE = '>=0.52.0 <0.68.0'
+const RULE_MATCH_REGEX = /https:\/\/.*#(.*)/g
 
 export default class OffenseFormatter extends ErrorFormatter {
   format(version, {
@@ -31,11 +32,17 @@ export default class OffenseFormatter extends ErrorFormatter {
       },
     }
 
-    getRuleMarkDown(url).then((markdown) => {
-      if (markdown) {
-        linterMessage.description = markdown
+    if (url) {
+      const ruleMatch = RULE_MATCH_REGEX.exec(url)
+      if (ruleMatch) {
+        const rule = ruleMatch[1]
+        getRuleDocumentation(rule).then((documentation) => {
+          if (documentation) {
+            linterMessage.description = documentation
+          }
+        })
       }
-    })
+    }
 
     return linterMessage
   }
