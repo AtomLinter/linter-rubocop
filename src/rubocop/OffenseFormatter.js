@@ -5,13 +5,13 @@ import getRuleMarkDown from './helpers/rule-cache'
 
 import ErrorFormatter from '../ErrorFormatter'
 
-const VERSION_RANGE = '>=0.52.0 <0.68.0'
+const HASCOPNAME_VERSION_RANGE = '>=0.52.0 <0.68.0'
 
 export default class OffenseFormatter extends ErrorFormatter {
   format(version, {
     message: rawMessage, location, severity, cop_name: copName,
   }, filePath) {
-    const hasCopName = satisfies(version, VERSION_RANGE)
+    const hasCopName = satisfies(version, HASCOPNAME_VERSION_RANGE)
     const [excerpt, url] = rawMessage.split(/ \((.*)\)/, 2)
     let position
     if (location) {
