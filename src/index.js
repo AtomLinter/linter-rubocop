@@ -43,47 +43,52 @@ export default {
     this.subscriptions = new CompositeDisposable()
 
     // Register autocorrect command
-    this.subscriptions.add(atom.commands.add('atom-text-editor', {
-      'linter-rubocop:fix-file': async () => {
-        const editor = atom.workspace.getActiveTextEditor()
-        if (hasValidScope(editor, this.scopes)) {
-          await this.fixFile(editor)
-        }
-      },
-    }))
+    this.subscriptions.add(
 
-    this.subscriptions.add(atom.contextMenu.add({
-      'atom-text-editor:not(.mini), .overlayer': [{
-        label: 'Fix file with Rubocop',
-        command: 'linter-rubocop:fix-file',
-        shouldDisplay: ({ path }) => {
-          const activeEditor = atom.workspace.getActiveTextEditor()
-          if (!activeEditor) {
-            return false
+      // Register autocorrect command
+      atom.commands.add('atom-text-editor', {
+        'linter-rubocop:fix-file': async () => {
+          const editor = atom.workspace.getActiveTextEditor()
+          if (hasValidScope(editor, this.scopes)) {
+            await this.fixFile(editor)
           }
-          // Black magic!
-          // Compares the private component property of the active TextEditor
-          // against the components of the elements
-          // Atom v1.19.0+
-          const evtIsActiveEditor = path.some(({ component }) => component && activeEditor.component
-            && component === activeEditor.component)
-          // Only show if it was the active editor and it is a valid scope
-          return evtIsActiveEditor && hasValidScope(activeEditor, this.scopes)
         },
-      }],
-    }))
+      }),
 
-    this.subscriptions.add(atom.config.observe('linter-rubocop.command', (value) => {
-      this.command = value
-    }))
+      atom.contextMenu.add({
+        'atom-text-editor:not(.mini), .overlayer': [{
+          label: 'Fix file with Rubocop',
+          command: 'linter-rubocop:fix-file',
+          shouldDisplay: ({ path }) => {
+            const activeEditor = atom.workspace.getActiveTextEditor()
+            if (!activeEditor) {
+              return false
+            }
+            // Black magic!
+            // Compares the private component property of the active TextEditor
+            // against the components of the elements
+            // Atom v1.19.0+
+            const evtIsActiveEditor = path.some(({ component }) => component
+              && activeEditor.component
+              && component === activeEditor.component)
+            // Only show if it was the active editor and it is a valid scope
+            return evtIsActiveEditor && hasValidScope(activeEditor, this.scopes)
+          },
+        }],
+      }),
 
-    this.subscriptions.add(atom.config.observe('linter-rubocop.disableWhenNoConfigFile', (value) => {
-      this.disableWhenNoConfigFile = value
-    }))
+      atom.config.observe('linter-rubocop.command', (value) => {
+        this.command = value
+      }),
 
-    this.subscriptions.add(atom.config.observe('linter-rubocop.useBundler', (value) => {
-      this.useBundler = value
-    }))
+      atom.config.observe('linter-rubocop.disableWhenNoConfigFile', (value) => {
+        this.disableWhenNoConfigFile = value
+      }),
+
+      atom.config.observe('linter-rubocop.useBundler', (value) => {
+        this.useBundler = value
+      }),
+    )
   },
 
   deactivate() {
