@@ -4,7 +4,7 @@ import tmp from 'tmp'
 import * as path from 'path'
 import {
   // eslint-disable-next-line no-unused-vars
-  it, fit, wait, beforeEach, afterEach, expectAsync,
+  it, fit, wait, beforeEach, afterEach,
 } from 'jasmine-fix'
 import { copyFileSync } from 'fs'
 
