@@ -44,7 +44,7 @@ export default class OffenseFormatter extends ErrorFormatter {
     }
 
     const linterMessage = {
-      url,
+      url: url || null,
       excerpt: hasCopName ? excerpt : `${copName}: ${excerpt}`,
       severity: SEVERITY_MAPPING[severity] || SEVERITY_MAPPING.error,
       description: () => getRuleDocumentation(ruleName(url)),
