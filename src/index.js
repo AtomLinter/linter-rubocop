@@ -1,9 +1,17 @@
 'use babel'
 
 import { CompositeDisposable } from 'atom'
-import RubocopConfig from './rubocop/RubocopConfig'
-import Rubocop from './rubocop/Rubocop'
 import hasValidScope from './helpers/scope-validator'
+
+let rubocop
+
+const initializeRubocop = ({ command, disableWhenNoConfigFile, useBundler }) => {
+  if (!rubocop) {
+    const RubocopConfig = require('./rubocop/RubocopConfig')
+    const Rubocop = require('./rubocop/Rubocop')
+    rubocop = new Rubocop(new RubocopConfig({ command, disableWhenNoConfigFile, useBundler }))
+  }
+}
 
 export default {
   activate() {
@@ -23,6 +31,11 @@ export default {
       if (!atom.inSpecMode()) {
         require('atom-package-deps').install('linter-rubocop', true)
       }
+      initializeRubocop({
+        command: this.command,
+        disableWhenNoConfigFile: this.disableWhenNoConfigFile,
+        useBundler: this.useBundler,
+      })
     }
 
     depsCallbackID = window.requestIdleCallback(installLinterRubocopDeps)
@@ -72,14 +85,6 @@ export default {
     this.subscriptions.add(atom.config.observe('linter-rubocop.useBundler', (value) => {
       this.useBundler = value
     }))
-
-    this.rubocop = new Rubocop(
-      new RubocopConfig({
-        command: this.command,
-        disableWhenNoConfigFile: this.disableWhenNoConfigFile,
-        useBundler: this.useBundler,
-      }),
-    )
   },
 
   deactivate() {
@@ -102,7 +107,7 @@ export default {
       return
     }
 
-    this.rubocop.autocorrect(editor.getPath())
+    rubocop.autocorrect(editor.getPath())
   },
 
   provideLinter() {
@@ -115,7 +120,13 @@ export default {
         const filePath = editor.getPath()
         if (!filePath) { return null }
 
-        const messages = await this.rubocop.analyze(editor.getText(), filePath)
+        initializeRubocop({
+          command: this.command,
+          disableWhenNoConfigFile: this.disableWhenNoConfigFile,
+          useBundler: this.useBundler,
+        })
+
+        const messages = await rubocop.analyze(editor.getText(), filePath)
 
         return messages
       },

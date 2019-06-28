@@ -11,7 +11,7 @@ const UNEXPECTED_ERROR_MSG = 'Rubocop: Unexpected error'
 const UNDEF_VERSION_ERROR_MSG = 'Unable to get rubocop version from linting output results.'
 const NO_FIXES_INFO_MSG = 'Linter-Rubocop: No fixes were made'
 
-export default class Rubocop {
+class Rubocop {
   constructor(config) {
     this.runner = new RubocopRunner(config)
     this.offenseFormatter = new OffenseFormatter()
@@ -83,3 +83,5 @@ export default class Rubocop {
     }
   }
 }
+
+module.exports = Rubocop
