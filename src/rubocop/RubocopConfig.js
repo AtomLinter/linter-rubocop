@@ -5,6 +5,8 @@ const isDisableWhenNoConfigFile = Symbol('isDisableWhenNoConfigFile')
 const isUseBundler = Symbol('isUseBundler')
 const baseCommand = Symbol('baseCommand')
 
+const buildBaseCommand = Symbol('buildBaseCommand')
+
 const BUNDLE_EXEC_CMD = 'bundle exec'
 
 const DEFAULT_ARGS = [
@@ -19,7 +21,7 @@ export default class RubocopConfig {
     this[theCommand] = command
     this[isDisableWhenNoConfigFile] = disableWhenNoConfigFile
     this[isUseBundler] = useBundler
-    this[baseCommand] = this.buildBaseCommand()
+    this[baseCommand] = this[buildBaseCommand]()
   }
 
   get command() {
@@ -50,7 +52,7 @@ export default class RubocopConfig {
     return this[baseCommand]
   }
 
-  buildBaseCommand() {
+  [buildBaseCommand]() {
     let cmd
     if (this[isUseBundler]) {
       cmd = `${BUNDLE_EXEC_CMD} ${this[theCommand]}`
