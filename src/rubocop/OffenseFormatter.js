@@ -16,6 +16,19 @@ const SEVERITY_MAPPING = {
 const HASCOPNAME_VERSION_RANGE = '>=0.52.0 <0.68.0'
 const RULE_MATCH_REGEX = /https:\/\/.*#(.*)/g
 
+function ruleName(url) {
+  if (url == null) {
+    return null
+  }
+  let rule
+  const ruleMatch = RULE_MATCH_REGEX.exec(url)
+  if (ruleMatch) {
+    [, rule] = ruleMatch
+  }
+  return rule
+}
+
+
 export default class OffenseFormatter extends ErrorFormatter {
   format(version, {
     message: rawMessage, location, severity, cop_name: copName,
@@ -34,22 +47,11 @@ export default class OffenseFormatter extends ErrorFormatter {
       url,
       excerpt: hasCopName ? excerpt : `${copName}: ${excerpt}`,
       severity: SEVERITY_MAPPING[severity] || SEVERITY_MAPPING.error,
+      description: () => getRuleDocumentation(ruleName(url)),
       location: {
         file: filePath,
         position,
       },
-    }
-
-    if (url) {
-      const ruleMatch = RULE_MATCH_REGEX.exec(url)
-      if (ruleMatch) {
-        const rule = ruleMatch[1]
-        getRuleDocumentation(rule).then((documentation) => {
-          if (documentation) {
-            linterMessage.description = documentation
-          }
-        })
-      }
     }
 
     return linterMessage

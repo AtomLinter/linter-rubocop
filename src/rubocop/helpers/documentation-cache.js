@@ -22,7 +22,7 @@ function takeWhile(source, predicate) {
 // Retrieves style guide documentation with cached responses
 export default async function getRuleDocumentation(rule) {
   if (rule == null) {
-    return null
+    return ''
   }
 
   if (docsRuleCache.has(rule)) {
@@ -67,8 +67,9 @@ export default async function getRuleDocumentation(rule) {
     })
   })
 
-  if (docsRuleCache.has(rule)) {
-    return docsRuleCache.get(rule).documentation
+  if (!docsRuleCache.has(rule)) {
+    return ''
   }
-  return null
+
+  return docsRuleCache.get(rule).documentation
 }
