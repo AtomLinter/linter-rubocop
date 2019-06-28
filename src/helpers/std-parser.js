@@ -1,13 +1,13 @@
 'use babel'
 
 const parseFromStd = (stdout, stderr) => {
-  if (stderr) throw new Error(stderr)
   let parsed
   try {
     parsed = JSON.parse(stdout)
   } catch (error) {
-    throw new Error(stdout)
+    // continue regardless of error
   }
+  if (typeof parsed !== 'object') { throw new Error(stderr || stdout) }
   return parsed
 }
 
