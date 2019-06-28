@@ -4,7 +4,7 @@ import tmp from 'tmp'
 import * as path from 'path'
 import {
   // eslint-disable-next-line no-unused-vars
-  it, fit, wait, beforeEach, afterEach,
+  it, fit, wait, beforeEach, afterEach, expectAsync,
 } from 'jasmine-fix'
 import { copyFileSync } from 'fs'
 
@@ -75,10 +75,11 @@ describe('The RuboCop provider for Linter', () => {
         + '(Using Ruby 2.3 parser; configure using `TargetRubyVersion` parameter, under `AllCops`)'
 
       const messages = await lint(editor)
+      const description = await messages[0].description()
 
       expect(messages[0].severity).toBe('error')
       expect(messages[0].excerpt).toBe(msgText)
-      expect(messages[0].description).not.toBeDefined()
+      expect(description).toBe('')
       expect(messages[0].location.file).toBe(badPath)
       expect(messages[0].location.position).toEqual([[1, 6], [1, 7]])
     })
@@ -119,6 +120,7 @@ describe('The RuboCop provider for Linter', () => {
       const msgText = 'Metrics/AbcSize: Assignment Branch Condition size for defaults is too high. [18.25/15]'
 
       const messages = await lint(editor)
+      const description = await messages[0].description()
 
       // We skip the position test because Rubocop versions before 0.52.0 returns
       // a different length for the offense
@@ -126,7 +128,7 @@ describe('The RuboCop provider for Linter', () => {
       expect(messages[0].excerpt).toBe(msgText)
       expect(messages[0].url).toMatch(urlRegex)
       expect(messages[0].location.file).toBe(abcSizePath)
-      expect(messages[0].description).not.toBeDefined()
+      expect(description).toBe('')
     })
   })
 
