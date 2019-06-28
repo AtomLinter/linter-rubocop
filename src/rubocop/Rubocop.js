@@ -13,14 +13,16 @@ const NO_FIXES_INFO_MSG = 'Linter-Rubocop: No fixes were made'
 
 export default class Rubocop {
   constructor(config) {
-    this.config = config
+    this.runner = new RubocopRunner(config)
+    this.offenseFormatter = new OffenseFormatter()
+    this.errorFormatter = new ErrorFormatter()
   }
 
   async autocorrect(filePath) {
     if (!filePath) { return }
 
     try {
-      const output = await new RubocopRunner(this.config).run(filePath, ['--auto-correct', filePath])
+      const output = await this.runner.run(filePath, ['--auto-correct', filePath])
       try {
         // Process was canceled by newer process or there is nothing to parse
         if (output === null) { return }
@@ -55,7 +57,7 @@ export default class Rubocop {
   async analyze(text, filePath) {
     if (!filePath) { return null }
     try {
-      const output = await new RubocopRunner(this.config).run(filePath, ['--stdin', filePath], { stdin: text })
+      const output = await this.runner.run(filePath, ['--stdin', filePath], { stdin: text })
       try {
         if (output === null) { return null }
 
@@ -70,10 +72,10 @@ export default class Rubocop {
         const offenses = files && files[0] && files[0].offenses
 
         return (offenses || []).map(
-          offense => new OffenseFormatter().format(rubocopVersion, offense, filePath),
+          offense => this.offenseFormatter.format(rubocopVersion, offense, filePath),
         )
       } catch (e) {
-        return new ErrorFormatter().format(filePath, e.message)
+        return this.errorFormatter.format(filePath, e.message)
       }
     } catch (e) {
       atom.notifications.addError(UNEXPECTED_ERROR_MSG, { description: e.message })
