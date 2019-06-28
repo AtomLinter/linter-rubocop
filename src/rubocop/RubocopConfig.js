@@ -1,6 +1,8 @@
 'use babel'
 
-const options = Symbol('options')
+const theCommand = Symbol('theCommand')
+const isDisableWhenNoConfigFile = Symbol('isDisableWhenNoConfigFile')
+const isUseBundler = Symbol('isUseBundler')
 const baseCommand = Symbol('baseCommand')
 
 const BUNDLE_EXEC_CMD = 'bundle exec'
@@ -13,33 +15,35 @@ const DEFAULT_ARGS = [
 ]
 
 export default class RubocopConfig {
-  constructor(newOptions) {
-    this[options] = newOptions
+  constructor({ command, disableWhenNoConfigFile, useBundler }) {
+    this[theCommand] = command
+    this[isDisableWhenNoConfigFile] = disableWhenNoConfigFile
+    this[isUseBundler] = useBundler
     this[baseCommand] = this.buildBaseCommand()
   }
 
   get command() {
-    return this[options].command
+    return this[theCommand]
   }
 
   set command(value) {
-    this[options].command = value
+    this[theCommand] = value
   }
 
   get disableWhenNoConfigFile() {
-    return this[options].disableWhenNoConfigFile
+    return this[isDisableWhenNoConfigFile]
   }
 
   set disableWhenNoConfigFile(value) {
-    this[options].disableWhenNoConfigFile = value
+    this[isDisableWhenNoConfigFile] = value
   }
 
   get useBundler() {
-    return this[options].useBundler
+    return this[isUseBundler]
   }
 
   set useBundler(value) {
-    this[options].useBundler = value
+    this[isUseBundler] = value
   }
 
   get baseCommand() {
@@ -48,10 +52,10 @@ export default class RubocopConfig {
 
   buildBaseCommand() {
     let cmd
-    if (this[options].useBundler) {
-      cmd = `${BUNDLE_EXEC_CMD} ${this[options].command}`
-    } else if (this[options].command.length !== 0) {
-      cmd = this[options].command
+    if (this[isUseBundler]) {
+      cmd = `${BUNDLE_EXEC_CMD} ${this[theCommand]}`
+    } else if (this[theCommand].length !== 0) {
+      cmd = this[theCommand]
     }
 
     return cmd.split(/\s+/)
