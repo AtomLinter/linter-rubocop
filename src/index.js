@@ -7,9 +7,8 @@ let rubocop
 
 const initializeRubocop = ({ command, disableWhenNoConfigFile, useBundler }) => {
   if (!rubocop) {
-    const RubocopConfig = require('./rubocop/RubocopConfig')
     const Rubocop = require('./rubocop/Rubocop')
-    rubocop = new Rubocop(new RubocopConfig({ command, disableWhenNoConfigFile, useBundler }))
+    rubocop = new Rubocop({ command, disableWhenNoConfigFile, useBundler })
   }
 }
 

@@ -2,6 +2,7 @@
 
 import pluralize from 'pluralize'
 import parseFromStd from '../helpers/std-parser'
+import RubocopConfig from './RubocopConfig'
 import RubocopRunner from './RubocopRunner'
 import ErrorFormatter from '../ErrorFormatter'
 import OffenseFormatter from './OffenseFormatter'
@@ -12,8 +13,9 @@ const UNDEF_VERSION_ERROR_MSG = 'Unable to get rubocop version from linting outp
 const NO_FIXES_INFO_MSG = 'Linter-Rubocop: No fixes were made'
 
 class Rubocop {
-  constructor(config) {
-    this.runner = new RubocopRunner(config)
+  constructor({ command, disableWhenNoConfigFile, useBundler }) {
+    this.config = new RubocopConfig({ command, disableWhenNoConfigFile, useBundler })
+    this.runner = new RubocopRunner(this.config)
     this.offenseFormatter = new OffenseFormatter()
     this.errorFormatter = new ErrorFormatter()
   }
