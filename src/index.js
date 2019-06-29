@@ -95,7 +95,7 @@ export default {
         if (Object.entries(newVal).toString() === Object.entries(oldVal).toString()) {
           return
         }
-        initializeRubocop(newValue['linter-rubocop'], { force: true })
+        initializeRubocop(newVal, { force: true })
       }),
     )
   },
