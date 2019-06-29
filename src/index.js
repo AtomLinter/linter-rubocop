@@ -5,8 +5,8 @@ import hasValidScope from './helpers/scope-validator'
 
 let rubocop
 
-const initializeRubocop = ({ command, disableWhenNoConfigFile, useBundler }) => {
-  if (!rubocop) {
+const initializeRubocop = ({ command, disableWhenNoConfigFile, useBundler }, { force } = {}) => {
+  if (!rubocop || Boolean(force)) {
     const Rubocop = require('./rubocop/Rubocop')
     rubocop = new Rubocop({ command, disableWhenNoConfigFile, useBundler })
   }
@@ -87,6 +87,15 @@ export default {
 
       atom.config.observe('linter-rubocop.useBundler', (value) => {
         this.useBundler = value
+      }),
+
+      atom.config.onDidChange(({ newValue, oldValue }) => {
+        const newVal = newValue['linter-rubocop']
+        const oldVal = oldValue['linter-rubocop']
+        if (Object.entries(newVal).toString() === Object.entries(oldVal).toString()) {
+          return
+        }
+        initializeRubocop(newValue['linter-rubocop'], { force: true })
       }),
     )
   },
