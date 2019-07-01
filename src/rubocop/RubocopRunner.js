@@ -32,21 +32,20 @@ export default class RubocopRunner {
   }
 
   runSync(filePath, args, options = {}) {
+    const cwd = atom.project.relativizePath(filePath)[0] || path.dirname(filePath)
+
     if (this.config.disableWhenNoConfigFile === true) {
-      const configFilePath = (atom.project.relativizePath(filePath)[0]
-                              || path.dirname(filePath)) + CONFIG_FILE
+      const configFilePath = cwd + CONFIG_FILE
       if (!fs.existsSync(configFilePath)) {
         return null
       }
     }
 
     const command = this.config.baseCommand.concat(args)
-    const baseOptions = { cwd: atom.project.relativizePath(filePath)[0] || path.dirname(filePath) }
-
     const output = childProcess.spawnSync(
       command[0],
       command.slice(1),
-      Object.assign(baseOptions, options),
+      Object.assign({ cwd }, options),
     )
 
     if (output.error) {
