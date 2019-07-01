@@ -33,6 +33,7 @@ export default class RubocopRunner {
 
   runSync(filePath, args, options = {}) {
     const cwd = atom.project.relativizePath(filePath)[0] || path.dirname(filePath)
+    const onWindows = (process.platform === 'win32' || process.platform === 'win64')
 
     if (this.config.disableWhenNoConfigFile === true) {
       const configFilePath = cwd + CONFIG_FILE
@@ -45,7 +46,7 @@ export default class RubocopRunner {
     const output = childProcess.spawnSync(
       command[0],
       command.slice(1),
-      Object.assign({ cwd }, options),
+      Object.assign({ cwd, shell: onWindows }, options),
     )
 
     if (output.error) {
