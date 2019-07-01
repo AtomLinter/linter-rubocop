@@ -55,6 +55,16 @@ export default {
         },
       }),
 
+      atom.workspace.observeTextEditors((editor) => {
+        editor.onDidSave(async () => {
+          if (hasValidScope(editor, this.scopes)
+            && atom.config.get('linter-rubocop.fixOnSave')
+          ) {
+            await this.fixFile(editor, { onSave: true })
+          }
+        })
+      }),
+
       atom.contextMenu.add({
         'atom-text-editor:not(.mini), .overlayer': [{
           label: 'Fix file with Rubocop',
@@ -106,7 +116,7 @@ export default {
     this.subscriptions.dispose()
   },
 
-  async fixFile(editor) {
+  async fixFile(editor, { onSave } = {}) {
     if (!editor || !atom.workspace.isTextEditor(editor)) {
       return
     }
@@ -120,7 +130,7 @@ export default {
       return
     }
 
-    rubocop.autocorrect(editor.getPath())
+    rubocop.autocorrect(editor.getPath(), onSave)
   },
 
   provideLinter() {

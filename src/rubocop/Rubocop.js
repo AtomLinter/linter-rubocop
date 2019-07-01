@@ -20,11 +20,11 @@ class Rubocop {
     this.errorFormatter = new ErrorFormatter()
   }
 
-  async autocorrect(filePath) {
+  async autocorrect(filePath, onSave = false) {
     if (!filePath) { return }
 
     try {
-      const output = await this.runner.run(filePath, ['--auto-correct', filePath])
+      const output = await this.runner.runSync(filePath, ['--auto-correct', filePath])
       try {
         // Process was canceled by newer process or there is nothing to parse
         if (output === null) { return }
@@ -42,10 +42,12 @@ class Rubocop {
           const corrections = Object.values(offenses)
             .reduce((off, { corrected }) => off + corrected, 0)
           const message = `Linter-Rubocop: Fixed ${pluralize('offenses', corrections, true)} of ${offenseCount}`
-          if (corrections < offenseCount) {
-            atom.notifications.addInfo(message)
-          } else {
-            atom.notifications.addSuccess(message)
+          if (!onSave) {
+            if (corrections < offenseCount) {
+              atom.notifications.addInfo(message)
+            } else {
+              atom.notifications.addSuccess(message)
+            }
           }
         }
       } catch (e) {

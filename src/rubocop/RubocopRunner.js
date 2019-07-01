@@ -1,7 +1,10 @@
 'use babel'
 
+import fs from 'fs'
 import path from 'path'
+import childProcess from 'child_process'
 import { exec, findAsync } from 'atom-linter'
+
 
 const CONFIG_FILE = '.rubocop.yml'
 
@@ -26,6 +29,35 @@ function buildExecOptions(filePath, extraOptions = {}) {
 export default class RubocopRunner {
   constructor(config) {
     this.config = config
+  }
+
+  runSync(filePath, args, options = {}) {
+    if (this.config.disableWhenNoConfigFile === true) {
+      const configFilePath = (atom.project.relativizePath(filePath)[0]
+                              || path.dirname(filePath)) + CONFIG_FILE
+      if (!fs.existsSync(configFilePath)) {
+        return null
+      }
+    }
+
+    const command = this.config.baseCommand.concat(args)
+    const baseOptions = { cwd: atom.project.relativizePath(filePath)[0] || path.dirname(filePath) }
+
+    const output = childProcess.spawnSync(
+      command[0],
+      command.slice(1),
+      Object.assign(baseOptions, options),
+    )
+
+    if (output.error) {
+      if (output.error.message !== TIMEOUT_ERROR_MSG) {
+        throw output.error
+      }
+      atom.notifications.addInfo(LINTER_TIMEOUT_MSG, { description: LINTER_TIMEOUT_DESC })
+      return null
+    }
+
+    return output
   }
 
   async run(filePath, args, options = {}) {

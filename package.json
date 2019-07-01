@@ -25,6 +25,12 @@
       "type": "boolean",
       "default": false,
       "description": "Use `bundler` to execute Rubocop."
+    },
+    "fixOnSave": {
+      "title": "Fix errors on save",
+      "description": "Have `rubocop` attempt to fix some errors automatically when saving the file.",
+      "type": "boolean",
+      "default": false
     }
   },
   "activationHooks": [
