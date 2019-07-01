@@ -26,9 +26,6 @@ class Rubocop {
     try {
       const output = await this.runner.runSync(filePath, ['--auto-correct', filePath])
       try {
-        // Process was canceled by newer process or there is nothing to parse
-        if (output === null) { return }
-
         const {
           files,
           summary: { offense_count: offenseCount },
