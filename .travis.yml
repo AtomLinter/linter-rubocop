@@ -9,15 +9,24 @@ jobs:
   include:
     # Test Atom versions
     - stage: test
+      name: "Atom stable with latest Rubocop"
+      env: ATOM_CHANNEL=stable
+
+    - stage: test
+      name: "Atom stable with Rubocop < 0.52.0"
       env: ATOM_CHANNEL=stable
       install:
         - gem install --no-document rubocop -v '< 0.52.0'
 
     - stage: test
-      env: ATOM_CHANNEL=stable
+      name: "Atom beta with latest Rubocop"
+      env: ATOM_CHANNEL=beta
 
     - stage: test
+      name: "Atom beta with Rubocop < 0.52.0"
       env: ATOM_CHANNEL=beta
+      install:
+        - gem install --no-document rubocop -v '< 0.52.0'      
 
     # Check the commit messages
     - stage: test
