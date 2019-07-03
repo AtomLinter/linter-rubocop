@@ -3,6 +3,7 @@ language: ruby
 rvm: 2.3.1
 os: linux
 install:
+  - sudo apt-get install -qq -y dpkg
   - gem install --no-document rubocop
 
 jobs:
