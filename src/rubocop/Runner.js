@@ -5,7 +5,6 @@ import path from 'path'
 import childProcess from 'child_process'
 import { exec, findAsync } from 'atom-linter'
 
-
 const CONFIG_FILE = '.rubocop.yml'
 
 const TIMEOUT_ERROR_MSG = 'Process execution timed out'
@@ -26,7 +25,7 @@ function buildExecOptions(filePath, extraOptions = {}) {
   return Object.assign(baseOptions, extraOptions)
 }
 
-export default class RubocopRunner {
+export default class Runner {
   constructor(config) {
     this.config = config
   }

@@ -1,7 +1,7 @@
 'use babel'
 
 import { satisfies } from 'semver'
-import getRuleDocumentation from './helpers/documentation-cache'
+import getRuleDocumentation from './helpers/doc-cache'
 
 import ErrorFormatter from '../ErrorFormatter'
 

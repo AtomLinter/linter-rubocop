@@ -16,7 +16,7 @@ const DEFAULT_ARGS = [
   '--cache', 'false',
 ]
 
-class RubocopConfig {
+class Config {
   constructor({ command, disableWhenNoConfigFile, useBundler }) {
     this[theCommand] = command
     this[isDisableWhenNoConfigFile] = disableWhenNoConfigFile
@@ -66,4 +66,4 @@ class RubocopConfig {
   }
 }
 
-module.exports = RubocopConfig
+module.exports = Config

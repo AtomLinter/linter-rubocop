@@ -2,8 +2,8 @@
 
 import pluralize from 'pluralize'
 import parseFromStd from '../helpers/std-parser'
-import RubocopConfig from './RubocopConfig'
-import RubocopRunner from './RubocopRunner'
+import Config from './Config'
+import Runner from './Runner'
 import ErrorFormatter from '../ErrorFormatter'
 import OffenseFormatter from './OffenseFormatter'
 
@@ -14,8 +14,8 @@ const NO_FIXES_INFO_MSG = 'Linter-Rubocop: No fixes were made'
 
 class Rubocop {
   constructor({ command, disableWhenNoConfigFile, useBundler }) {
-    this.config = new RubocopConfig({ command, disableWhenNoConfigFile, useBundler })
-    this.runner = new RubocopRunner(this.config)
+    this.config = new Config({ command, disableWhenNoConfigFile, useBundler })
+    this.runner = new Runner(this.config)
     this.offenseFormatter = new OffenseFormatter()
     this.errorFormatter = new ErrorFormatter()
   }
