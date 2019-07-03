@@ -13,10 +13,13 @@ const LINTER_TIMEOUT_DESC = 'Make sure you are not running Rubocop with a slow-s
                             + 'If you are still seeing timeouts, consider running your linter `on save` and not `on change`, '
                             + 'or reference https://github.com/AtomLinter/linter-rubocop/issues/202 .'
 
+function currentDirectory(filePath) {
+  return atom.project.relativizePath(filePath)[0] || path.dirname(filePath)
+}
 
 function buildExecOptions(filePath, extraOptions = {}) {
   const baseOptions = {
-    cwd: atom.project.relativizePath(filePath)[0] || path.dirname(filePath),
+    cwd: currentDirectory(filePath),
     stream: 'both',
     timeout: 10000,
     uniqueKey: `linter-rubocop::${filePath}`,
@@ -25,14 +28,17 @@ function buildExecOptions(filePath, extraOptions = {}) {
   return Object.assign(baseOptions, extraOptions)
 }
 
+function isWindows() {
+  return (process.platform === 'win32' || process.platform === 'win64')
+}
+
 export default class Runner {
   constructor(config) {
     this.config = config
   }
 
   runSync(filePath, args, options = {}) {
-    const cwd = atom.project.relativizePath(filePath)[0] || path.dirname(filePath)
-    const onWindows = (process.platform === 'win32' || process.platform === 'win64')
+    const cwd = currentDirectory(filePath)
 
     if (this.config.disableWhenNoConfigFile === true) {
       const configFilePath = cwd + CONFIG_FILE
@@ -45,7 +51,7 @@ export default class Runner {
     const output = childProcess.spawnSync(
       command[0],
       command.slice(1),
-      Object.assign({ cwd, shell: onWindows }, options),
+      Object.assign({ cwd, shell: isWindows() }, options),
     )
 
     if (output.error) {
