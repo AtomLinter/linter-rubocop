@@ -8,6 +8,8 @@ import {
 } from 'jasmine-fix'
 import { copyFileSync } from 'fs'
 
+const NO_DOC_MSG = 'No documentation available yet.'
+
 const { lint } = require('../src/index.js').provideLinter()
 
 const badPath = path.join(__dirname, 'fixtures', 'lintableFiles', 'bad.rb')
@@ -79,7 +81,7 @@ describe('The RuboCop provider for Linter', () => {
 
       expect(messages[0].severity).toBe('error')
       expect(messages[0].excerpt).toBe(msgText)
-      expect(description).toBe('')
+      expect(description).toBe(NO_DOC_MSG)
       expect(messages[0].location.file).toBe(badPath)
       expect(messages[0].location.position).toEqual([[1, 6], [1, 7]])
     })
@@ -104,7 +106,7 @@ describe('The RuboCop provider for Linter', () => {
       expect(messages[0].url).toMatch(urlRegex)
       expect(messages[0].location.file).toBe(invalidWithUrlPath)
       expect(messages[0].location.position).toEqual([[2, 6], [2, 20]])
-      expect(messages[0].description).not.toBe(null)
+      expect(messages[0].description).not.toBe(NO_DOC_MSG)
     })
   })
 
@@ -128,7 +130,7 @@ describe('The RuboCop provider for Linter', () => {
       expect(messages[0].excerpt).toBe(msgText)
       expect(messages[0].url).toMatch(urlRegex)
       expect(messages[0].location.file).toBe(abcSizePath)
-      expect(description).toBe('')
+      expect(description).toBe(NO_DOC_MSG)
     })
   })
 
