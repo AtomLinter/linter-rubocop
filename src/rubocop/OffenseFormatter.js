@@ -20,14 +20,15 @@ function ruleName(url) {
   if (url == null) {
     return null
   }
-  let rule
+
   const ruleMatch = RULE_MATCH_REGEX.exec(url)
-  if (ruleMatch) {
-    [, rule] = ruleMatch
+  if (ruleMatch == null) {
+    return null
   }
+
+  const [, rule] = ruleMatch
   return rule
 }
-
 
 export default class OffenseFormatter extends ErrorFormatter {
   format(version, {
