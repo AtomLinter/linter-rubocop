@@ -85,6 +85,7 @@ addons:
     - fakeroot
     - git
     - libsecret-1-dev
+    - libgconf-2-4
 
 stages:
   - test
