@@ -3,6 +3,7 @@
 const RULE_INDEX_REGEX = /===.*\[\[(.*)\]\]/g
 const DOC_URL = 'https://raw.githubusercontent.com/bbatsov/ruby-style-guide/master/README.adoc'
 const DOCUMENTATION_LIFETIME = 86400 * 1000
+const NO_DOC_MSG = 'No documentation available yet.'
 
 const docsRuleCache = new Map()
 
@@ -22,7 +23,7 @@ function takeWhile(source, predicate) {
 // Retrieves style guide documentation with cached responses
 export default async function getRuleDocumentation(rule) {
   if (rule == null) {
-    return ''
+    return NO_DOC_MSG
   }
 
   if (docsRuleCache.has(rule)) {
@@ -68,7 +69,7 @@ export default async function getRuleDocumentation(rule) {
   })
 
   if (!docsRuleCache.has(rule)) {
-    return ''
+    return NO_DOC_MSG
   }
 
   return docsRuleCache.get(rule).documentation
