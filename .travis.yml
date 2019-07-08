@@ -26,7 +26,7 @@ jobs:
       name: "Atom beta with Rubocop < 0.52.0"
       env: ATOM_CHANNEL=beta
       install:
-        - gem install --no-document rubocop -v '< 0.52.0'      
+        - gem install --no-document rubocop -v '< 0.52.0'
 
     # Check the commit messages
     - stage: test
@@ -74,7 +74,7 @@ branches:
 git:
   depth: 10
 
-dist: trusty
+dist: xenial
 
 sudo: false
 
