@@ -1,3 +1,11 @@
+## [2.5.2](https://github.com/AtomLinter/linter-rubocop/compare/v2.5.1...v2.5.2) (2019-10-25)
+
+
+### Bug Fixes
+
+* expected parentheses around arrow function argument  arrow-parens ([0f6ddf2](https://github.com/AtomLinter/linter-rubocop/commit/0f6ddf2))
+* use an object spread instead of `Object.assign` ([7f5e004](https://github.com/AtomLinter/linter-rubocop/commit/7f5e004))
+
 ## [2.5.1](https://github.com/AtomLinter/linter-rubocop/compare/v2.5.0...v2.5.1) (2019-10-25)
 
 
