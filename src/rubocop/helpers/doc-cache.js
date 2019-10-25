@@ -59,7 +59,7 @@ export default async function getRuleDocumentation(rule) {
     const beginSearch = byLine.slice(startingIndex + 1)
 
     // gobble all the documentation until you reach the next rule
-    const rawRuleDoc = takeWhile(beginSearch, x => !x.match(RULE_INDEX_REGEX))
+    const rawRuleDoc = takeWhile(beginSearch, (x) => !x.match(RULE_INDEX_REGEX))
     const documentation = '\n'.concat(rawRuleDoc.join('\n'))
 
     docsRuleCache.set(ruleName, {

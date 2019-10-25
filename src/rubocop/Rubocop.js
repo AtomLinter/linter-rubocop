@@ -73,7 +73,7 @@ class Rubocop {
         const offenses = files && files[0] && files[0].offenses
 
         return (offenses || []).map(
-          offense => this.offenseFormatter.format(rubocopVersion, offense, filePath),
+          (offense) => this.offenseFormatter.format(rubocopVersion, offense, filePath),
         )
       } catch (e) {
         return this.errorFormatter.format(filePath, e.message)

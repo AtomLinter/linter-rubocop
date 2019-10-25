@@ -111,7 +111,7 @@ export default {
   },
 
   deactivate() {
-    this.idleCallbacks.forEach(callbackID => window.cancelIdleCallback(callbackID))
+    this.idleCallbacks.forEach((callbackID) => window.cancelIdleCallback(callbackID))
     this.idleCallbacks.clear()
     this.subscriptions.dispose()
   },
