@@ -51,7 +51,7 @@ export default class Runner {
     const output = childProcess.spawnSync(
       command[0],
       command.slice(1),
-      Object.assign({ cwd, shell: isWindows() }, options),
+      { cwd, shell: isWindows(), ...options },
     )
 
     if (output.error) {
