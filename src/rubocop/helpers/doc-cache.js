@@ -1,7 +1,10 @@
 'use babel'
 
 const RULE_INDEX_REGEX = /===.*\[\[(.*)\]\]/g
+const DOC_URL = 'https://raw.githubusercontent.com/bbatsov/ruby-style-guide/master/README.adoc'
 const DOCUMENTATION_LIFETIME = 86400 * 1000
+const NO_DOC_MSG = 'No documentation available yet.'
+
 const docsRuleCache = new Map()
 
 function takeWhile(source, predicate) {
@@ -18,35 +21,31 @@ function takeWhile(source, predicate) {
 }
 
 // Retrieves style guide documentation with cached responses
-export default async function getRuleMarkDown(url) {
-  if (url == null) {
-    return null
-  }
-  const ruleMatch = /https:\/\/github.com\/.*\/ruby-style-guide#(.*)/g.exec(url)
-  if (ruleMatch == null) {
-    return null
+export default async function getRuleDocumentation(rule) {
+  if (rule == null) {
+    return NO_DOC_MSG
   }
 
-  const rule = ruleMatch[1]
   if (docsRuleCache.has(rule)) {
     const cachedRule = docsRuleCache.get(rule)
+
     if (new Date().getTime() >= cachedRule.expires) {
       // If documentation is stale, clear cache
       docsRuleCache.delete(rule)
     } else {
-      return cachedRule.markdown
+      return cachedRule.documentation
     }
   }
 
-  let rawRulesMarkdown
-  const response = await fetch('https://raw.githubusercontent.com/bbatsov/ruby-style-guide/master/README.adoc')
+  let rawRulesDoc
+  const response = await fetch(DOC_URL)
   if (response.ok) {
-    rawRulesMarkdown = await response.text()
+    rawRulesDoc = await response.text()
   } else {
     return `***\nError retrieving documentation: ${response.statusText}`
   }
 
-  const byLine = rawRulesMarkdown.split('\n')
+  const byLine = rawRulesDoc.split('\n')
   const ruleIndexes = byLine.reduce(
     (acc, line, idx) => (line.match(RULE_INDEX_REGEX) ? acc.concat([[idx, line]]) : acc),
     [],
@@ -60,14 +59,18 @@ export default async function getRuleMarkDown(url) {
     const beginSearch = byLine.slice(startingIndex + 1)
 
     // gobble all the documentation until you reach the next rule
-    const documentationForRule = takeWhile(beginSearch, x => !x.match(RULE_INDEX_REGEX))
-    const markdownOutput = '\n'.concat(documentationForRule.join('\n'))
+    const rawRuleDoc = takeWhile(beginSearch, x => !x.match(RULE_INDEX_REGEX))
+    const documentation = '\n'.concat(rawRuleDoc.join('\n'))
 
     docsRuleCache.set(ruleName, {
-      markdown: markdownOutput,
+      documentation,
       expires: new Date().getTime() + DOCUMENTATION_LIFETIME,
     })
   })
 
-  return docsRuleCache.get(rule).markdown
+  if (!docsRuleCache.has(rule)) {
+    return NO_DOC_MSG
+  }
+
+  return docsRuleCache.get(rule).documentation
 }

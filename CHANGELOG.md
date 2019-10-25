@@ -1,3 +1,33 @@
+# [2.5.0](https://github.com/AtomLinter/linter-rubocop/compare/v2.4.2...v2.5.0) (2019-10-25)
+
+
+### Bug Fixes
+
+* an autocorrect call should not be blocked by a lint call ([58cecae](https://github.com/AtomLinter/linter-rubocop/commit/58cecae))
+* attempt to solve the bug with travis using an old version of dpkg ([d57f493](https://github.com/AtomLinter/linter-rubocop/commit/d57f493))
+* check filePath on autocorrect ([bf86d7d](https://github.com/AtomLinter/linter-rubocop/commit/bf86d7d))
+* deactivate cache ([7579065](https://github.com/AtomLinter/linter-rubocop/commit/7579065))
+* ensured inline doc for Rubocop versions < 0.52 ([67987af](https://github.com/AtomLinter/linter-rubocop/commit/67987af))
+* error severity on severity absence ([0ca146e](https://github.com/AtomLinter/linter-rubocop/commit/0ca146e))
+* fixed description on spec ([b759091](https://github.com/AtomLinter/linter-rubocop/commit/b759091))
+* fixed missing cache deactivation ([d98931f](https://github.com/AtomLinter/linter-rubocop/commit/d98931f))
+* fixed rule doc cache for latest Rubocop 0.72 ([d7e1e0d](https://github.com/AtomLinter/linter-rubocop/commit/d7e1e0d))
+* linter message url ([70fd058](https://github.com/AtomLinter/linter-rubocop/commit/70fd058))
+* put function inside class body ([c5ed006](https://github.com/AtomLinter/linter-rubocop/commit/c5ed006))
+* reload config on change its values ([95da678](https://github.com/AtomLinter/linter-rubocop/commit/95da678))
+* removed detectBundledRubocop ([060a005](https://github.com/AtomLinter/linter-rubocop/commit/060a005))
+* removed no needed deps ([2218072](https://github.com/AtomLinter/linter-rubocop/commit/2218072))
+* return null when no rule name match is present in the url ([ec1ab85](https://github.com/AtomLinter/linter-rubocop/commit/ec1ab85))
+* rule doc could not exists yet in the cache ([95c1321](https://github.com/AtomLinter/linter-rubocop/commit/95c1321))
+* test spec for excerpt description ([036ad88](https://github.com/AtomLinter/linter-rubocop/commit/036ad88))
+* throw error if stderr is present when parsing std ([9649fea](https://github.com/AtomLinter/linter-rubocop/commit/9649fea))
+* we use shell option to run on windows ([df33642](https://github.com/AtomLinter/linter-rubocop/commit/df33642))
+
+
+### Features
+
+* implemented fix on save ([4c1807e](https://github.com/AtomLinter/linter-rubocop/commit/4c1807e))
+
 ## [2.4.2](https://github.com/AtomLinter/linter-rubocop/compare/v2.4.1...v2.4.2) (2019-06-24)
 
 
