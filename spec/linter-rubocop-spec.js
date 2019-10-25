@@ -8,6 +8,8 @@ import {
 } from 'jasmine-fix'
 import { copyFileSync } from 'fs'
 
+const NO_DOC_MSG = 'No documentation available yet.'
+
 const { lint } = require('../src/index.js').provideLinter()
 
 const badPath = path.join(__dirname, 'fixtures', 'lintableFiles', 'bad.rb')
@@ -75,10 +77,11 @@ describe('The RuboCop provider for Linter', () => {
         + '(Using Ruby 2.3 parser; configure using `TargetRubyVersion` parameter, under `AllCops`)'
 
       const messages = await lint(editor)
+      const description = await messages[0].description()
 
       expect(messages[0].severity).toBe('error')
       expect(messages[0].excerpt).toBe(msgText)
-      expect(messages[0].description).not.toBeDefined()
+      expect(description).toBe(NO_DOC_MSG)
       expect(messages[0].location.file).toBe(badPath)
       expect(messages[0].location.position).toEqual([[1, 6], [1, 7]])
     })
@@ -92,7 +95,7 @@ describe('The RuboCop provider for Linter', () => {
     })
 
     it('verifies the first message', async () => {
-      const urlRegex = /https:\/\/github.com\/.*\/ruby-style-guide#consistent-string-literals/g
+      const urlRegex = /https:\/\/.*#consistent-string-literals/g
       const msgText = 'Style/StringLiterals: Prefer single-quoted strings '
         + "when you don't need string interpolation or special symbols."
 
@@ -103,7 +106,7 @@ describe('The RuboCop provider for Linter', () => {
       expect(messages[0].url).toMatch(urlRegex)
       expect(messages[0].location.file).toBe(invalidWithUrlPath)
       expect(messages[0].location.position).toEqual([[2, 6], [2, 20]])
-      expect(messages[0].description).not.toBe(null)
+      expect(messages[0].description).not.toBe(NO_DOC_MSG)
     })
   })
 
@@ -119,6 +122,7 @@ describe('The RuboCop provider for Linter', () => {
       const msgText = 'Metrics/AbcSize: Assignment Branch Condition size for defaults is too high. [18.25/15]'
 
       const messages = await lint(editor)
+      const description = await messages[0].description()
 
       // We skip the position test because Rubocop versions before 0.52.0 returns
       // a different length for the offense
@@ -126,7 +130,7 @@ describe('The RuboCop provider for Linter', () => {
       expect(messages[0].excerpt).toBe(msgText)
       expect(messages[0].url).toMatch(urlRegex)
       expect(messages[0].location.file).toBe(abcSizePath)
-      expect(messages[0].description).not.toBeDefined()
+      expect(description).toBe(NO_DOC_MSG)
     })
   })
 
