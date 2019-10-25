@@ -61,7 +61,7 @@ class Config {
     }
 
     return cmd.split(/\s+/)
-      .filter(i => i)
+      .filter((i) => i)
       .concat(DEFAULT_ARGS)
   }
 }
