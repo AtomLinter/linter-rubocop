@@ -17,10 +17,6 @@ function currentDirectory(filePath) {
   return atom.project.relativizePath(filePath)[0] || path.dirname(filePath)
 }
 
-function isWindows() {
-  return (process.platform === 'win32' || process.platform === 'win64')
-}
-
 function errorHandler(e) {
   if (e.message !== TIMEOUT_ERROR_MSG) {
     throw e
@@ -47,7 +43,13 @@ export default class Runner {
     const output = childProcess.spawnSync(
       command[0],
       command.slice(1),
-      { cwd, shell: isWindows(), ...options },
+      {
+        cwd,
+        shell:
+          process.platform === 'win32'
+          || process.platform === 'win64',
+        ...options,
+      },
     )
 
     if (output.error) {
