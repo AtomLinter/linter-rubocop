@@ -17,19 +17,11 @@ function currentDirectory(filePath) {
   return atom.project.relativizePath(filePath)[0] || path.dirname(filePath)
 }
 
-function buildExecOptions(filePath, extraOptions = {}) {
-  const baseOptions = {
-    cwd: currentDirectory(filePath),
-    stream: 'both',
-    timeout: 10000,
-    uniqueKey: `linter-rubocop::${filePath}`,
-    ignoreExitCode: true,
+function errorHandler(e) {
+  if (e.message !== TIMEOUT_ERROR_MSG) {
+    throw e
   }
-  return Object.assign(baseOptions, extraOptions)
-}
-
-function isWindows() {
-  return (process.platform === 'win32' || process.platform === 'win64')
+  atom.notifications.addInfo(LINTER_TIMEOUT_MSG, { description: LINTER_TIMEOUT_DESC })
 }
 
 export default class Runner {
@@ -51,14 +43,17 @@ export default class Runner {
     const output = childProcess.spawnSync(
       command[0],
       command.slice(1),
-      { cwd, shell: isWindows(), ...options },
+      {
+        cwd,
+        shell:
+          process.platform === 'win32'
+          || process.platform === 'win64',
+        ...options,
+      },
     )
 
     if (output.error) {
-      if (output.error.message !== TIMEOUT_ERROR_MSG) {
-        throw output.error
-      }
-      atom.notifications.addInfo(LINTER_TIMEOUT_MSG, { description: LINTER_TIMEOUT_DESC })
+      errorHandler(output.error)
       return null
     }
 
@@ -79,15 +74,20 @@ export default class Runner {
       output = await exec(
         command[0],
         command.slice(1),
-        buildExecOptions(filePath, options),
+        {
+          cwd: currentDirectory(filePath),
+          stream: 'both',
+          timeout: 10000,
+          uniqueKey: `linter-rubocop::${filePath}`,
+          ignoreExitCode: true,
+          ...options,
+        },
       )
     } catch (e) {
-      if (e.message !== TIMEOUT_ERROR_MSG) {
-        throw e
-      }
-      atom.notifications.addInfo(LINTER_TIMEOUT_MSG, { description: LINTER_TIMEOUT_DESC })
+      errorHandler(e)
       return null
     }
+
     return output
   }
 }
