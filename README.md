@@ -85,24 +85,6 @@ or
   command: "/Users/JohnDoe/.gem/ruby/2.5.1/bin/rubocop"
 ```
 
-## Contributing
-
-If you would like to contribute enhancements or fixes, please do the following:
-
-1.  Fork the plugin repository.
-2.  Hack on a separate topic branch created from the latest `master`.
-3.  Commit and push the topic branch.
-4.  Make a pull request.
-5.  Welcome to the club!
-
-Please note that modifications should follow these coding guidelines:
-
--   Indent is 2 spaces.
--   Code should pass `npm run lint` (eslint).
--   Vertical whitespace helps readability, don’t be afraid to use it.
-
-Thank you for helping out!
-
 ## Donation
 
 [![Share the love!](https://s3-eu-west-1.amazonaws.com/atom-linter/we-need-your-help.png?style=flat)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=KXUYS4ARNHCN8 "Share the love")
