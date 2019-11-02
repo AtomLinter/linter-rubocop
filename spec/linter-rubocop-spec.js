@@ -119,7 +119,9 @@ describe('The RuboCop provider for Linter', () => {
 
     it('verifies the first message', async () => {
       const urlRegex = /(http:\/\/c2.com\/cgi\/wiki\?AbcMetric)/g
-      const msgText = 'Metrics/AbcSize: Assignment Branch Condition size for defaults is too high. [18.25/15]'
+      // AbcSize cop returns the abc_vector ("<assignment, branch, condition>") in the message
+      // since 0.76 so we use a regex to maintain the backward compatibility
+      const msgText = /(Metrics\/AbcSize: Assignment Branch Condition size for defaults is too high. \[(.*)18.25\/15\])/g
 
       const messages = await lint(editor)
       const description = await messages[0].description()
@@ -127,7 +129,7 @@ describe('The RuboCop provider for Linter', () => {
       // We skip the position test because Rubocop versions before 0.52.0 returns
       // a different length for the offense
       expect(messages[0].severity).toBe('info')
-      expect(messages[0].excerpt).toBe(msgText)
+      expect(messages[0].excerpt).toMatch(msgText)
       expect(messages[0].url).toMatch(urlRegex)
       expect(messages[0].location.file).toBe(abcSizePath)
       expect(description).toBe(NO_DOC_MSG)
