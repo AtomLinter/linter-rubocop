@@ -1,3 +1,10 @@
+## [2.5.3](https://github.com/AtomLinter/linter-rubocop/compare/v2.5.2...v2.5.3) (2019-11-06)
+
+
+### Bug Fixes
+
+* runner methods returns null output if no rubocop config file found ([b82fa62](https://github.com/AtomLinter/linter-rubocop/commit/b82fa627610642c18921595a95dc0379c50c94bf))
+
 ## [2.5.2](https://github.com/AtomLinter/linter-rubocop/compare/v2.5.1...v2.5.2) (2019-10-25)
 
 
