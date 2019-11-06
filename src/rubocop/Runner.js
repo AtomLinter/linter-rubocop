@@ -1,11 +1,8 @@
 'use babel'
 
-import fs from 'fs'
 import path from 'path'
 import childProcess from 'child_process'
-import { exec, findAsync } from 'atom-linter'
-
-const CONFIG_FILE = '.rubocop.yml'
+import { exec } from 'atom-linter'
 
 const TIMEOUT_ERROR_MSG = 'Process execution timed out'
 const LINTER_TIMEOUT_MSG = 'Linter-Rubocop: Linter timed out'
@@ -32,13 +29,6 @@ export default class Runner {
   runSync(filePath, args, options = {}) {
     const cwd = currentDirectory(filePath)
 
-    if (this.config.disableWhenNoConfigFile === true) {
-      const configFilePath = cwd + CONFIG_FILE
-      if (!fs.existsSync(configFilePath)) {
-        return null
-      }
-    }
-
     const command = this.config.baseCommand.concat(args)
     const output = childProcess.spawnSync(
       command[0],
@@ -61,13 +51,6 @@ export default class Runner {
   }
 
   async run(filePath, args, options = {}) {
-    if (this.config.disableWhenNoConfigFile === true) {
-      const configFile = await findAsync(filePath, CONFIG_FILE)
-      if (configFile === null) {
-        return null
-      }
-    }
-
     const command = this.config.baseCommand.concat(args)
     let output
     try {
