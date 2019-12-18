@@ -1,3 +1,10 @@
+## [2.5.4](https://github.com/AtomLinter/linter-rubocop/compare/v2.5.3...v2.5.4) (2019-12-18)
+
+
+### Bug Fixes
+
+* **deps:** update dependency semver to v7 ([ef5c7ab](https://github.com/AtomLinter/linter-rubocop/commit/ef5c7ab45fce0d18dd8ca40a660a7d1f4b41cde5))
+
 ## [2.5.3](https://github.com/AtomLinter/linter-rubocop/compare/v2.5.2...v2.5.3) (2019-11-06)
 
 
