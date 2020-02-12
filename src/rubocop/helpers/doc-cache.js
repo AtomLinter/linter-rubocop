@@ -20,6 +20,10 @@ function takeWhile(source, predicate) {
   return result
 }
 
+function formatDoc(text) {
+  return `<pre>${text.replace(/\[source,ruby\]|----/gi, '')}</pre>`
+}
+
 // Retrieves style guide documentation with cached responses
 export default async function getRuleDocumentation(rule) {
   if (rule == null) {
@@ -63,7 +67,7 @@ export default async function getRuleDocumentation(rule) {
     const documentation = '\n'.concat(rawRuleDoc.join('\n'))
 
     docsRuleCache.set(ruleName, {
-      documentation,
+      documentation: formatDoc(documentation),
       expires: new Date().getTime() + DOCUMENTATION_LIFETIME,
     })
   })
