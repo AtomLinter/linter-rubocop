@@ -14,20 +14,19 @@ const SEVERITY_MAPPING = {
 }
 
 const HASCOPNAME_VERSION_RANGE = '>=0.52.0 <0.68.0'
-const RULE_MATCH_REGEX = /https:\/\/.*#(.*)/g
+const RULE_MATCH_REGEX = /https:\/\/.*#(.*)/
 
 function ruleName(url) {
   if (url == null) {
     return null
   }
 
-  const ruleMatch = RULE_MATCH_REGEX.exec(url)
+  const ruleMatch = url.match(RULE_MATCH_REGEX)
   if (ruleMatch == null) {
     return null
   }
 
-  const [, rule] = ruleMatch
-  return rule
+  return ruleMatch[1]
 }
 
 export default class OffenseFormatter extends ErrorFormatter {
