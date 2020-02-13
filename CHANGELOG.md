@@ -1,3 +1,11 @@
+## [2.5.7](https://github.com/AtomLinter/linter-rubocop/compare/v2.5.6...v2.5.7) (2020-02-13)
+
+
+### Bug Fixes
+
+* no documentation available on a second click ([374c781](https://github.com/AtomLinter/linter-rubocop/commit/374c7819cd944aeaffd15478cdc477d5a5608134))
+* show rule documentation without format ([9279292](https://github.com/AtomLinter/linter-rubocop/commit/927929205a551aa7cbc98fb2b60ac948b4f2782e))
+
 ## [2.5.6](https://github.com/AtomLinter/linter-rubocop/compare/v2.5.5...v2.5.6) (2020-02-11)
 
 
