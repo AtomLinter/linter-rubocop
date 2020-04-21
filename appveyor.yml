@@ -1,6 +1,6 @@
 ### Project specific config ###
 environment:
-  RUBY_VERSION: 23-x64
+  RUBY_VERSION: 24-x64
 
   matrix:
     - ATOM_CHANNEL: stable
