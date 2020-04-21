@@ -1,16 +1,8 @@
 'use babel'
 
 import { CompositeDisposable } from 'atom'
+import Rubocop from './rubocop/Rubocop'
 import hasValidScope from './helpers/scope-validator'
-
-let rubocop
-
-const initializeRubocop = ({ command, disableWhenNoConfigFile, useBundler }, { force } = {}) => {
-  if (!rubocop || Boolean(force)) {
-    const Rubocop = require('./rubocop/Rubocop')
-    rubocop = new Rubocop({ command, disableWhenNoConfigFile, useBundler })
-  }
-}
 
 export default {
   activate() {
@@ -22,29 +14,23 @@ export default {
       'source.ruby.chef',
     ]
 
-    this.idleCallbacks = new Set()
     let depsCallbackID
+    this.idleCallbacks = new Set()
 
     const installLinterRubocopDeps = () => {
       this.idleCallbacks.delete(depsCallbackID)
       if (!atom.inSpecMode()) {
         require('atom-package-deps').install('linter-rubocop', true)
       }
-      initializeRubocop({
-        command: this.command,
-        disableWhenNoConfigFile: this.disableWhenNoConfigFile,
-        useBundler: this.useBundler,
-      })
     }
 
     depsCallbackID = window.requestIdleCallback(installLinterRubocopDeps)
-    this.idleCallbacks.add(depsCallbackID)
 
+    this.idleCallbacks.add(depsCallbackID)
     this.subscriptions = new CompositeDisposable()
 
     // Register autocorrect command
     this.subscriptions.add(
-
       // Register autocorrect command
       atom.commands.add('atom-text-editor', {
         'linter-rubocop:fix-file': async () => {
@@ -54,7 +40,6 @@ export default {
           }
         },
       }),
-
       atom.workspace.observeTextEditors((editor) => {
         editor.onDidSave(async () => {
           if (hasValidScope(editor, this.scopes)
@@ -64,7 +49,6 @@ export default {
           }
         })
       }),
-
       atom.contextMenu.add({
         'atom-text-editor:not(.mini), .overlayer': [{
           label: 'Fix file with Rubocop',
@@ -86,15 +70,12 @@ export default {
           },
         }],
       }),
-
       atom.config.observe('linter-rubocop.command', (value) => {
         this.command = value
       }),
-
       atom.config.observe('linter-rubocop.disableWhenNoConfigFile', (value) => {
         this.disableWhenNoConfigFile = value
       }),
-
       atom.config.observe('linter-rubocop.useBundler', (value) => {
         this.useBundler = value
       }),
@@ -105,9 +86,15 @@ export default {
         if (Object.entries(newVal).toString() === Object.entries(oldVal).toString()) {
           return
         }
-        initializeRubocop(newVal, { force: true })
+        this.rubocop = new Rubocop(newVal)
       }),
     )
+
+    this.rubocop = new Rubocop({
+      command: this.command,
+      disableWhenNoConfigFile: this.disableWhenNoConfigFile,
+      useBundler: this.useBundler,
+    })
   },
 
   deactivate() {
@@ -120,17 +107,14 @@ export default {
     if (!editor || !atom.workspace.isTextEditor(editor)) {
       return
     }
-
     if (editor.isModified()) {
       atom.notifications.addError('Linter-Rubocop: Please save before fix file')
     }
-
     const text = editor.getText()
     if (text.length === 0) {
       return
     }
-
-    rubocop.autocorrect(editor.getPath(), onSave)
+    this.rubocop.autocorrect(editor.getPath(), onSave)
   },
 
   provideLinter() {
@@ -141,17 +125,10 @@ export default {
       lintsOnChange: true,
       lint: async (editor) => {
         const filePath = editor.getPath()
-        if (!filePath) { return null }
-
-        initializeRubocop({
-          command: this.command,
-          disableWhenNoConfigFile: this.disableWhenNoConfigFile,
-          useBundler: this.useBundler,
-        })
-
-        const messages = await rubocop.analyze(editor.getText(), filePath)
-
-        return messages
+        if (!filePath) {
+          return null
+        }
+        return this.rubocop.analyze(editor.getText(), filePath)
       },
     }
   },
