@@ -50,7 +50,7 @@ jobs:
         - export PATH=${PATH}:${HOME}/atom/usr/bin/
       deploy:
         provider: script
-        skip_cleanup: true
+        cleanup: true
         script:
           - npx semantic-release
 
@@ -76,8 +76,6 @@ git:
   depth: 10
 
 dist: xenial
-
-sudo: false
 
 addons:
   apt:
