@@ -74,7 +74,7 @@ describe('The RuboCop provider for Linter', () => {
 
     it('verifies the first message', async () => {
       const msgText = 'Lint/Syntax: unterminated string meets end of file\n'
-        + '(Using Ruby 2.3 parser; configure using `TargetRubyVersion` parameter, under `AllCops`)'
+        + '(Using Ruby 2.4 parser; configure using `TargetRubyVersion` parameter, under `AllCops`)'
 
       const messages = await lint(editor)
       const description = await messages[0].description()
