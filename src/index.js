@@ -81,12 +81,12 @@ export default {
       }),
 
       atom.config.onDidChange(({ newValue, oldValue }) => {
-        const newVal = newValue['linter-rubocop']
-        const oldVal = oldValue['linter-rubocop']
-        if (Object.entries(newVal).toString() === Object.entries(oldVal).toString()) {
+        const newConfig = newValue['linter-rubocop']
+        const oldConfig = oldValue['linter-rubocop']
+        if (Object.entries(newConfig).toString() === Object.entries(oldConfig).toString()) {
           return
         }
-        this.rubocop = new Rubocop(newVal)
+        this.rubocop = new Rubocop(newConfig)
       }),
     )
 
