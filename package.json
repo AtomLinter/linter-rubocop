@@ -26,6 +26,12 @@
       "default": false,
       "description": "Use `bundler` to execute Rubocop."
     },
+    "detectProjectSettings": {
+      "type": "boolean",
+      "title": "Detect linter-rubocop specific project file.",
+      "default": false,
+      "description": "Detect and run `rubocop` using the settings of the `.lrproject-conf.json` file. This will override the `Command` and `Use bundler` settings."
+    },
     "fixOnSave": {
       "title": "Fix errors on save",
       "description": "Have `rubocop` attempt to fix some errors automatically when saving the file.",

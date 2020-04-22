@@ -79,6 +79,9 @@ export default {
       atom.config.observe('linter-rubocop.useBundler', (value) => {
         this.useBundler = value
       }),
+      atom.config.observe('linter-rubocop.detectProjectSettings', (value) => {
+        this.detectProjectSettings = value
+      }),
 
       atom.config.onDidChange(({ newValue, oldValue }) => {
         const newConfig = newValue['linter-rubocop']
@@ -94,6 +97,7 @@ export default {
       command: this.command,
       disableWhenNoConfigFile: this.disableWhenNoConfigFile,
       useBundler: this.useBundler,
+      detectProjectSettings: this.detectProjectSettings,
     })
   },
 
@@ -128,6 +132,7 @@ export default {
         if (!filePath) {
           return null
         }
+
         return this.rubocop.analyze(editor.getText(), filePath)
       },
     }

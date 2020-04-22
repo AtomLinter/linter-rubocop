@@ -1,7 +1,9 @@
 'use babel'
 
 import { findAsync } from 'atom-linter'
+import fs from 'fs'
 import pluralize from 'pluralize'
+import path from 'path'
 import parseFromStd from '../helpers/std-parser'
 import Config from './Config'
 import Runner from './Runner'
@@ -9,6 +11,7 @@ import ErrorFormatter from '../ErrorFormatter'
 import OffenseFormatter from './OffenseFormatter'
 
 const CONFIG_FILE = '.rubocop.yml'
+const PROJECT_CONFIG_FILE = '.lrproject-conf.json'
 
 const PARSE_ERROR_MSG = 'Rubocop: Parse error'
 const UNEXPECTED_ERROR_MSG = 'Rubocop: Unexpected error'
@@ -16,11 +19,15 @@ const UNDEF_VERSION_ERROR_MSG = 'Unable to get rubocop version from linting outp
 const NO_FIXES_INFO_MSG = 'Linter-Rubocop: No fixes were made'
 
 const configFileFound = Symbol('configFileFound')
+const projectSpecificSettings = Symbol('projectSpecificSettings')
+
+function currentDirectory(filePath) {
+  return atom.project.relativizePath(filePath)[0] || path.dirname(filePath)
+}
 
 class Rubocop {
-  constructor({ command, disableWhenNoConfigFile, useBundler }) {
-    this.config = new Config({ command, disableWhenNoConfigFile, useBundler })
-    this.runner = new Runner(this.config)
+  constructor(config = {}) {
+    this.config = new Config(config)
     this.offenseFormatter = new OffenseFormatter()
     this.errorFormatter = new ErrorFormatter()
   }
@@ -32,13 +39,30 @@ class Rubocop {
     return true
   }
 
+  async [projectSpecificSettings](filePath) {
+    if (this.config.detectProjectSettings === true
+        && await findAsync(filePath, PROJECT_CONFIG_FILE) !== null) {
+      try {
+        return JSON.parse(
+          fs.readFileSync(path.join(currentDirectory(filePath), PROJECT_CONFIG_FILE)),
+        )
+      } catch (error) {
+        return null
+      }
+    }
+    return null
+  }
+
   async autocorrect(filePath, onSave = false) {
     if (!filePath || !await this[configFileFound](filePath)) {
       return
     }
 
     try {
-      const output = await this.runner.runSync(filePath, ['--auto-correct', filePath])
+      const output = await Runner.runSync(
+        currentDirectory(filePath),
+        this.config.baseCommand.concat(['--auto-correct', filePath]),
+      )
       try {
         const {
           files,
@@ -74,8 +98,19 @@ class Rubocop {
       return null
     }
 
+    let command = this.config.baseCommand
+
+    const projectSettings = await this[projectSpecificSettings](filePath)
+    if (projectSettings !== null && projectSettings.command) {
+      command = Config.splitCommand(projectSettings.command)
+    }
+
     try {
-      const output = await this.runner.run(filePath, ['--stdin', filePath], { stdin: text })
+      const output = await Runner.run(
+        currentDirectory(filePath),
+        command.concat(['--stdin', filePath]),
+        { stdin: text },
+      )
       try {
         if (output === null) { return null }
 

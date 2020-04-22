@@ -4,6 +4,7 @@ const theCommand = Symbol('theCommand')
 const isDisableWhenNoConfigFile = Symbol('isDisableWhenNoConfigFile')
 const isUseBundler = Symbol('isUseBundler')
 const baseCommand = Symbol('baseCommand')
+const detectProjectSettings = Symbol('detectProjectSettings')
 
 const buildBaseCommand = Symbol('buildBaseCommand')
 
@@ -17,10 +18,11 @@ const DEFAULT_ARGS = [
 ]
 
 class Config {
-  constructor({ command, disableWhenNoConfigFile, useBundler }) {
-    this[theCommand] = command
-    this[isDisableWhenNoConfigFile] = disableWhenNoConfigFile
-    this[isUseBundler] = useBundler
+  constructor(config = {}) {
+    this[theCommand] = config.command
+    this[isDisableWhenNoConfigFile] = config.disableWhenNoConfigFile
+    this[isUseBundler] = config.useBundler
+    this[detectProjectSettings] = config.detectProjectSettings
     this[baseCommand] = this[buildBaseCommand]()
   }
 
@@ -48,8 +50,22 @@ class Config {
     this[isUseBundler] = value
   }
 
+  get detectProjectSettings() {
+    return this[detectProjectSettings]
+  }
+
+  set detectProjectSettings(value) {
+    this[detectProjectSettings] = value
+  }
+
   get baseCommand() {
     return this[baseCommand]
+  }
+
+  static splitCommand(command) {
+    return command.split(/\s+/)
+      .filter((i) => i)
+      .concat(DEFAULT_ARGS)
   }
 
   [buildBaseCommand]() {
@@ -60,9 +76,7 @@ class Config {
       cmd = this[theCommand]
     }
 
-    return cmd.split(/\s+/)
-      .filter((i) => i)
-      .concat(DEFAULT_ARGS)
+    return this.constructor.splitCommand(cmd)
   }
 }
 
