@@ -1,7 +1,6 @@
 'use babel'
 
 import { findAsync } from 'atom-linter'
-import fs from 'fs'
 import pluralize from 'pluralize'
 import path from 'path'
 import parseFromStd from '../helpers/std-parser'
@@ -11,7 +10,6 @@ import ErrorFormatter from '../ErrorFormatter'
 import OffenseFormatter from './OffenseFormatter'
 
 const CONFIG_FILE = '.rubocop.yml'
-const PROJECT_CONFIG_FILE = '.lrproject-conf.json'
 
 const PARSE_ERROR_MSG = 'Rubocop: Parse error'
 const UNEXPECTED_ERROR_MSG = 'Rubocop: Unexpected error'
@@ -19,7 +17,6 @@ const UNDEF_VERSION_ERROR_MSG = 'Unable to get rubocop version from linting outp
 const NO_FIXES_INFO_MSG = 'Linter-Rubocop: No fixes were made'
 
 const configFileFound = Symbol('configFileFound')
-const projectSpecificSettings = Symbol('projectSpecificSettings')
 
 function currentDirectory(filePath) {
   return atom.project.relativizePath(filePath)[0] || path.dirname(filePath)
@@ -37,20 +34,6 @@ class Rubocop {
       return await findAsync(filePath, CONFIG_FILE) !== null
     }
     return true
-  }
-
-  async [projectSpecificSettings](filePath) {
-    if (this.config.detectProjectSettings === true
-        && await findAsync(filePath, PROJECT_CONFIG_FILE) !== null) {
-      try {
-        return JSON.parse(
-          fs.readFileSync(path.join(currentDirectory(filePath), PROJECT_CONFIG_FILE)),
-        )
-      } catch (error) {
-        return null
-      }
-    }
-    return null
   }
 
   async autocorrect(filePath, onSave = false) {
@@ -98,17 +81,10 @@ class Rubocop {
       return null
     }
 
-    let command = this.config.baseCommand
-
-    const projectSettings = await this[projectSpecificSettings](filePath)
-    if (projectSettings !== null && projectSettings.command) {
-      command = Config.splitCommand(projectSettings.command)
-    }
-
     try {
       const output = await Runner.run(
         currentDirectory(filePath),
-        command.concat(['--stdin', filePath]),
+        this.config.baseCommand.concat(['--stdin', filePath]),
         { stdin: text },
       )
       try {

@@ -3,6 +3,9 @@
 import { CompositeDisposable } from 'atom'
 import Rubocop from './rubocop/Rubocop'
 import hasValidScope from './helpers/scope-validator'
+import deserializeProjectFile from './helpers/deserializeProjectFile'
+
+const PROJECT_CONFIG_FILE = '.lrproject-config.json'
 
 export default {
   activate() {
@@ -89,7 +92,7 @@ export default {
         if (Object.entries(newConfig).toString() === Object.entries(oldConfig).toString()) {
           return
         }
-        this.rubocop = new Rubocop(newConfig)
+        this.rubocop.setConfig(newConfig)
       }),
     )
 
@@ -131,6 +134,13 @@ export default {
         const filePath = editor.getPath()
         if (!filePath) {
           return null
+        }
+
+        if (this.detectProjectSettings === true) {
+          const config = await deserializeProjectFile(filePath, PROJECT_CONFIG_FILE)
+          if (config && config.command) {
+            this.rubocop.setConfig(config)
+          }
         }
 
         return this.rubocop.analyze(editor.getText(), filePath)
