@@ -1,9 +1,9 @@
 'use babel'
 
 import { satisfies } from 'semver'
-import getRuleDocumentation from './helpers/doc-cache'
+import getRuleDocumentation from '../helpers/getRuleDocumentation'
 
-import ErrorFormatter from '../ErrorFormatter'
+import ErrorFormatter from './ErrorFormatter'
 
 const SEVERITY_MAPPING = {
   refactor: 'info',

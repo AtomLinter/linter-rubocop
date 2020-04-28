@@ -2,12 +2,12 @@
 
 import { findAsync } from 'atom-linter'
 import pluralize from 'pluralize'
-import path from 'path'
-import parseFromStd from '../helpers/std-parser'
-import Config from './Config'
+import parseFromStd from '../helpers/parseFromStd'
+
+import CommandBuilder from './CommandBuilder'
 import Runner from './Runner'
-import ErrorFormatter from '../ErrorFormatter'
-import OffenseFormatter from './OffenseFormatter'
+import ErrorFormatter from './formatters/ErrorFormatter'
+import OffenseFormatter from './formatters/OffenseFormatter'
 
 const CONFIG_FILE = '.rubocop.yml'
 
@@ -16,35 +16,33 @@ const UNEXPECTED_ERROR_MSG = 'Rubocop: Unexpected error'
 const UNDEF_VERSION_ERROR_MSG = 'Unable to get rubocop version from linting output results.'
 const NO_FIXES_INFO_MSG = 'Linter-Rubocop: No fixes were made'
 
-const configFileFound = Symbol('configFileFound')
-
-function currentDirectory(filePath) {
-  return atom.project.relativizePath(filePath)[0] || path.dirname(filePath)
-}
-
 class Rubocop {
-  constructor(config = {}) {
-    this.config = new Config(config)
+  constructor(config) {
+    this.config = config
     this.offenseFormatter = new OffenseFormatter()
     this.errorFormatter = new ErrorFormatter()
   }
 
-  async [configFileFound](filePath) {
+  setConfig(newConfig) {
+    this.config = newConfig
+  }
+
+  async configFileExists(filePath) {
     if (this.config.disableWhenNoConfigFile === true) {
       return await findAsync(filePath, CONFIG_FILE) !== null
     }
     return true
   }
 
-  async autocorrect(filePath, onSave = false) {
-    if (!filePath || !await this[configFileFound](filePath)) {
+  async autocorrect(cwd, filePath, onSave = false) {
+    if (!filePath || !await this.configFileExists(filePath)) {
       return
     }
 
     try {
       const output = await Runner.runSync(
-        currentDirectory(filePath),
-        this.config.baseCommand.concat(['--auto-correct', filePath]),
+        cwd,
+        CommandBuilder.build(this.config.command, ['--auto-correct', filePath]),
       )
       try {
         const {
@@ -76,15 +74,15 @@ class Rubocop {
     }
   }
 
-  async analyze(text, filePath) {
-    if (!filePath || !await this[configFileFound](filePath)) {
+  async analyze(text, cwd, filePath) {
+    if (!filePath || !await this.configFileExists(filePath)) {
       return null
     }
 
     try {
       const output = await Runner.run(
-        currentDirectory(filePath),
-        this.config.baseCommand.concat(['--stdin', filePath]),
+        cwd,
+        CommandBuilder.build(this.config.command, ['--stdin', filePath]),
         { stdin: text },
       )
       try {

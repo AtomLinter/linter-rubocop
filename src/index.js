@@ -2,8 +2,9 @@
 
 import { CompositeDisposable } from 'atom'
 import Rubocop from './rubocop/Rubocop'
-import hasValidScope from './helpers/scope-validator'
+import hasValidScope from './helpers/hasValidScope'
 import deserializeProjectFile from './helpers/deserializeProjectFile'
+import currentDirectory from './helpers/currentDirectory'
 
 const PROJECT_CONFIG_FILE = '.lrproject-config.json'
 
@@ -121,7 +122,9 @@ export default {
     if (text.length === 0) {
       return
     }
-    this.rubocop.autocorrect(editor.getPath(), onSave)
+
+    const filePath = editor.getPath()
+    this.rubocop.autocorrect(currentDirectory(filePath), filePath, onSave)
   },
 
   provideLinter() {
@@ -143,7 +146,7 @@ export default {
           }
         }
 
-        return this.rubocop.analyze(editor.getText(), filePath)
+        return this.rubocop.analyze(editor.getText(), currentDirectory(filePath), filePath)
       },
     }
   },

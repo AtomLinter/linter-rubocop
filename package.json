@@ -21,11 +21,6 @@
       "default": false,
       "description": "Only run linter if a RuboCop config file is found somewhere in the path for the current file."
     },
-    "useBundler": {
-      "type": "boolean",
-      "default": false,
-      "description": "Use `bundler` to execute Rubocop."
-    },
     "detectProjectSettings": {
       "type": "boolean",
       "title": "Detect linter-rubocop specific project file.",
