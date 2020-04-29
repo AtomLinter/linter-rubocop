@@ -6,7 +6,7 @@ import hasValidScope from './helpers/hasValidScope'
 import deserializeProjectFile from './helpers/deserializeProjectFile'
 import currentDirectory from './helpers/currentDirectory'
 
-const PROJECT_CONFIG_FILE = '.lrproject-config.json'
+const PROJECT_CONFIG_FILE = '.lrproject.json'
 
 export default {
   activate() {
