@@ -93,15 +93,28 @@ export default {
         if (Object.entries(newConfig).toString() === Object.entries(oldConfig).toString()) {
           return
         }
-        this.rubocop.setConfig(newConfig)
+        this.rubocop.setConfig({
+          command: newConfig.command,
+          disableWhenNoConfigFile: newConfig.disableWhenNoConfigFile,
+        })
       }),
     )
+
+    this.setProjectSettings = async (filePath) => {
+      if (this.detectProjectSettings === true) {
+        const config = await deserializeProjectFile(filePath, PROJECT_CONFIG_FILE)
+        if (config && config.command) {
+          this.rubocop.setConfig({
+            command: this.command,
+            disableWhenNoConfigFile: this.disableWhenNoConfigFile,
+          })
+        }
+      }
+    }
 
     this.rubocop = new Rubocop({
       command: this.command,
       disableWhenNoConfigFile: this.disableWhenNoConfigFile,
-      useBundler: this.useBundler,
-      detectProjectSettings: this.detectProjectSettings,
     })
   },
 
@@ -124,6 +137,7 @@ export default {
     }
 
     const filePath = editor.getPath()
+    this.setProjectSettings(filePath)
     this.rubocop.autocorrect(currentDirectory(filePath), filePath, onSave)
   },
 
@@ -139,12 +153,7 @@ export default {
           return null
         }
 
-        if (this.detectProjectSettings === true) {
-          const config = await deserializeProjectFile(filePath, PROJECT_CONFIG_FILE)
-          if (config && config.command) {
-            this.rubocop.setConfig(config)
-          }
-        }
+        this.setProjectSettings(filePath)
 
         return this.rubocop.analyze(editor.getText(), currentDirectory(filePath), filePath)
       },
