@@ -121,7 +121,7 @@ describe('The RuboCop provider for Linter', () => {
       const urlRegex = /(http:\/\/c2.com\/cgi\/wiki\?AbcMetric)/g
       // AbcSize cop returns the abc_vector ("<assignment, branch, condition>") in the message
       // since 0.76 so we use a regex to maintain the backward compatibility
-      const msgText = /(Metrics\/AbcSize: Assignment Branch Condition size for defaults is too high. \[(.*)18.25\/17\])/g
+      const msgText = /(Metrics\/AbcSize: Assignment Branch Condition size for defaults is too high. \[(.*)18.25\/(.\d)\])/g
 
       const messages = await lint(editor)
       const description = await messages[0].description()
