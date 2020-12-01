@@ -46,7 +46,7 @@
     "atom-linter": "10.0.0",
     "atom-package-deps": "7.0.2",
     "pluralize": "8.0.0",
-    "semver": "7.3.2"
+    "semver": "7.3.4"
   },
   "devDependencies": {
     "@commitlint/cli": "11.0.0",
