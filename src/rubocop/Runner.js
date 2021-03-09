@@ -1,6 +1,5 @@
 'use babel'
 
-import path from 'path'
 import childProcess from 'child_process'
 import { exec } from 'atom-linter'
 
@@ -10,10 +9,6 @@ const LINTER_TIMEOUT_DESC = 'Make sure you are not running Rubocop with a slow-s
                             + 'If you are still seeing timeouts, consider running your linter `on save` and not `on change`, '
                             + 'or reference https://github.com/AtomLinter/linter-rubocop/issues/202 .'
 
-function currentDirectory(filePath) {
-  return atom.project.relativizePath(filePath)[0] || path.dirname(filePath)
-}
-
 function errorHandler(e) {
   if (e.message !== TIMEOUT_ERROR_MSG) {
     throw e
@@ -22,14 +17,7 @@ function errorHandler(e) {
 }
 
 export default class Runner {
-  constructor(config) {
-    this.config = config
-  }
-
-  runSync(filePath, args, options = {}) {
-    const cwd = currentDirectory(filePath)
-
-    const command = this.config.baseCommand.concat(args)
+  static runSync(cwd, command, options = {}) {
     const output = childProcess.spawnSync(
       command[0],
       command.slice(1),
@@ -50,18 +38,17 @@ export default class Runner {
     return output
   }
 
-  async run(filePath, args, options = {}) {
-    const command = this.config.baseCommand.concat(args)
+  static async run(cwd, command, options = {}) {
     let output
     try {
       output = await exec(
         command[0],
         command.slice(1),
         {
-          cwd: currentDirectory(filePath),
+          cwd,
           stream: 'both',
           timeout: 10000,
-          uniqueKey: `linter-rubocop::${filePath}`,
+          uniqueKey: `linter-rubocop::${Date.now()}`,
           ignoreExitCode: true,
           ...options,
         },

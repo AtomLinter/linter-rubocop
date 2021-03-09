@@ -2,7 +2,11 @@
 
 import { CompositeDisposable } from 'atom'
 import Rubocop from './rubocop/Rubocop'
-import hasValidScope from './helpers/scope-validator'
+import hasValidScope from './helpers/hasValidScope'
+import deserializeProjectFile from './helpers/deserializeProjectFile'
+import currentDirectory from './helpers/currentDirectory'
+
+const PROJECT_CONFIG_FILE = '.lrproject.json'
 
 export default {
   activate() {
@@ -79,6 +83,9 @@ export default {
       atom.config.observe('linter-rubocop.useBundler', (value) => {
         this.useBundler = value
       }),
+      atom.config.observe('linter-rubocop.detectProjectSettings', (value) => {
+        this.detectProjectSettings = value
+      }),
 
       atom.config.onDidChange(({ newValue, oldValue }) => {
         const newConfig = newValue['linter-rubocop']
@@ -86,14 +93,28 @@ export default {
         if (Object.entries(newConfig).toString() === Object.entries(oldConfig).toString()) {
           return
         }
-        this.rubocop = new Rubocop(newConfig)
+        this.rubocop.setConfig({
+          command: newConfig.command,
+          disableWhenNoConfigFile: newConfig.disableWhenNoConfigFile,
+        })
       }),
     )
+
+    this.setProjectSettings = async (filePath) => {
+      if (this.detectProjectSettings === true) {
+        const config = await deserializeProjectFile(filePath, PROJECT_CONFIG_FILE)
+        if (config && config.command) {
+          this.rubocop.setConfig({
+            command: this.command,
+            disableWhenNoConfigFile: this.disableWhenNoConfigFile,
+          })
+        }
+      }
+    }
 
     this.rubocop = new Rubocop({
       command: this.command,
       disableWhenNoConfigFile: this.disableWhenNoConfigFile,
-      useBundler: this.useBundler,
     })
   },
 
@@ -114,7 +135,10 @@ export default {
     if (text.length === 0) {
       return
     }
-    this.rubocop.autocorrect(editor.getPath(), onSave)
+
+    const filePath = editor.getPath()
+    this.setProjectSettings(filePath)
+    this.rubocop.autocorrect(currentDirectory(filePath), filePath, onSave)
   },
 
   provideLinter() {
@@ -128,7 +152,10 @@ export default {
         if (!filePath) {
           return null
         }
-        return this.rubocop.analyze(editor.getText(), filePath)
+
+        this.setProjectSettings(filePath)
+
+        return this.rubocop.analyze(editor.getText(), currentDirectory(filePath), filePath)
       },
     }
   },
