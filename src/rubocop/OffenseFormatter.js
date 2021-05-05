@@ -34,7 +34,7 @@ export default class OffenseFormatter extends ErrorFormatter {
     message: rawMessage, location, severity, cop_name: copName,
   }, filePath) {
     const hasCopName = satisfies(version, HASCOPNAME_VERSION_RANGE)
-    const [excerpt, url] = rawMessage.split(/ \((.*)\)/, 2)
+    const [excerpt, url] = rawMessage.split(/(?=(?=\((http.*)(, ))|(\(http.*\)))/, 2)
     let position
     if (location) {
       const { line, column, length } = location
